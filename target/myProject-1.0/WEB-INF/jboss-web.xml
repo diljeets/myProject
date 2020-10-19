@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-web version="8.0" xmlns="http://www.jboss.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/schema/jbossas/jboss-web_8_0.xsd">
+    <context-root>/myProject</context-root>
+    <security-domain>myProjectJdbcRealmApplicationDomain</security-domain>
+    <!--    <security-domain>jdbcRealmApplicationDomain</security-domain>-->
+    <!--    <security-domain>myDbDomain</security-domain>-->
+    <!--  <security-domain>other</security-domain>-->
+    <!--  <security-domain>testApplicationDomain</security-domain>  -->
+<!--    <security-role>
+        <role-name>Administrator</role-name>
+    </security-role>-->
+</jboss-web>

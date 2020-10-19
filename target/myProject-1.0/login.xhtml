@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Login</title>   
+        <style type="text/css">
+            .animated .ui-progressbar-value { 
+                background-image: url("#{resource['demo/images/pbar-ani.gif']}"); 
+            }
+            body .ui-progressbar .ui-progressbar-value {
+                border: 0 none;
+                margin: 0;
+                background: #007ad9;
+            }
+            .container{
+                top:-300px;
+                bottom:0;
+                right:0;
+                left:0;
+                position:absolute;
+                width:500px;
+                margin:auto;
+                height:fit-content;
+                background-color: #efefef;
+                padding: 30px;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <div class="container">
+            <p:panel widgetVar="progressPanel"
+                     visible="false"
+                     style="border:none;"
+                     closable="true"
+                     toggleable="true" 
+                     rendered="#{!param['fail'] == 'true'}">
+                <p:progressBar mode="indeterminate"/>
+            </p:panel>
+            <h2>Hello, please log in:</h2>
+            <p>
+                <h:outputText value="Authentication failed" rendered="#{param['fail'] == 'true'}" style="color:#ff0000"/>
+            </p>    
+            <p>
+                <h:outputText value="Account is Active. Kindly login again." rendered="#{param['account'] == 'true'}" style="color:#ff0000"/>
+            </p>
+            <p>
+                <h:outputText value="Account/User either is inactive or does not exist." rendered="#{param['account'] == 'false'}" style="color:#ff0000"/>
+            </p>
+            <p>
+                <h:outputText value="Account/User is already Active." rendered="#{param['isactive'] == 'true'}" style="color:#ff0000"/>
+            </p>
+            <p>
+                <h:outputText value="Kindly use Password sent to your registered Email id to login." rendered="#{param['sentPassword'] == 'true'}" style="color:#ff0000"/>
+            </p>
+            <p>
+                <h:outputText value="Password changed Successfully." rendered="#{param['passwordChanged'] == 'true'}" style="color:#ff0000"/>
+            </p>
+            <p>
+                <h:outputText value="Password has already been changed." rendered="#{param['passwordAlreadyChanged'] == 'true'}" style="color:#ff0000"/>
+            </p>        
+            <!--        <form method="post" action="j_security_check">            
+                        <table role="presentation">
+                            <tr>
+                                <td>Please type your user name: </td>
+                                <td><input type="text" name="j_username"
+                                           size="20"/></td>
+                            </tr>
+                            <tr>
+                                <td>Please type your password: </td>
+                                <td><input type="password" name="j_password"
+                                           size="20"/></td>
+                            </tr>
+                        </table>
+                        <p></p>
+                        <input type="submit" value="Submit" />            
+                        &nbsp;
+                        <input type="reset" value="Reset"/>           
+                    </form>-->
+            <h:form id="login" onsubmit="document.getElementById('login').action = 'j_security_check';" prependId="false">
+                <h:panelGrid columns="2">
+                    <p:outputLabel for="j_username" value="Username" />
+                    <p:inputText id="j_username"/>            
+                    <p:outputLabel for="j_password" value="Password" />
+                    <p:password id="j_password"/>
+                    <p:commandButton type="submit" value="Submit" ajax="false" onclick="PF('progressPanel').show();"/>
+                </h:panelGrid>
+            </h:form>
+
+            <p>
+                <a href="forgot-password.xhtml">Forgot Password</a>?
+            </p>            
+            <p>
+                New User? <a href="signup.xhtml">Sign Up</a>?
+            </p>
+            <p>
+                <a href="change-password.xhtml">Change Password</a>
+            </p>
+
+        </div>
+
+    </h:body>
+</html>
+

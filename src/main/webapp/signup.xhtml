@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Sign Up</title>
+        <style type="text/css">            
+            body .ui-progressbar .ui-progressbar-value {
+                border: 0 none;
+                margin: 0;
+                background: #007ad9;
+            }
+            .ui-message-info, .ui-message-error, .ui-message-warn, .ui-message-fatal {
+                display: inline-block;
+            }
+            .ui-float-label{
+                margin-top: 25px;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        Hello, Kindly Register
+        <p>
+            <h:form id="signupForm">
+                <!--                <p:growl id="msgs" showDetail="true"/>--> 
+                <p:panel widgetVar="progressPanel"
+                         visible="false"
+                         style="border:none;"
+                         closable="true"
+                         toggleable="true">
+                    <p:progressBar mode="indeterminate"/>
+                </p:panel>
+                <p>
+                    <p:message id="msgs" for="createBtn" showDetail="true"/>                    
+                </p>
+
+                <p:panelGrid>
+
+                    <span class="ui-float-label">                        
+                        <p:inputText id="name" value="#{registeredUsersController.user.name}" maxlength="25"/>
+                        <p:outputLabel for="@previous" value="Name"/>
+                        <p:message for="name"/>
+                    </span>
+
+                    <span class="ui-float-label"> 
+                        <p:inputText id="mobile" value="#{registeredUsersController.user.mobile}"/>
+                        <p:outputLabel for="mobile" value="Mobile"/>
+                        <p:message for="mobile"/>
+                    </span>
+
+                    <span class="ui-float-label">                             
+                        <p:inputText id="email" value="#{registeredUsersController.user.email}"/>
+                        <p:outputLabel for="email" value="Email Id"/>
+                        <p:message for="email"/>
+                    </span>
+
+                    <span class="ui-float-label">                             
+                        <p:password id="password" value="#{registeredUsersController.user.password}"/>  
+                        <p:outputLabel for="password" value="Password"/>
+                        <p:message for="password"/>
+                    </span>
+
+                    <span class="ui-float-label">                             
+                        <p:password id="confirmPassword" value="#{registeredUsersController.user.confirmPassword}"/>
+                        <p:outputLabel for="confirmPassword" value="Confirm Password"/>
+                        <p:message for="confirmPassword"/> 
+                    </span>
+
+                </p:panelGrid>    
+
+
+
+
+                <!--                <h:panelGrid columns="3">
+                
+                                    <p:outputLabel for="email" value="Email Id"/>
+                                    <p:inputText id="email" value="#{registeredUsersController.user.email}"/>
+                                    <p:message for="email"/>
+                
+                                    <p:outputLabel for="password" value="Password"/>
+                                    <p:password id="password" value="#{registeredUsersController.user.password}"/>  
+                                    <p:message for="password"/>
+                
+                                    <p:outputLabel for="confirmPassword" value="Confirm Password"/>
+                                    <p:password id="confirmPassword" value="#{registeredUsersController.user.confirmPassword}"/>
+                                    <p:message for="confirmPassword"/>                  
+                
+                                </h:panelGrid>-->
+                <p:commandButton value="Create" id="createBtn" action="#{registeredUsersController.createUser(registeredUsersController.user)}" binding="#{registeredUsersController.createBtn}" update="signupForm msgs" onclick="PF('progressPanel').show();PF('actionBtn').disable();" oncomplete="PF('progressPanel').close();PF('actionBtn').enable();" widgetVar="actionBtn" style="margin-top: 25px"/>
+            </h:form>
+        </p>
+    </h:body>
+</html>
+
