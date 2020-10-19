@@ -1,0 +1,24 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Oct 19, 2020, 11:42:46 AM
+    Author     : diljeet
+*/
+
+body .ui-progressbar .ui-progressbar-value {
+    border: 0 none;
+    margin: 0;
+    background: #007ad9;
+}
+.ui-message-info, .ui-message-error, .ui-message-warn, .ui-message-fatal {
+    display: inline-block;
+}
+.ui-float-label{
+    margin-top: 25px;
+}
+.cmdBtn{
+    margin-top: 25px !important;
+}

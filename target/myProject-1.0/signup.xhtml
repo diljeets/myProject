@@ -5,19 +5,7 @@
       xmlns:p="http://primefaces.org/ui">
     <h:head>
         <title>Sign Up</title>
-        <style type="text/css">            
-            body .ui-progressbar .ui-progressbar-value {
-                border: 0 none;
-                margin: 0;
-                background: #007ad9;
-            }
-            .ui-message-info, .ui-message-error, .ui-message-warn, .ui-message-fatal {
-                display: inline-block;
-            }
-            .ui-float-label{
-                margin-top: 25px;
-            }
-        </style>
+        <h:outputStylesheet library="css" name="common.css"/>        
     </h:head>
     <h:body>
         Hello, Kindly Register
@@ -87,7 +75,7 @@
                                     <p:message for="confirmPassword"/>                  
                 
                                 </h:panelGrid>-->
-                <p:commandButton value="Create" id="createBtn" action="#{registeredUsersController.createUser(registeredUsersController.user)}" binding="#{registeredUsersController.createBtn}" update="signupForm msgs" onclick="PF('progressPanel').show();PF('actionBtn').disable();" oncomplete="PF('progressPanel').close();PF('actionBtn').enable();" widgetVar="actionBtn" style="margin-top: 25px"/>
+                <p:commandButton value="Create" id="createBtn" class="cmdBtn" action="#{registeredUsersController.createUser(registeredUsersController.user)}" binding="#{registeredUsersController.createBtn}" update="signupForm msgs" onclick="PF('progressPanel').show();PF('actionBtn').disable();" oncomplete="PF('progressPanel').close();PF('actionBtn').enable();" widgetVar="actionBtn"/>
             </h:form>
         </p>
     </h:body>
