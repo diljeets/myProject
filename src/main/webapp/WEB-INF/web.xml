@@ -50,7 +50,9 @@
         <display-name>Constraint1</display-name>
         <web-resource-collection>
             <web-resource-name>Admin</web-resource-name>
-            <url-pattern>/index.xhtml</url-pattern>            
+            <url-pattern>/index.xhtml</url-pattern>      
+            <url-pattern>/meal-plan-category.xhtml</url-pattern>       
+            <url-pattern>/cart.xhtml</url-pattern>     
         </web-resource-collection>
         <auth-constraint>
             <role-name>Administrator</role-name>
@@ -61,11 +63,11 @@
         </user-data-constraint>
     </security-constraint>
     
-<!--    <security-constraint>
+    <security-constraint>
         <display-name>Constraint2</display-name>
         <web-resource-collection>
             <web-resource-name>webapi</web-resource-name>            
-            <url-pattern>/webapi/*</url-pattern>            
+            <url-pattern>/webapi/MealPlanCategory/*</url-pattern>            
         </web-resource-collection>
         <auth-constraint>
             <role-name>Administrator</role-name>            
@@ -75,7 +77,7 @@
         <user-data-constraint>                                    
             <transport-guarantee>NONE</transport-guarantee>
         </user-data-constraint>
-    </security-constraint>        -->
+    </security-constraint>        
    
     <login-config>
         <auth-method>FORM</auth-method>

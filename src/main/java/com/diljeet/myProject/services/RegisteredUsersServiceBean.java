@@ -15,10 +15,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Base64.Decoder;
 import java.util.Base64.Encoder;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.mail.Session;
 import javax.persistence.EntityManager;
@@ -49,13 +51,13 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
     public Session mailSession;
 
     @Override
-    public Response createUser(RegisteredUsers user) throws NoSuchAlgorithmException {        
-        if (user == null) {            
+    public Response createUser(RegisteredUsers user) throws NoSuchAlgorithmException {
+        if (user == null) {
             return null;
         } else {
             try {
-                Query query = em.createQuery("Select u FROM RegisteredUsers u where u.email = :email");
-                query.setParameter("email", user.getEmail());
+                Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
+                query.setParameter("username", user.getUsername());
                 List<RegisteredUsers> userExists = query.getResultList();
 
                 if (!userExists.isEmpty()) {
@@ -87,8 +89,12 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                             user.setIsActive("no");
                         }
 
+                        if (user.getDateCustomerCreated() == null) {
+                            user.setDateCustomerCreated(new Date());
+                        }
+
                         em.persist(user);
-                        MyProjectUtils.sendActivationLinkOnMail(mailSession, user.getEmail());
+                        MyProjectUtils.sendActivationLinkOnMail(mailSession, user.getUsername());
 
                     } else {
                         return Response.status(Response.Status.PRECONDITION_FAILED).build();
@@ -97,7 +103,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                 }
 
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Exception is {0}",e.getMessage());
+                logger.log(Level.SEVERE, "Exception is {0}", e.getMessage());
 //                LOG.error(e.getMessage());
                 return null;
             }
@@ -120,40 +126,41 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
         return users;
     }
 
-    @Override
-    public Response getUser(String email) {        
+    @Override    
+//    @RolesAllowed("Administrator")
+    public Response getUser(String username) {        
         try {
-            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.email = :email");
-            query.setParameter("email", email);
+            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
+            query.setParameter("username", username);
             Object accountExists = query.getSingleResult();
             RegisteredUsers existingUser = (RegisteredUsers) accountExists;
-            if (existingUser instanceof RegisteredUsers) {
+            if (existingUser instanceof RegisteredUsers) {                
                 return Response.status(Response.Status.FOUND).entity(existingUser).build();
-            } else {
+            } else {                
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-        } catch(Exception e){
+        } catch(Exception e){            
             return null;
-        }        
+        }          
     }
 
-    
     @Override
     public void activateAccount(String encodedEmail,
             HttpServletRequest req,
-            HttpServletResponse res) {
+             HttpServletResponse res
+    ) {
         try {
             Decoder decoder = Base64.getDecoder();
             byte[] decodedEmail = decoder.decode(encodedEmail);
-            String email = new String(decodedEmail);
+            String username = new String(decodedEmail);
 
-            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.email = :email");
-            query.setParameter("email", email);
+            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
+            query.setParameter("username", username);
             Object accountExists = query.getSingleResult();
             RegisteredUsers existingUser = (RegisteredUsers) accountExists;
 
             if (existingUser instanceof RegisteredUsers) {
-                if ((existingUser.getIsActive()).equals("no")) {    
+                if ((existingUser.getIsActive()).equals("no")) {
                     existingUser.setIsActive("yes");
                     res.sendRedirect(req.getContextPath() + "/login.xhtml?account=true");
                 } else {
@@ -172,10 +179,10 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
     }
 
     @Override
-    public Response forgotPassword(String email) {
+    public Response forgotPassword(String username) {
         try {
-            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.email = :email");
-            query.setParameter("email", email);
+            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
+            query.setParameter("username", username);
             Object accountExists = query.getSingleResult();
             RegisteredUsers existingUser = (RegisteredUsers) accountExists;
             if (existingUser instanceof RegisteredUsers) {
@@ -195,7 +202,9 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                     String encodedPassword = encoder.encodeToString(digest);
                     existingUser.setPassword(encodedPassword);
 
-                    MyProjectUtils.sendForgotPasswordOnMail(mailSession, email, password);
+                    existingUser.setDateCustomerLastUpdated(new Date());
+
+                    MyProjectUtils.sendForgotPasswordOnMail(mailSession, username, password);
 
                     return Response.status(Response.Status.OK).build();
 
@@ -220,10 +229,11 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
     }
 
     @Override
-    public Response getUserByUsername(String email, RegisteredUsers user) {
+    public Response getUserByUsername(String username, RegisteredUsers user
+    ) {
         try {
-            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.email = :email");
-            query.setParameter("email", email);
+            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
+            query.setParameter("username", username);
             Object accountExists = query.getSingleResult();
             RegisteredUsers existingUser = (RegisteredUsers) accountExists;
 
@@ -243,7 +253,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                     byte[] digest = md.digest();
 
                     if ((existingUser.getIsPasswordChangeRequest()).equals("yes")) {
-                        MyProjectUtils.sendChangePasswordConsentLinkOnMail(mailSession, email, digest);
+                        MyProjectUtils.sendChangePasswordConsentLinkOnMail(mailSession, username, digest);
                     }
 
                     return Response.status(Response.Status.ACCEPTED).build();
@@ -267,15 +277,16 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
     @Override
     public void changePassword(String encodedEmail,
             String encodedPassword,
-            HttpServletRequest req,
-            HttpServletResponse res) {
+             HttpServletRequest req,
+            HttpServletResponse res
+    ) {
         try {
             Decoder decoder = Base64.getDecoder();
             byte[] decodedEmail = decoder.decode(encodedEmail);
-            String email = new String(decodedEmail);
+            String username = new String(decodedEmail);
 
-            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.email = :email");
-            query.setParameter("email", email);
+            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
+            query.setParameter("username", username);
             Object accountExists = query.getSingleResult();
             RegisteredUsers existingUser = (RegisteredUsers) accountExists;
             if ((existingUser instanceof RegisteredUsers)
@@ -286,6 +297,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                 }
                 existingUser.setPassword(encodedPassword);
                 existingUser.setIsPasswordChangeRequest("no");
+                existingUser.setDateCustomerLastUpdated(new Date());
                 res.sendRedirect(req.getContextPath() + "/login.xhtml?passwordChanged=true");
             } else if ((existingUser.getIsPasswordChangeRequest()).equals("no")) {
                 res.sendRedirect(req.getContextPath() + "/login.xhtml?passwordAlreadyChanged=true");

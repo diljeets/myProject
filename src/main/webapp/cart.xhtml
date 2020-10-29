@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"      	
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Facelet Title</title>        
+    </h:head>
+    <h:body>
+        <ui:composition template="./template.xhtml">
+            <ui:define name="top">
+                <p>Hello #{indexController.currentCustomer}</p>
+                <p><p:commandLink id="itemCount" action="/cart.xhtml">Cart #{cartController.itemsInCart}</p:commandLink></p>  
+                <h:form>
+                    <p>
+                        <p:commandLink value="Log Out" action="#{indexController.logout()}"/>
+                    </p> 
+                </h:form>
+            </ui:define>
+            <ui:define name="content">                
+                <h:outputText value="You are in the Cart Content Section"/>
+                <h:form id="myDatatable">
+                    <p>             
+                        <p:dataTable id="datatable"                              
+                                     value="#{cartController.mealPlans}"        
+                                     var="mealPlan"
+                                     rendered="#{cartController.mealPlans.size() > -1}"
+                                     summary="List of Ordered Plans" 
+                                     draggableColumns="true" 
+                                     draggableRows="true">
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Name"/>
+                                </f:facet> 
+                                <h:outputText value="#{mealPlan.mealPlanName}"/>
+                            </p:column>   
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Rate"/>
+                                </f:facet> 
+                                <h:outputText value="#{mealPlan.mealPlanRate}"/>
+                            </p:column> 
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="ACTION"/>
+                                </f:facet>
+                                <p:commandButton value="Remove from Cart" action="#{cartController.removeFromCart(mealPlan)}" update="itemCount myDatatable"/>
+                            </p:column> 
+                        </p:dataTable>
+                    </p>
+                </h:form>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

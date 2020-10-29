@@ -14,14 +14,17 @@ import com.diljeet.myProject.customexceptions.UserAccountDoesNotExistException;
 import com.diljeet.myProject.controllers.RegisteredUsersController;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -39,35 +42,6 @@ public class RegisteredUsersBean {
 
     private static final Logger logger = Logger.getLogger(RegisteredUsersBean.class.getCanonicalName());
 
-//    @PersistenceContext(name = "my-persistence-unit")
-//    private EntityManager em;
-//    
-//    public void createUser(TestUsers user) {
-//        if(user == null){
-//            return;
-//        }
-////        logger.log(Level.SEVERE, user.getUsername());
-////        logger.log(Level.SEVERE, user.getPassword());
-////        logger.log(Level.SEVERE, user.getRole());
-//        try {
-//            if(user.getRole() == null)
-//                user.setRole("user");
-//            em.persist(user);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//    
-//    public List<TestUsers> getUser() {
-//        logger.log(Level.SEVERE, "Coming from service");
-//        List<TestUsers> users = null;
-//        try {
-//            users = em.createNamedQuery("getAllUsers").getResultList();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return users;
-//    }
     private Client client;
 
     private FacesMessage msg;
@@ -75,11 +49,8 @@ public class RegisteredUsersBean {
     @Inject
     RegisteredUsersController registeredUsersController;
 
-//    @Inject
-//    HttpServletRequest req;
-//
-//    @
-//    HttpServletResponse res;    
+    @Inject
+    HttpServletRequest req;
     
     @PostConstruct
     public void init() {
@@ -95,16 +66,7 @@ public class RegisteredUsersBean {
         if (user == null) {
             return;
         }
-//        boolean isValid = false;
         try {
-//            try {
-//                InternetAddress email = new InternetAddress(user.getUsername());
-//                email.validate();
-//                isValid = true;
-//            } catch (AddressException e) {
-//                throw new AddressException("Not valid");
-//            }
-//            if (isValid) {
                 Response response = client.target("http://localhost:8080/myProject/webapi/RegisteredUsers")
                         .request(MediaType.APPLICATION_JSON)
                         .post(Entity.entity(user, MediaType.APPLICATION_JSON), Response.class);
@@ -118,25 +80,20 @@ public class RegisteredUsersBean {
                 } else {
                     throw new ErrorCreatingUserException("Error creating User");
                 }
-//            } //else {
-//                throw new AddressException("Not a valid Email Address");
-//            }
         } catch (NewUserCreatedException e) {
             msg = new FacesMessage(FacesMessage.SEVERITY_INFO, e.getMessage(), null);
             FacesContext.getCurrentInstance().addMessage(registeredUsersController.getCreateBtn().getClientId(), msg);
         } catch (ErrorCreatingUserException | PasswordsDontMatchException | SQLIntegrityConstraintViolationException e) {
-//            e.printStackTrace();
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
             FacesContext.getCurrentInstance().addMessage(registeredUsersController.getCreateBtn().getClientId(), msg);
         } catch (Exception e) {
-//            e.printStackTrace();
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
             FacesContext.getCurrentInstance().addMessage(registeredUsersController.getCreateBtn().getClientId(), msg);
         }
 
     }
 
-    public List<RegisteredUsers> getUser() {
+    public List<RegisteredUsers> getAllUsers() {
         List<RegisteredUsers> users = null;
         users = client.target("http://localhost:8080/myProject/webapi/RegisteredUsers")
                 .path("all")
@@ -147,15 +104,38 @@ public class RegisteredUsersBean {
         return users;
     }
 
-    public void forgotPassword(String email) {     
+    public String getUser(String username) {
+        String customerName = null;
+        RegisteredUsers currentCustomer = null;
+        try {
+            Response response = client.target("http://localhost:8080/myProject/webapi/RegisteredUsers")
+                    .path(username)
+                    .request(MediaType.APPLICATION_JSON)
+//                    .header("Cookie", req.getHeader("Cookie"))
+                    .get();
+            if (response.getStatus() == Response.Status.FOUND.getStatusCode()) {
+                currentCustomer = response.readEntity(RegisteredUsers.class);
+                customerName = currentCustomer.getName();                
+            } else {
+                throw new UserAccountDoesNotExistException("User does not exist.");
+            }
+        } catch (UserAccountDoesNotExistException e) {
+            logger.log(Level.SEVERE, e.getMessage());
+        } catch (Exception e) {            
+            logger.log(Level.SEVERE, e.getMessage());
+        }
+        
+        return customerName;
+    }
+    
+    public void forgotPassword(String username) {     
         try {
             Response response = client.target("http://localhost:8080/myProject/webapi/RegisteredUsers/retrieve-password/")
-                    .path(email)
+                    .path(username)
                     .request(MediaType.APPLICATION_JSON)
                     .get();
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 FacesContext.getCurrentInstance().getExternalContext().redirect("/myProject/login.xhtml?sentPassword=true");
-//                res.sendRedirect(req.getContextPath() + "/login.xhtml?sentPassword=true");
             } else if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()
                     || response.getStatus() == Response.Status.NOT_MODIFIED.getStatusCode()) {                
                 throw new UserAccountDoesNotExistException("Account/User either is inactive or does not exist.");
@@ -173,7 +153,7 @@ public class RegisteredUsersBean {
     public void changePassword(RegisteredUsers user) {   
         try {
             Response response = client.target("http://localhost:8080/myProject/webapi/RegisteredUsers/")
-                    .path(user.getEmail())                 
+                    .path(user.getUsername())                 
                     .request(MediaType.APPLICATION_JSON)
                     .post(Entity.entity(user, MediaType.APPLICATION_JSON),Response.class);
             if (response.getStatus() == Response.Status.PRECONDITION_FAILED.getStatusCode()) {
@@ -187,7 +167,6 @@ public class RegisteredUsersBean {
             msg = new FacesMessage(FacesMessage.SEVERITY_INFO, e.getMessage(), null);
             FacesContext.getCurrentInstance().addMessage(registeredUsersController.getChangePasswordBtn().getClientId(), msg);
         } catch (UserAccountDoesNotExistException | PasswordsDontMatchException e) {
-//            testUsersController.setIsProgressBar(false);
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
             FacesContext.getCurrentInstance().addMessage(registeredUsersController.getChangePasswordBtn().getClientId(), msg);
         } catch (Exception e) {

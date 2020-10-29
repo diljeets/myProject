@@ -8,6 +8,7 @@ package com.diljeet.myProject.interfaces;
 import com.diljeet.myProject.entities.RegisteredUsers;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -37,33 +38,33 @@ public interface RegisteredUsersService {
     public List<RegisteredUsers> getAllUsers();
     
     @GET
-    @Path("{email}")
-    @Produces({MediaType.APPLICATION_JSON})
-    public Response getUser(@PathParam("email") String email);
+    @Path("{username}")
+    @Produces({MediaType.APPLICATION_JSON})    
+    public Response getUser(@PathParam("username") String email);
     
     @POST
-    @Path("{email}")
+    @Path("{username}")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response getUserByUsername(@PathParam("email") String email , RegisteredUsers user);
+    public Response getUserByUsername(@PathParam("username") String email , RegisteredUsers user);
 
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    @Path("/retrieve-password/{email}")
-    public Response forgotPassword(@PathParam("email") String email);
+    @Path("/retrieve-password/{username}")
+    public Response forgotPassword(@PathParam("username") String email);
     
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    @Path("/change-password/{email}/{password}")
-    public void changePassword(@PathParam("email") String encodedEmail, 
+    @Path("/change-password/{username}/{password}")
+    public void changePassword(@PathParam("username") String encodedEmail, 
             @PathParam("password") String encodedPassword,
             @Context HttpServletRequest req,
             @Context HttpServletResponse res);
 
     @GET
     @Produces({MediaType.APPLICATION_JSON})
-    @Path("/activate-account/{email}")
-    public void activateAccount(@PathParam("email") String encodedEmail,
+    @Path("/activate-account/{username}")
+    public void activateAccount(@PathParam("username") String encodedEmail,
             @Context HttpServletRequest req,
             @Context HttpServletResponse res);
 

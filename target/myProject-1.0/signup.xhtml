@@ -38,7 +38,7 @@
                     </span>
 
                     <span class="ui-float-label">                             
-                        <p:inputText id="email" value="#{registeredUsersController.user.email}"/>
+                        <p:inputText id="email" value="#{registeredUsersController.user.username}"/>
                         <p:outputLabel for="email" value="Email Id"/>
                         <p:message for="email"/>
                     </span>
@@ -55,26 +55,8 @@
                         <p:message for="confirmPassword"/> 
                     </span>
 
-                </p:panelGrid>    
-
-
-
-
-                <!--                <h:panelGrid columns="3">
+                </p:panelGrid> 
                 
-                                    <p:outputLabel for="email" value="Email Id"/>
-                                    <p:inputText id="email" value="#{registeredUsersController.user.email}"/>
-                                    <p:message for="email"/>
-                
-                                    <p:outputLabel for="password" value="Password"/>
-                                    <p:password id="password" value="#{registeredUsersController.user.password}"/>  
-                                    <p:message for="password"/>
-                
-                                    <p:outputLabel for="confirmPassword" value="Confirm Password"/>
-                                    <p:password id="confirmPassword" value="#{registeredUsersController.user.confirmPassword}"/>
-                                    <p:message for="confirmPassword"/>                  
-                
-                                </h:panelGrid>-->
                 <p:commandButton value="Create" id="createBtn" class="cmdBtn" action="#{registeredUsersController.createUser(registeredUsersController.user)}" binding="#{registeredUsersController.createBtn}" update="signupForm msgs" onclick="PF('progressPanel').show();PF('actionBtn').disable();" oncomplete="PF('progressPanel').close();PF('actionBtn').enable();" widgetVar="actionBtn"/>
             </h:form>
         </p>

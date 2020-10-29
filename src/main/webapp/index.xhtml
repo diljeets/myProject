@@ -18,6 +18,7 @@
         <ui:composition template="./template.xhtml">
             <ui:define name="top">                
                 <p>Hello #{indexController.currentCustomer}</p>
+                <p><p:commandLink id="itemCount" action="/cart.xhtml">Cart #{cartController.itemsInCart}</p:commandLink></p>     
                 <h:form>
                     <p>
                         <p:commandLink value="Log Out" action="#{indexController.logout()}"/>
@@ -26,6 +27,36 @@
             </ui:define>
             <ui:define name="content">                
                 <h:outputText value="You are in the Index Content Section"/>
+                <h:form id="myDatatable">
+                    <p>             
+                        <p:dataTable id="datatable"                              
+                                     value="#{indexController.mealPlans}"        
+                                     var="mealPlan"
+                                     rendered="#{indexController.mealPlans.size() > 0}"
+                                     summary="List of Meal Plans" 
+                                     draggableColumns="true" 
+                                     draggableRows="true">                            
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="MEAL PLAN NAME"/>
+                                </f:facet>
+                                <h:outputText value="#{mealPlan.mealPlanName}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="MEAL PLAN RATE"/>
+                                </f:facet>
+                                <h:outputText value="#{mealPlan.mealPlanRate}"/>
+                            </p:column>    
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="ACTION"/>
+                                </f:facet>
+                                <p:commandButton value="Add to Cart" action="#{cartController.addToCart(mealPlan)}" update="itemCount"/>
+                            </p:column> 
+                        </p:dataTable>
+                    </p>
+                </h:form>
             </ui:define>
         </ui:composition>
     </h:body>

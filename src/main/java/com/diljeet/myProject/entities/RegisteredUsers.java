@@ -6,6 +6,7 @@
 package com.diljeet.myProject.entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.logging.Logger;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -56,7 +57,7 @@ public class RegisteredUsers implements Serializable {
     @NotBlank
     @NotEmpty
     @Email(message = "Not a valid Email Id.")
-    private String email;
+    private String username;
     
     @NotNull
     @Size(min = 8 , max = 15 , message = "Password can be 8-15 characters in length")
@@ -73,6 +74,10 @@ public class RegisteredUsers implements Serializable {
     private String isActive;
     
     private String isPasswordChangeRequest;
+    
+    private Date dateCustomerCreated;
+    
+    private Date dateCustomerLastUpdated;
 
     public RegisteredUsers() {        
 
@@ -102,13 +107,13 @@ public class RegisteredUsers implements Serializable {
         this.mobile = mobile;
     }   
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }    
+    public void setUsername(String username) {
+        this.username = username;
+    }  
 
     public String getPassword() {
         return password;
@@ -157,7 +162,24 @@ public class RegisteredUsers implements Serializable {
     public void setIsPasswordChangeRequest(String isPasswordChangeRequest) {
         this.isPasswordChangeRequest = isPasswordChangeRequest;
     }    
-        
+
+    public Date getDateCustomerCreated() {
+        return dateCustomerCreated;
+    }
+
+    public void setDateCustomerCreated(Date dateCustomerCreated) {
+        this.dateCustomerCreated = dateCustomerCreated;
+    }
+
+    public Date getDateCustomerLastUpdated() {
+        return dateCustomerLastUpdated;
+    }
+
+    public void setDateCustomerLastUpdated(Date dateCustomerLastUpdated) {
+        this.dateCustomerLastUpdated = dateCustomerLastUpdated;
+    }
+      
+    
     @Override
     public int hashCode() {
         int hash = 0;

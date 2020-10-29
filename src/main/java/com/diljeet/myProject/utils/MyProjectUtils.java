@@ -33,15 +33,15 @@ public class MyProjectUtils {
     public MyProjectUtils() {
     }
 
-    public static void sendActivationLinkOnMail(Session mailSession, String email) {
+    public static void sendActivationLinkOnMail(Session mailSession, String username) {
         try {
 
             Encoder encoder = Base64.getEncoder();
-            String encodedEmail = encoder.encodeToString(email.getBytes());
+            String encodedEmail = encoder.encodeToString(username.getBytes());
 
             MimeMessage m = new MimeMessage(mailSession);
             Address from = new InternetAddress("rayatdiljeet1983@gmail.com");
-            Address[] to = new InternetAddress[]{new InternetAddress(email)};
+            Address[] to = new InternetAddress[]{new InternetAddress(username)};
 
             m.setFrom(from);
             m.setRecipients(Message.RecipientType.TO, to);
@@ -60,11 +60,11 @@ public class MyProjectUtils {
         }
     }
 
-    public static void sendForgotPasswordOnMail(Session mailSession, String email, String password) {
+    public static void sendForgotPasswordOnMail(Session mailSession, String username, String password) {
         try {
             MimeMessage m = new MimeMessage(mailSession);
             Address from = new InternetAddress("rayatdiljeet1983@gmail.com");
-            Address[] to = new InternetAddress[]{new InternetAddress(email)};
+            Address[] to = new InternetAddress[]{new InternetAddress(username)};
 
             m.setFrom(from);
             m.setRecipients(Message.RecipientType.TO, to);
@@ -82,11 +82,11 @@ public class MyProjectUtils {
         }
     }
 
-    public static void sendChangePasswordConsentLinkOnMail(Session mailSession, String email, byte[] password) {
+    public static void sendChangePasswordConsentLinkOnMail(Session mailSession, String username, byte[] password) {
         try {
 
             Encoder encoder = Base64.getEncoder();
-            String encodedEmail = encoder.encodeToString(email.getBytes());
+            String encodedEmail = encoder.encodeToString(username.getBytes());
             String encodedPassword = encoder.encodeToString(password);
 
             if (encodedPassword.contains("/")) {
@@ -95,7 +95,7 @@ public class MyProjectUtils {
 
             MimeMessage m = new MimeMessage(mailSession);
             Address from = new InternetAddress("rayatdiljeet1983@gmail.com");
-            Address[] to = new InternetAddress[]{new InternetAddress(email)};
+            Address[] to = new InternetAddress[]{new InternetAddress(username)};
 
             m.setFrom(from);
             m.setRecipients(Message.RecipientType.TO, to);

@@ -84,7 +84,7 @@ public class RegisteredUsersController implements Serializable {
     public void clearFields() {
         user.setName(null);
         user.setMobile(null);
-        user.setEmail(null);
+        user.setUsername(null);
         user.setPassword(null);
         user.setConfirmPassword(null);
         user.setRole(null);
@@ -96,8 +96,8 @@ public class RegisteredUsersController implements Serializable {
         clearFields();
     }
 
-    public void forgotPassword(String email) {
-        registeredUsersBean.forgotPassword(email);
+    public void forgotPassword(String username) {
+        registeredUsersBean.forgotPassword(username);
         clearFields();
     }
 
