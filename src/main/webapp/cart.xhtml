@@ -24,9 +24,9 @@
                 <h:form id="myDatatable">
                     <p>             
                         <p:dataTable id="datatable"                              
-                                     value="#{cartController.mealPlans}"        
-                                     var="mealPlan"
-                                     rendered="#{cartController.mealPlans.size() > -1}"
+                                     value="#{cartController.cartItems}"        
+                                     var="cartItem"
+                                     rendered="#{cartController.cartItems.size() > -1}"
                                      summary="List of Ordered Plans" 
                                      draggableColumns="true" 
                                      draggableRows="true">
@@ -34,19 +34,25 @@
                                 <f:facet name="header">
                                     <h:outputText value="Name"/>
                                 </f:facet> 
-                                <h:outputText value="#{mealPlan.mealPlanName}"/>
+                                <h:outputText value="#{cartItem.mealPlanName}"/>
                             </p:column>   
                             <p:column>
                                 <f:facet name="header">
                                     <h:outputText value="Rate"/>
                                 </f:facet> 
-                                <h:outputText value="#{mealPlan.mealPlanRate}"/>
+                                <h:outputText value="#{cartItem.mealPlanRate}"/>
+                            </p:column> 
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Quantity"/>
+                                </f:facet>
+                                <p:spinner value="#{cartItem.mealPlanQuantity}"/>
                             </p:column> 
                             <p:column>
                                 <f:facet name="header">
                                     <h:outputText value="ACTION"/>
                                 </f:facet>
-                                <p:commandButton value="Remove from Cart" action="#{cartController.removeFromCart(mealPlan)}" update="itemCount myDatatable"/>
+                                <p:commandButton value="Remove from Cart" action="#{cartController.removeFromCart(cartItem)}" update="itemCount myDatatable"/>
                             </p:column> 
                         </p:dataTable>
                     </p>

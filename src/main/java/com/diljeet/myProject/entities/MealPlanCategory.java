@@ -7,22 +7,16 @@ package com.diljeet.myProject.entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-//import org.jboss.security.auth.spi.Util;
 
 /**
  *
@@ -44,11 +38,14 @@ public class MealPlanCategory implements Serializable {
     @NotBlank
     @NotEmpty
     private String mealPlanName;
-    
-    private BigDecimal mealPlanRate;
 
-    public MealPlanCategory() {
+    private Double mealPlanRate;
 
+    @PostConstruct
+    public void init() {
+    }
+
+    public MealPlanCategory() {   
     }
 
     public Long getId() {
@@ -67,14 +64,14 @@ public class MealPlanCategory implements Serializable {
         this.mealPlanName = mealPlanName;
     }
 
-    public BigDecimal getMealPlanRate() {
+    public Double getMealPlanRate() {
         return mealPlanRate;
     }
 
-    public void setMealPlanRate(BigDecimal mealPlanRate) {
+    public void setMealPlanRate(Double mealPlanRate) {
         this.mealPlanRate = mealPlanRate;
-    }    
-
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

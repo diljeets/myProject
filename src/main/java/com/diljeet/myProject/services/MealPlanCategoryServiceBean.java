@@ -5,32 +5,15 @@
  */
 package com.diljeet.myProject.services;
 
-import com.diljeet.myProject.customexceptions.UserAccountDoesNotExistException;
 import com.diljeet.myProject.entities.MealPlanCategory;
-import com.diljeet.myProject.interfaces.RegisteredUsersService;
-import com.diljeet.myProject.entities.RegisteredUsers;
 import com.diljeet.myProject.interfaces.MealPlanCategoryService;
-import com.diljeet.myProject.utils.MyProjectUtils;
-import static com.diljeet.myProject.utils.MyProjectUtils.manipulateEncodedPassword;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Base64.Decoder;
-import java.util.Base64.Encoder;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
-import javax.mail.Session;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;

@@ -5,24 +5,14 @@
  */
 package com.diljeet.myProject.ejb;
 
-import com.diljeet.myProject.customexceptions.ChangePasswordRequestAcceptedException;
-import com.diljeet.myProject.customexceptions.ErrorCreatingUserException;
-import com.diljeet.myProject.entities.RegisteredUsers;
-import com.diljeet.myProject.customexceptions.NewUserCreatedException;
-import com.diljeet.myProject.customexceptions.PasswordsDontMatchException;
-import com.diljeet.myProject.customexceptions.UserAccountDoesNotExistException;
-import com.diljeet.myProject.controllers.RegisteredUsersController;
 import com.diljeet.myProject.entities.MealPlanCategory;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;

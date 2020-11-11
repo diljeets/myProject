@@ -5,28 +5,15 @@
  */
 package com.diljeet.myProject.controllers;
 
-import com.diljeet.myProject.ejb.IndexBean;
 import com.diljeet.myProject.ejb.MealPlanCategoryBean;
-import com.diljeet.myProject.ejb.RegisteredUsersBean;
 import com.diljeet.myProject.entities.MealPlanCategory;
-import com.diljeet.myProject.entities.RegisteredUsers;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.inject.Inject;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -41,18 +28,19 @@ public class MealPlanCategoryController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private MealPlanCategory mealPlan;
-    
+
     private List<MealPlanCategory> mealPlans;
+
+    private int mealPlanQuantity;
 
     @EJB
     MealPlanCategoryBean mealPlanCategoryBean;
 
-//    @Inject
-//    HttpServletRequest req;  
     @PostConstruct
     public void init() {
         mealPlan = new MealPlanCategory();
         setMealPlans(mealPlanCategoryBean.getMealPlanCategories());
+        setMealPlanQuantity(1);
     }
 
     /**
@@ -79,14 +67,27 @@ public class MealPlanCategoryController implements Serializable {
 
     public void setMealPlans(List<MealPlanCategory> mealPlans) {
         this.mealPlans = mealPlans;
+    }
+
+    public int getMealPlanQuantity() {
+        return mealPlanQuantity;
+    }
+
+    public void setMealPlanQuantity(int mealPlanQuantity) {
+        this.mealPlanQuantity = mealPlanQuantity;
     }    
-    
-    public void addMealPlan(MealPlanCategory mealPlan){
+
+    public void addMealPlan(MealPlanCategory mealPlan) {
         mealPlanCategoryBean.addMealPlan(mealPlan);
-        cleatFields();
-    }    
-    
-    public void cleatFields(){
+        clearFields();
+    }
+
+//    public void updateMealPlanQuantity(AjaxBehaviorEvent event) {
+//        mealPlanQuantity = (Integer) ((UIOutput) event.getSource()).getValue();        
+//        logger.log(Level.SEVERE, "Meal Quantity is {0}", Integer.toString(mealPlanQuantity));  
+//    }
+
+    public void clearFields() {
         mealPlan.setMealPlanName(null);
         mealPlan.setMealPlanRate(null);
     }

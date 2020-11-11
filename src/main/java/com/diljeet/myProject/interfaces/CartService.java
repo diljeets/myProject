@@ -5,10 +5,10 @@
  */
 package com.diljeet.myProject.interfaces;
 
-import com.diljeet.myProject.entities.MealPlanCategory;
+import com.diljeet.myProject.entities.Cart;
 import java.util.List;
-import javax.ejb.Remote;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -25,8 +25,8 @@ import javax.ws.rs.core.Response;
 public interface CartService {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addToCart(MealPlanCategory mealPlan);    
-
+    public Response addToCart(Cart cartItem); 
+    
     @GET
     @Path("items-in-cart")
     @Produces({MediaType.TEXT_PLAIN})
@@ -35,7 +35,9 @@ public interface CartService {
     @GET
     @Path("all")
     @Produces({MediaType.APPLICATION_JSON})
-    public List<MealPlanCategory> getItemsFromCart();
+    public List<Cart> getItemsFromCart();
 
-    public void removeFromCart(MealPlanCategory mealPlan);
+    @DELETE
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void removeFromCart(Cart cartItem);
 }

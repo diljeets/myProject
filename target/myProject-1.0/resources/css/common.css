@@ -7,7 +7,10 @@ and open the template in the editor.
     Created on : Oct 19, 2020, 11:42:46 AM
     Author     : diljeet
 */
-
+.top{
+    background-color: #cfcfcf;
+    padding: 1em;
+}
 body .ui-progressbar .ui-progressbar-value {
     border: 0 none;
     margin: 0;
@@ -16,6 +19,9 @@ body .ui-progressbar .ui-progressbar-value {
 .ui-message-info, .ui-message-error, .ui-message-warn, .ui-message-fatal {
     display: inline-block;
 }
+.ui-spinner-input {
+    text-align: left;
+}    
 .ui-float-label{
     margin-top: 25px;
 }

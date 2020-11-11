@@ -4,15 +4,10 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"      	
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
-        <title>Facelet Title</title>
-        <style>
-            p{
-                width:50%;
-                display: inline;
-            }
-        </style>
+        <title>Facelet Title</title>       
     </h:head>
     <h:body>
         <ui:composition template="./template.xhtml">
@@ -35,7 +30,7 @@
                                      rendered="#{indexController.mealPlans.size() > 0}"
                                      summary="List of Meal Plans" 
                                      draggableColumns="true" 
-                                     draggableRows="true">                            
+                                     draggableRows="true">                                
                             <p:column>
                                 <f:facet name="header">
                                     <h:outputText value="MEAL PLAN NAME"/>
@@ -47,15 +42,21 @@
                                     <h:outputText value="MEAL PLAN RATE"/>
                                 </f:facet>
                                 <h:outputText value="#{mealPlan.mealPlanRate}"/>
-                            </p:column>    
+                            </p:column>  
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="MEAL PLAN QUANTITY"/>
+                                </f:facet>
+                                <p:spinner id="mealPlanQuantity" value="#{indexController.mealPlanCategoryController.mealPlanQuantity}" /> 
+                            </p:column> 
                             <p:column>
                                 <f:facet name="header">
                                     <h:outputText value="ACTION"/>
                                 </f:facet>
-                                <p:commandButton value="Add to Cart" action="#{cartController.addToCart(mealPlan)}" update="itemCount"/>
+                                <p:commandButton value="Add to Cart" action="#{cartController.addToCart(mealPlan.id,mealPlan.mealPlanName,mealPlan.mealPlanRate,indexController.mealPlanCategoryController.mealPlanQuantity)}" process="@this , mealPlanQuantity" update="itemCount"/>
                             </p:column> 
                         </p:dataTable>
-                    </p>
+                    </p>                   
                 </h:form>
             </ui:define>
         </ui:composition>

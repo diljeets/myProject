@@ -5,6 +5,7 @@
  */
 package com.diljeet.myProject.utils;
 
+import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -157,6 +158,12 @@ public class MyProjectUtils {
             encodedPassword = encodedPassword.replace(toReplace, replaceWith);
         }
         return encodedPassword;
+    }
+    
+    public static Double calculateTotalMealPlanRate(Double mealPlanRate,
+            int mealPlanQuantity){        
+        Double totalMealPlanRate = mealPlanRate * mealPlanQuantity;
+        return totalMealPlanRate;
     }
 
 }

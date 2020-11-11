@@ -5,29 +5,17 @@
  */
 package com.diljeet.myProject.controllers;
 
-import com.diljeet.myProject.ejb.IndexBean;
-import com.diljeet.myProject.ejb.RegisteredUsersBean;
-import com.diljeet.myProject.entities.MealPlanCategory;
-import com.diljeet.myProject.entities.RegisteredUsers;
+import com.diljeet.myProject.entities.Cart;
 import com.diljeet.myProject.interfaces.CartService;
-import com.diljeet.myProject.services.CartServiceBean;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Enumeration;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -41,12 +29,15 @@ public class CartController implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String itemsInCart;    
+    private String itemsInCart;
 
-    private List<MealPlanCategory> mealPlans;
-    
+    private List<Cart> cartItems;
+
     @EJB
     CartService cartService;
+    
+    @Inject
+    MealPlanCategoryController mealPlanCategoryController;
 
     @PostConstruct
     public void init() {
@@ -55,7 +46,7 @@ public class CartController implements Serializable {
     /**
      * Creates a new instance of TestUsersController
      */
-    public CartController() {
+    public CartController() {        
     }
 
     public String getItemsInCart() {
@@ -66,20 +57,28 @@ public class CartController implements Serializable {
         this.itemsInCart = itemsInCart;
     }
 
-    public List<MealPlanCategory> getMealPlans() {
+    public List<Cart> getCartItems() {
         return cartService.getItemsFromCart();
     }
 
-    public void setMealPlans(List<MealPlanCategory> mealPlans) {
-        this.mealPlans = mealPlans;
-    }
-
-    public void addToCart(MealPlanCategory mealPlan){
-        cartService.addToCart(mealPlan);
+    public void setCartItems(List<Cart> cartItems) {
+        this.cartItems = cartItems;
     }
    
-    public void removeFromCart(MealPlanCategory mealPlan){
-        cartService.removeFromCart(mealPlan);
+    public void addToCart(Cart cartItem){
+        cartService.addToCart(cartItem);
+        mealPlanCategoryController.setMealPlanQuantity(1);
+    }
+    
+    public void addToCart(Long mealPlanId,
+            String mealPlanName,
+            Double mealPlanRate,
+            int mealPlanQuantity) {        
+        addToCart(new Cart(mealPlanId, mealPlanName, mealPlanRate, mealPlanQuantity));
+    }
+
+    public void removeFromCart(Cart cartItem) {
+        cartService.removeFromCart(cartItem);
     }
 
 }

@@ -11,6 +11,7 @@
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/RegisteredUsersServiceBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/entities/MealPlanCategory.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/MealPlanCategoryBean.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/entities/Cart.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/IndexBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/interfaces/RegisteredUsersService.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/customexceptions/UserAccountDoesNotExistException.java
