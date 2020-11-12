@@ -38,28 +38,26 @@ public class CartServiceBean implements CartService {
     @Override
     public Response addToCart(Cart cartItem) {
         try {
-            Double calculatedTotalMealPlanRate = MyProjectUtils.calculateTotalMealPlanRate(cartItem.getMealPlanRate(),
-                    cartItem.getMealPlanQuantity());
-            cartItem.setMealPlanRate(calculatedTotalMealPlanRate);
+            Cart updatedCartItem = MyProjectUtils.calculateTotalMealPlanRate(cartItem);            
             
             if (cartItems.isEmpty()) {
-                cartItems.add(cartItem);
+                cartItems.add(updatedCartItem);
             } else {
                 boolean isItemInCart = false;
                 int itemIndex = 0;
                 Iterator<Cart> itr = cartItems.iterator();                
                 while(itr.hasNext()) {
                     Cart item = itr.next();
-                    if (Objects.equals(item.getMealPlanId(), cartItem.getMealPlanId())) {
+                    if (Objects.equals(item.getMealPlanId(), updatedCartItem.getMealPlanId())) {
                         isItemInCart = true;
                         itemIndex = cartItems.indexOf(item);
                     } 
                 }
                 if (isItemInCart) {
                     cartItems.remove(itemIndex);
-                    cartItems.add(itemIndex, cartItem);
+                    cartItems.add(itemIndex, updatedCartItem);
                 } else {
-                    cartItems.add(cartItem);
+                    cartItems.add(updatedCartItem);
                 }
             }
         } catch (Exception e) {

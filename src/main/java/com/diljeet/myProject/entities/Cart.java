@@ -43,6 +43,8 @@ public class Cart implements Serializable {
     private String mealPlanName;
 
     private Double mealPlanRate;
+    
+    private Double totalMealPlanRate;
 
     private int mealPlanQuantity;
 
@@ -95,6 +97,14 @@ public class Cart implements Serializable {
         this.mealPlanRate = mealPlanRate;
     }
 
+    public Double getTotalMealPlanRate() {
+        return totalMealPlanRate;
+    }
+
+    public void setTotalMealPlanRate(Double totalMealPlanRate) {
+        this.totalMealPlanRate = totalMealPlanRate;
+    }
+    
     public int getMealPlanQuantity() {
         return mealPlanQuantity;
     }

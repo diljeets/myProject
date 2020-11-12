@@ -82,11 +82,6 @@ public class MealPlanCategoryController implements Serializable {
         clearFields();
     }
 
-//    public void updateMealPlanQuantity(AjaxBehaviorEvent event) {
-//        mealPlanQuantity = (Integer) ((UIOutput) event.getSource()).getValue();        
-//        logger.log(Level.SEVERE, "Meal Quantity is {0}", Integer.toString(mealPlanQuantity));  
-//    }
-
     public void clearFields() {
         mealPlan.setMealPlanName(null);
         mealPlan.setMealPlanRate(null);

@@ -47,7 +47,7 @@
                                 <f:facet name="header">
                                     <h:outputText value="MEAL PLAN QUANTITY"/>
                                 </f:facet>
-                                <p:spinner id="mealPlanQuantity" value="#{indexController.mealPlanCategoryController.mealPlanQuantity}" /> 
+                                <p:spinner id="mealPlanQuantity" min="1" max="999" maxlength="3" size="5" value="#{indexController.mealPlanCategoryController.mealPlanQuantity}" /> 
                             </p:column> 
                             <p:column>
                                 <f:facet name="header">

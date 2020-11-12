@@ -5,6 +5,7 @@
  */
 package com.diljeet.myProject.utils;
 
+import com.diljeet.myProject.entities.Cart;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -160,10 +161,10 @@ public class MyProjectUtils {
         return encodedPassword;
     }
     
-    public static Double calculateTotalMealPlanRate(Double mealPlanRate,
-            int mealPlanQuantity){        
-        Double totalMealPlanRate = mealPlanRate * mealPlanQuantity;
-        return totalMealPlanRate;
+    public static Cart calculateTotalMealPlanRate(Cart cartItem){        
+        Double totalMealPlanRate = cartItem.getMealPlanRate() * cartItem.getMealPlanQuantity();
+        cartItem.setTotalMealPlanRate(totalMealPlanRate);
+        return cartItem;
     }
 
 }

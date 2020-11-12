@@ -7,14 +7,18 @@ package com.diljeet.myProject.controllers;
 
 import com.diljeet.myProject.entities.Cart;
 import com.diljeet.myProject.interfaces.CartService;
+import com.diljeet.myProject.utils.MyProjectUtils;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.component.UIOutput;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
 
 /**
@@ -35,7 +39,7 @@ public class CartController implements Serializable {
 
     @EJB
     CartService cartService;
-    
+
     @Inject
     MealPlanCategoryController mealPlanCategoryController;
 
@@ -46,7 +50,7 @@ public class CartController implements Serializable {
     /**
      * Creates a new instance of TestUsersController
      */
-    public CartController() {        
+    public CartController() {
     }
 
     public String getItemsInCart() {
@@ -64,16 +68,16 @@ public class CartController implements Serializable {
     public void setCartItems(List<Cart> cartItems) {
         this.cartItems = cartItems;
     }
-   
-    public void addToCart(Cart cartItem){
+
+    public void addToCart(Cart cartItem) {
         cartService.addToCart(cartItem);
         mealPlanCategoryController.setMealPlanQuantity(1);
     }
-    
+
     public void addToCart(Long mealPlanId,
             String mealPlanName,
             Double mealPlanRate,
-            int mealPlanQuantity) {        
+            int mealPlanQuantity) {
         addToCart(new Cart(mealPlanId, mealPlanName, mealPlanRate, mealPlanQuantity));
     }
 
@@ -81,4 +85,11 @@ public class CartController implements Serializable {
         cartService.removeFromCart(cartItem);
     }
 
+//    public void updateMealPlanQuantity(AjaxBehaviorEvent event, Cart cartItem) {        
+//        int mealPlanQuantity = (Integer) ((UIOutput) event.getSource()).getValue();
+//        logger.log(Level.SEVERE, "Cart Meal Quantity is {0}", Integer.toString(mealPlanQuantity));
+//        logger.log(Level.SEVERE, "Cart Meal Name is {0}", cartItem.getMealPlanName());
+//        logger.log(Level.SEVERE, "Cart Meal Rate is {0}", Double.toString(cartItem.getMealPlanRate()));
+//        logger.log(Level.SEVERE, "Cart Meal Total Rate is {0}", Double.toString(cartItem.getTotalMealPlanRate()));
+//    }
 }
