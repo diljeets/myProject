@@ -6,13 +6,18 @@
 package com.diljeet.myProject.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
+import javax.json.bind.annotation.JsonbTransient;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Email;
@@ -78,6 +83,11 @@ public class RegisteredUsers implements Serializable {
     private Date dateCustomerCreated;
     
     private Date dateCustomerLastUpdated;
+    
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "registeredUser")
+    @JsonbTransient
+//    @XmlTransient
+    private List<RegisteredUsersAddress> addresses = new ArrayList<>();
 
     public RegisteredUsers() {        
 
@@ -178,7 +188,24 @@ public class RegisteredUsers implements Serializable {
     public void setDateCustomerLastUpdated(Date dateCustomerLastUpdated) {
         this.dateCustomerLastUpdated = dateCustomerLastUpdated;
     }
+
+    public List<RegisteredUsersAddress> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<RegisteredUsersAddress> addresses) {
+        this.addresses = addresses;
+    }
       
+    public void addAddress(RegisteredUsersAddress address) {
+        addresses.add(address);
+        address.setRegisteredUser(this);
+    }
+
+    public void removeAddress(RegisteredUsersAddress address) {
+        addresses.remove(address);
+        address.setRegisteredUser(this);
+    }
     
     @Override
     public int hashCode() {

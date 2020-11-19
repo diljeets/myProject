@@ -12,6 +12,7 @@ import com.diljeet.myProject.customexceptions.NewUserCreatedException;
 import com.diljeet.myProject.customexceptions.PasswordsDontMatchException;
 import com.diljeet.myProject.customexceptions.UserAccountDoesNotExistException;
 import com.diljeet.myProject.controllers.RegisteredUsersController;
+import com.diljeet.myProject.controllers.TemplateController;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.logging.Level;
@@ -48,6 +49,9 @@ public class RegisteredUsersBean {
 
     @Inject
     RegisteredUsersController registeredUsersController;
+    
+    @Inject
+    TemplateController templateController;
 
     @Inject
     HttpServletRequest req;
@@ -166,6 +170,7 @@ public class RegisteredUsersBean {
         } catch (ChangePasswordRequestAcceptedException e) {
             msg = new FacesMessage(FacesMessage.SEVERITY_INFO, e.getMessage(), null);
             FacesContext.getCurrentInstance().addMessage(registeredUsersController.getChangePasswordBtn().getClientId(), msg);
+            templateController.logout();
         } catch (UserAccountDoesNotExistException | PasswordsDontMatchException e) {
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
             FacesContext.getCurrentInstance().addMessage(registeredUsersController.getChangePasswordBtn().getClientId(), msg);

@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
+import javax.faces.context.FacesContext;
 import javax.mail.Session;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -297,7 +298,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                 }
                 existingUser.setPassword(encodedPassword);
                 existingUser.setIsPasswordChangeRequest("no");
-                existingUser.setDateCustomerLastUpdated(new Date());
+                existingUser.setDateCustomerLastUpdated(new Date());                
                 res.sendRedirect(req.getContextPath() + "/login.xhtml?passwordChanged=true");
             } else if ((existingUser.getIsPasswordChangeRequest()).equals("no")) {
                 res.sendRedirect(req.getContextPath() + "/login.xhtml?passwordAlreadyChanged=true");

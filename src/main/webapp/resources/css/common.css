@@ -11,7 +11,21 @@ and open the template in the editor.
     background-color: #cfcfcf;
     padding: 1em;
 }
-body .ui-progressbar .ui-progressbar-value {
+.ui-float-label{
+    margin-top: 25px;
+}
+.cmdBtn{
+    margin-top: 25px !important;
+}
+body .ui-progressbar {
+    height: 6px;
+}
+body .ui-panel .ui-panel-content {
+    border: 0;
+    background: 0;
+    padding: 0;    
+}
+/*body .ui-progressbar .ui-progressbar-value {
     border: 0 none;
     margin: 0;
     background: #007ad9;
@@ -22,9 +36,102 @@ body .ui-progressbar .ui-progressbar-value {
 .ui-spinner-input {
     text-align: left;
 }    
-.ui-float-label{
-    margin-top: 25px;
+
+body .ui-radiobutton .ui-radiobutton-box {
+    border: 1px solid #a6a6a6;
+    background-color: #fff;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    position: relative;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    -moz-transition: background-color .3s,border-color .3s;
+    -o-transition: background-color .3s,border-color .3s;
+    -webkit-transition: background-color .3s,border-color .3s;
+    transition: background-color .3s,border-color .3s;
 }
-.cmdBtn{
-    margin-top: 25px !important;
+body .ui-radiobutton .ui-radiobutton-box.ui-state-active .ui-icon-bullet {
+    background-color: #fff;
 }
+body .ui-radiobutton .ui-radiobutton-box .ui-radiobutton-icon {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -5px;
+    margin-top: -5px;
+    vertical-align: middle;
+    -moz-transition: background-color .3s;
+    -o-transition: background-color .3s;
+    -webkit-transition: background-color .3s;
+    transition: background-color .3s;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+}
+body .ui-datatable .ui-datatable-data>tr.ui-datatable-selectable.ui-state-highlight .ui-radiobutton>.ui-corner-all.ui-state-active, body .ui-datatable .ui-datatable-data>tr.ui-datatable-selectable.ui-state-highlight .ui-chkbox>.ui-corner-all.ui-state-active {
+    border-color: #fff;
+}
+body .ui-radiobutton .ui-radiobutton-box.ui-state-active {
+    border-color: #007ad9;
+    background-color: #007ad9;
+    color: #fff;
+}
+body .ui-datatable .ui-datatable-data>tr.ui-state-highlight {
+    border: 1px solid #c8c8c8;
+    background-color: #007ad9;
+    color: #fff;
+    cursor: default;
+}
+body .ui-spinner .ui-spinner-button.ui-button.ui-spinner-up {
+    margin-top: 1px;
+    margin-right: 1px;
+}
+body .ui-spinner .ui-spinner-button.ui-button {
+    background-color: transparent;
+    color: #333;
+    border: 0 none;
+    width: 1.429em;
+    margin: 0;
+}
+body .ui-widget:not(.pi), body .ui-widget .ui-widget:not(.pi) {
+    font-family: "Open Sans","Helvetica Neue",sans-serif;
+    font-size: 14px;
+}
+body .ui-widget, body .ui-widget .ui-widget {
+    text-decoration: none;
+}
+body .ui-spinner .ui-spinner-button.ui-button.ui-spinner-up .ui-icon {
+    margin-top: -0.5em;
+    margin-left: -0.5em;
+    font-family: 'primeicons';
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-indent: 0 !important;
+    text-align: center;
+    background: 0;
+    display: inline-block;
+    font-size: 1.25em;
+}
+body .ui-spinner .ui-spinner-button.ui-button .ui-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+body .ui-spinner .ui-spinner-button.ui-button.ui-spinner-up .ui-icon:before {
+    content: "";
+}
+body .ui-button .ui-icon-triangle-1-s:before {
+    content: "";
+}*/

@@ -2,20 +2,33 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:h="http://xmlns.jcp.org/jsf/html">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
     <h:head>
-        <title>Facelets Template</title>               
+        <title>Facelets Template</title>  
+        <h:outputStylesheet library="css" name="common.css"/>
     </h:head>
     <h:body>
         <div id="top" class="top">
+            <p>Hello #{templateController.currentCustomer}</p>                 
+            <h:form id="navForm">
+                <p>
+                    <p:commandLink id="itemCount" action="/cart.xhtml">Cart #{cartController.itemsInCart}</p:commandLink>
+                </p>    
+                <p>
+                    <p:commandLink value="Change Password" action="/change-password.xhtml"/>
+                </p> 
+                <p>
+                    <p:commandLink value="Log Out" action="#{templateController.logout()}"/>
+                </p> 
+            </h:form> 
             <ui:insert name="top">Top Section</ui:insert>
         </div>
         <div>
             <div id="content">
                 <ui:insert name="content">Main Content</ui:insert>
             </div>
-        </div>
-        <h:outputStylesheet library="css" name="common.css"/>
+        </div>  
     </h:body>
 </html>
 

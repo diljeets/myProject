@@ -23,7 +23,6 @@ import javax.ws.rs.core.Response;
  * @author diljeet
  */
 @Stateless
-@RolesAllowed("Administrator")
 public class MealPlanCategoryServiceBean implements MealPlanCategoryService {
 
     private static final Logger logger = Logger.getLogger(MealPlanCategoryServiceBean.class.getCanonicalName());
@@ -32,7 +31,7 @@ public class MealPlanCategoryServiceBean implements MealPlanCategoryService {
     @PersistenceContext(name = "my-persistence-unit")
     private EntityManager em;
 
-    @Override
+    @Override    
     public Response addMealPlan(MealPlanCategory mealPlan) {        
         if (mealPlan == null) {
             return null;
@@ -47,8 +46,7 @@ public class MealPlanCategoryServiceBean implements MealPlanCategoryService {
         return Response.status(Response.Status.CREATED).build();
     }
 
-    @Override
-    @RolesAllowed("Administrator")
+    @Override        
     public List<MealPlanCategory> getMealPlanCategories() {
         List<MealPlanCategory> mealPlans = null;
         try {

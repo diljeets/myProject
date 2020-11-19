@@ -6,17 +6,15 @@
 package com.diljeet.myProject.entities;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 
 /**
  *
@@ -35,11 +33,8 @@ public class Cart implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Transient
     private Long mealPlanId;
 
-    @NotBlank
-    @NotEmpty
     private String mealPlanName;
 
     private Double mealPlanRate;
@@ -47,6 +42,10 @@ public class Cart implements Serializable {
     private Double totalMealPlanRate;
 
     private int mealPlanQuantity;
+    
+    @ManyToOne
+    @JoinColumn(name = "CUSTOMERORDER_ID")
+    private CustomerOrder customerOrder;
 
     @PostConstruct
     public void init() {
@@ -111,6 +110,14 @@ public class Cart implements Serializable {
 
     public void setMealPlanQuantity(int mealPlanQuantity) {
         this.mealPlanQuantity = mealPlanQuantity;
+    }
+
+    public CustomerOrder getCustomerOrder() {
+        return customerOrder;
+    }
+
+    public void setCustomerOrder(CustomerOrder customerOrder) {
+        this.customerOrder = customerOrder;
     }
 
     @Override

@@ -10,15 +10,7 @@
     </h:head>
     <h:body>
         <ui:composition template="./template.xhtml">
-            <ui:define name="top">
-                <p>Hello #{indexController.currentCustomer}</p>
-                <p><p:commandLink id="itemCount" action="/cart.xhtml">Cart #{cartController.itemsInCart}</p:commandLink></p>  
-                <h:form>
-                    <p>
-                        <p:commandLink value="Log Out" action="#{indexController.logout()}"/>
-                    </p> 
-                </h:form>
-            </ui:define>
+            <ui:define name="top"></ui:define>
             <ui:define name="content">                
                 <h:outputText value="You are in the Cart Content Section"/>
                 <h:form id="myDatatable">
@@ -60,9 +52,12 @@
                                 <f:facet name="header">
                                     <h:outputText value="ACTION"/>
                                 </f:facet>
-                                <p:commandButton value="Remove from Cart" action="#{cartController.removeFromCart(cartItem)}" update="itemCount myDatatable"/>
+                                <p:commandButton value="Remove from Cart" action="#{cartController.removeFromCart(cartItem)}" update=":navForm:itemCount myDatatable"/>
                             </p:column> 
                         </p:dataTable>
+                    </p>
+                    <p>
+                        <p:commandButton value="Checkout" action="/checkout.xhtml"/>
                     </p>
                 </h:form>
             </ui:define>

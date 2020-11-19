@@ -7,18 +7,13 @@ package com.diljeet.myProject.controllers;
 
 import com.diljeet.myProject.entities.Cart;
 import com.diljeet.myProject.interfaces.CartService;
-import com.diljeet.myProject.utils.MyProjectUtils;
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.component.UIOutput;
-import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
 
 /**
@@ -34,6 +29,8 @@ public class CartController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String itemsInCart;
+    
+    private Cart cartItem;
 
     private List<Cart> cartItems;
 
@@ -51,6 +48,7 @@ public class CartController implements Serializable {
      * Creates a new instance of TestUsersController
      */
     public CartController() {
+        cartItem = new Cart();
     }
 
     public String getItemsInCart() {
@@ -61,6 +59,14 @@ public class CartController implements Serializable {
         this.itemsInCart = itemsInCart;
     }
 
+    public Cart getCartItem() {
+        return cartItem;
+    }
+
+    public void setCartItem(Cart cartItem) {
+        this.cartItem = cartItem;
+    }
+    
     public List<Cart> getCartItems() {
         return cartService.getItemsFromCart();
     }
