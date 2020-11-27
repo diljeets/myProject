@@ -14,41 +14,37 @@
             <ui:define name="top"></ui:define>
             <ui:define name="content">                
                 <h:outputText value="You are in the Index Content Section"/>
-                <h:form id="myDatatable">
-                    <p>             
-                        <p:dataTable id="datatable"                              
-                                     value="#{indexController.mealPlans}"        
-                                     var="mealPlan"
-                                     rendered="#{indexController.mealPlans.size() > 0}"
-                                     summary="List of Meal Plans" 
-                                     draggableColumns="true" 
-                                     draggableRows="true">                                
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="MEAL PLAN NAME"/>
-                                </f:facet>
-                                <h:outputText value="#{mealPlan.mealPlanName}"/>
-                            </p:column>
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="MEAL PLAN RATE"/>
-                                </f:facet>
-                                <h:outputText value="#{mealPlan.mealPlanRate}"/>
-                            </p:column>  
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="MEAL PLAN QUANTITY"/>
-                                </f:facet>
-                                <p:spinner id="mealPlanQuantity" min="1" max="999" maxlength="3" size="5" value="#{indexController.mealPlanCategoryController.mealPlanQuantity}" /> 
-                            </p:column> 
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="ACTION"/>
-                                </f:facet>
-                                <p:commandButton value="Add to Cart" action="#{cartController.addToCart(mealPlan.id,mealPlan.mealPlanName,mealPlan.mealPlanRate,indexController.mealPlanCategoryController.mealPlanQuantity)}" process="@this , mealPlanQuantity" update=":navForm:itemCount"/>
-                            </p:column> 
-                        </p:dataTable>
-                    </p>                   
+                <h:form> 
+                    <div class="p-grid p-justify-center">
+                        <div class="p-col-9">
+                            <div class="p-grid p-justify-around">
+                                <p:repeat value="#{indexController.mealPlans}" var="mealPlan">
+                                    <div class="p-col-12 p-sm-12 p-md-6 p-lg-3" style="border: 1px #116fbf solid">
+                                        <div class="p-col p-text-center">
+                                            <div class="box">
+                                                <h:outputText value="#{mealPlan.mealPlanName}"/>
+                                            </div>
+                                        </div>
+                                        <div class="p-col p-text-center">
+                                            <div class="box">
+                                                <h:outputText value="#{mealPlan.mealPlanRate}"/>
+                                            </div>
+                                        </div>
+                                        <div class="p-col p-text-center">
+                                            <div class="box">
+                                                <p:spinner id="mealPlanQuantity" min="1" max="999" maxlength="3" size="5" value="#{indexController.mealPlanCategoryController.mealPlanQuantity}" /> 
+                                            </div>
+                                        </div>
+                                        <div class="p-col p-text-center">
+                                            <div class="box">
+                                                <p:commandButton value="Add to Cart" action="#{cartController.addToCart(mealPlan.id,mealPlan.mealPlanName,mealPlan.mealPlanRate,indexController.mealPlanCategoryController.mealPlanQuantity)}" process="@this , mealPlanQuantity" update=":navForm:itemCount"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p:repeat>
+                            </div>
+                        </div>
+                    </div>
                 </h:form>
             </ui:define>
         </ui:composition>

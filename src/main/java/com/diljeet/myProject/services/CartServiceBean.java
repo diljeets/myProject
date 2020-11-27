@@ -25,7 +25,10 @@ import javax.annotation.PostConstruct;
 public class CartServiceBean implements CartService {
 
     private static final Logger logger = Logger.getLogger(CartServiceBean.class.getCanonicalName());
+    
     ArrayList<Cart> cartItems = null;
+    
+    private Double payableAmount;
 
     public CartServiceBean() {
         cartItems = new ArrayList<>();
@@ -74,6 +77,12 @@ public class CartServiceBean implements CartService {
     @Override
     public List<Cart> getItemsFromCart() {
         return cartItems;
+    }
+
+    @Override
+    public String getPayableAmount() {
+        payableAmount = MyProjectUtils.calculatePayableAmount(cartItems);
+        return Double.toString(payableAmount);
     }
 
     @Override

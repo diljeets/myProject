@@ -5,7 +5,7 @@
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <!--        <jta-data-source>jdbc/postgres</jta-data-source>-->
     <!--        <jta-data-source>java:/PostgresDS</jta-data-source>-->
-    <jta-data-source>java:/MySqlDS</jta-data-source>
+    <jta-data-source>java:/MyProjectDS</jta-data-source>
     <class>com.diljeet.myProject.entities.RegisteredUsers</class>
     <!--    <class>com.diljeet.test.entity.Address</class>
         <class>com.diljeet.test.entity.TestUsers</class>-->

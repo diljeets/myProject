@@ -30,6 +30,8 @@ public class CartController implements Serializable {
 
     private String itemsInCart;
     
+    private String payableAmount;
+    
     private Cart cartItem;
 
     private List<Cart> cartItems;
@@ -57,6 +59,14 @@ public class CartController implements Serializable {
 
     public void setItemsInCart(String itemsInCart) {
         this.itemsInCart = itemsInCart;
+    }
+
+    public String getPayableAmount() {
+        return cartService.getPayableAmount();
+    }
+
+    public void setPayableAmount(String payableAmount) {
+        this.payableAmount = payableAmount;
     }
 
     public Cart getCartItem() {

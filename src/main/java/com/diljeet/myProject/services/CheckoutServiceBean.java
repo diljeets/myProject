@@ -5,17 +5,24 @@
  */
 package com.diljeet.myProject.services;
 
+import com.diljeet.myProject.controllers.TemplateController;
+import com.diljeet.myProject.ejb.PaymentGatewayBean;
 import com.diljeet.myProject.entities.Cart;
 import com.diljeet.myProject.entities.CustomerOrder;
 import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import java.util.logging.Logger;
 import javax.ejb.Stateful;
 import com.diljeet.myProject.interfaces.CheckoutService;
+import com.diljeet.myProject.utils.MyProjectUtils;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -28,6 +35,15 @@ public class CheckoutServiceBean implements CheckoutService {
     
     @PersistenceContext(name = "my-persistence-unit")
     private EntityManager em;
+    
+    @EJB
+    PaymentGatewayBean paymentGatewayBean;
+    
+    @Inject
+    HttpServletRequest req;
+    
+    @Inject
+    TemplateController templateController;
     
     private String deliveryAddress;    
     
@@ -67,12 +83,21 @@ public class CheckoutServiceBean implements CheckoutService {
 
     @Override
     public void placeOrder(CustomerOrder customerOrder) {
-        try {            
+        String orderId = MyProjectUtils.createOrderId();
+        String payableAmount = customerOrder.getPayableAmount();
+        String customerName = templateController.getCurrentCustomer();
+        String username = req.getUserPrincipal().getName();
+        try {                
+            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username);
+            customerOrder.setCustomerName(customerName);
+            customerOrder.setUsername(username);
+            customerOrder.setDateOrderCreated(new Date());
+            customerOrder.setOrderId(orderId);
             List<Cart> cartItems = customerOrder.getOrders();
             for(Cart cartItem : cartItems){
                 cartItem.setCustomerOrder(customerOrder);
             }
-            em.persist(customerOrder);
+//            em.persist(customerOrder);
         } catch (Exception e) {
             e.printStackTrace();
         }

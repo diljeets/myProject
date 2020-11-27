@@ -8,9 +8,13 @@ package com.diljeet.myProject.utils;
 import com.diljeet.myProject.entities.Cart;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Base64.Encoder;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.logging.Level;
@@ -29,7 +33,7 @@ import javax.mail.internet.MimeMessage;
 public class MyProjectUtils {
 
     private static final Logger logger = Logger.getLogger(MyProjectUtils.class.getCanonicalName());
-
+    
 //    @Resource(lookup = "java:jboss/mail/gmailSession")
 //    public Session mailSession;
     public MyProjectUtils() {
@@ -162,9 +166,25 @@ public class MyProjectUtils {
     }
     
     public static Cart calculateTotalMealPlanRate(Cart cartItem){        
-        Double totalMealPlanRate = cartItem.getMealPlanRate() * cartItem.getMealPlanQuantity();
+        Double totalMealPlanRate = cartItem.getMealPlanRate() * cartItem.getMealPlanQuantity();        
         cartItem.setTotalMealPlanRate(totalMealPlanRate);
         return cartItem;
     }
+    
+    public static Double calculatePayableAmount(ArrayList<Cart> cartItems) {
+        Double payableAmount = (double) 0;
+        for(Cart item : cartItems){
+            payableAmount = payableAmount + item.getTotalMealPlanRate();
+        }
+        return payableAmount;
+    }
+    
+    public static String createOrderId() {
+        Random random = new Random();
+        int randomInt = random.nextInt();        
+        String date = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMYYYY"));
+        return "ORDERID" + date + Integer.toString(randomInt);
+    }
+
 
 }

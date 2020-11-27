@@ -36,6 +36,11 @@ public interface CartService {
     @Path("all")
     @Produces({MediaType.APPLICATION_JSON})
     public List<Cart> getItemsFromCart();
+    
+    @GET
+    @Path("payable-amount")
+    @Produces({MediaType.TEXT_PLAIN})
+    public String getPayableAmount();
 
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)

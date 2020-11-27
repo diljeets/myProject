@@ -7,6 +7,7 @@ package com.diljeet.myProject.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.json.bind.annotation.JsonbTransient;
@@ -17,6 +18,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 //import org.jboss.security.auth.spi.Util;
 
 /**
@@ -35,10 +38,21 @@ public class CustomerOrder implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    private String orderId;
+    
+    private String customerName;
+    
+    private String username;
 
     private String deliveryTime;
     
     private String deliveryAddress;
+    
+    private String payableAmount;
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dateOrderCreated;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "customerOrder")
     @JsonbTransient
@@ -50,10 +64,12 @@ public class CustomerOrder implements Serializable {
 
     public CustomerOrder(String deliveryTime, 
             String deliveryAddress,
-            List<Cart> cartItems) {
+            List<Cart> cartItems,
+            String payableAmount) {
         this.deliveryTime = deliveryTime;
         this.deliveryAddress = deliveryAddress;
         this.orders = cartItems;
+        this.payableAmount = payableAmount;
     }
 
     public Long getId() {
@@ -62,6 +78,30 @@ public class CustomerOrder implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getDeliveryTime() {
@@ -78,6 +118,22 @@ public class CustomerOrder implements Serializable {
 
     public void setDeliveryAddress(String deliveryAddress) {
         this.deliveryAddress = deliveryAddress;
+    }
+
+    public String getPayableAmount() {
+        return payableAmount;
+    }
+
+    public void setPayableAmount(String payableAmount) {
+        this.payableAmount = payableAmount;
+    }
+
+    public Date getDateOrderCreated() {
+        return dateOrderCreated;
+    }
+
+    public void setDateOrderCreated(Date dateOrderCreated) {
+        this.dateOrderCreated = dateOrderCreated;
     }
 
     public List<Cart> getOrders() {

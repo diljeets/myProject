@@ -31,9 +31,9 @@ public class CheckoutController implements Serializable {
     private static final Logger logger = Logger.getLogger(CheckoutController.class.getCanonicalName());
 
     private static final long serialVersionUID = 1L;
-    
+
     private CustomerOrder customerOrder;
-    
+
     private String deliveryTime;
 
     private String deliveryAddress;
@@ -69,8 +69,8 @@ public class CheckoutController implements Serializable {
 
     public void setDeliveryTime(String deliveryTime) {
         this.deliveryTime = deliveryTime;
-    }    
-    
+    }
+
     public String getDeliveryAddress() {
         return checkoutService.getDeliveryAddress();
     }
@@ -90,9 +90,9 @@ public class CheckoutController implements Serializable {
     public void addDeliveryAddress(RegisteredUsersAddress selectedAddress) {
         checkoutService.addDeliveryAddress(selectedAddress);
     }
-    
-    public void addDeliveryTime(AjaxBehaviorEvent event) {       
-        String selectedTime = (String)((UIOutput)event.getSource()).getValue();                
+
+    public void addDeliveryTime(AjaxBehaviorEvent event) {
+        String selectedTime = (String) ((UIOutput) event.getSource()).getValue();
         checkoutService.addDeliveryTime(selectedTime);
     }
 
@@ -101,9 +101,10 @@ public class CheckoutController implements Serializable {
     }
 
     public void placeOrder() {
-        placeOrder(new CustomerOrder(getDeliveryTime(), 
-                getDeliveryAddress(), 
-                cartController.getCartItems()));
+        placeOrder(new CustomerOrder(getDeliveryTime(),
+                getDeliveryAddress(),
+                cartController.getCartItems(),
+                cartController.getPayableAmount()));
     }
 
 }

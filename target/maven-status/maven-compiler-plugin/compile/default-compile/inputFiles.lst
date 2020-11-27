@@ -7,6 +7,7 @@
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/TemplateController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/IndexBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/RegisteredUsersAddressServiceBean.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/PaymentGatewayBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/interfaces/CartService.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/customexceptions/ErrorCreatingUserException.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/IndexController.java
