@@ -5,12 +5,15 @@
  */
 package com.diljeet.myProject.controllers;
 
+import com.diljeet.myProject.ejb.PaymentGatewayBean;
 import com.diljeet.myProject.entities.CustomerOrder;
 import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.interfaces.CheckoutService;
+import com.diljeet.myProject.utils.PaymentOptions;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
@@ -37,12 +40,19 @@ public class CheckoutController implements Serializable {
     private String deliveryTime;
 
     private String deliveryAddress;
+    
+    private PaymentOptions option;
+    
+    private List<PaymentOptions> paymentOptions;
 
     @Inject
     CartController cartController;
 
     @EJB
     CheckoutService checkoutService;
+    
+    @EJB
+    PaymentGatewayBean paymentGatewayBean;
 
     @PostConstruct
     public void init() {
@@ -79,6 +89,22 @@ public class CheckoutController implements Serializable {
         this.deliveryAddress = deliveryAddress;
     }
 
+    public PaymentOptions getOption() {
+        return option;
+    }
+
+    public void setOption(PaymentOptions option) {
+        this.option = option;
+    }
+    
+    public List<PaymentOptions> getPaymentOptions() {
+        return paymentGatewayBean.getPaymentOptions();
+    }
+
+    public void setPaymentOptions(List<PaymentOptions> paymentOptions) {
+        this.paymentOptions = paymentOptions;
+    }
+    
     public CartController getCartController() {
         return cartController;
     }
@@ -94,6 +120,10 @@ public class CheckoutController implements Serializable {
     public void addDeliveryTime(AjaxBehaviorEvent event) {
         String selectedTime = (String) ((UIOutput) event.getSource()).getValue();
         checkoutService.addDeliveryTime(selectedTime);
+    }
+    
+    public void initiateTransaction(String payableAmount) {        
+        checkoutService.initiateTransaction(payableAmount);
     }
 
     public void placeOrder(CustomerOrder customerOrder) {

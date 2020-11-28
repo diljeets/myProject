@@ -82,6 +82,17 @@ public class CheckoutServiceBean implements CheckoutService {
     }
 
     @Override
+    public void initiateTransaction(String payableAmount) {        
+        String orderId = MyProjectUtils.createOrderId();
+        String username = req.getUserPrincipal().getName();
+        try {                
+            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username);            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @Override
     public void placeOrder(CustomerOrder customerOrder) {
         String orderId = MyProjectUtils.createOrderId();
         String payableAmount = customerOrder.getPayableAmount();

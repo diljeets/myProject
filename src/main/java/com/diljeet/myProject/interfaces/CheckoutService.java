@@ -38,7 +38,11 @@ public interface CheckoutService {
     @GET
     @Path("delivery-address")
     @Produces({MediaType.TEXT_PLAIN})
-    public String getDeliveryAddress();   
+    public String getDeliveryAddress();  
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void initiateTransaction(String payableAmount);
     
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

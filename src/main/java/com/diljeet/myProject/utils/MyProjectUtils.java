@@ -7,6 +7,7 @@ package com.diljeet.myProject.utils;
 
 import com.diljeet.myProject.entities.Cart;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -33,7 +34,7 @@ import javax.mail.internet.MimeMessage;
 public class MyProjectUtils {
 
     private static final Logger logger = Logger.getLogger(MyProjectUtils.class.getCanonicalName());
-    
+
 //    @Resource(lookup = "java:jboss/mail/gmailSession")
 //    public Session mailSession;
     public MyProjectUtils() {
@@ -164,27 +165,31 @@ public class MyProjectUtils {
         }
         return encodedPassword;
     }
-    
-    public static Cart calculateTotalMealPlanRate(Cart cartItem){        
-        Double totalMealPlanRate = cartItem.getMealPlanRate() * cartItem.getMealPlanQuantity();        
+
+    public static Cart calculateTotalMealPlanRate(Cart cartItem) {
+        Double totalMealPlanRate = Math.round((cartItem.getMealPlanRate() * cartItem.getMealPlanQuantity()) * 100.0) / 100.0;
+//        BigDecimal bd = new BigDecimal(totalMealPlanRate);
+//        BigDecimal roundOff = bd.setScale(2, BigDecimal.ROUND_HALF_EVEN);
+//        logger.log(Level.SEVERE, "roundOff val is {0}", roundOff.toString());
+//        Double roundOffTotalMealPlanRate = roundOff.doubleValue();
+//        logger.log(Level.SEVERE, "roundOffTotalMealPlanRate val is {0}", roundOffTotalMealPlanRate.toString());
         cartItem.setTotalMealPlanRate(totalMealPlanRate);
         return cartItem;
     }
-    
+
     public static Double calculatePayableAmount(ArrayList<Cart> cartItems) {
         Double payableAmount = (double) 0;
-        for(Cart item : cartItems){
-            payableAmount = payableAmount + item.getTotalMealPlanRate();
+        for (Cart item : cartItems) {
+            payableAmount = Math.round((payableAmount + item.getTotalMealPlanRate()) * 100.0) / 100.0;
         }
         return payableAmount;
     }
-    
+
     public static String createOrderId() {
         Random random = new Random();
-        int randomInt = random.nextInt();        
+        int randomInt = random.nextInt();
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("ddMMYYYY"));
         return "ORDERID" + date + Integer.toString(randomInt);
     }
-
 
 }

@@ -5,6 +5,7 @@
  */
 package com.diljeet.myProject.ejb;
 
+import com.diljeet.myProject.utils.PayChannelOptions;
 import com.diljeet.myProject.utils.PaymentOptions;
 import com.paytm.pg.merchant.PaytmChecksum;
 import java.io.BufferedReader;
@@ -59,9 +60,27 @@ public class PaymentGatewayBean {
     private String transactionToken;
     private String iconBaseUrl;
     private List<PaymentOptions> paymentOptions;
+    private List<PayChannelOptions> payChannelOptions;
 
     public PaymentGatewayBean() {
         paymentOptions = new ArrayList<>();
+        payChannelOptions = new ArrayList<>();
+    }
+
+    public List<PaymentOptions> getPaymentOptions() {
+        return paymentOptions;
+    }
+
+    public void setPaymentOptions(List<PaymentOptions> paymentOptions) {
+        this.paymentOptions = paymentOptions;
+    }
+
+    public List<PayChannelOptions> getPayChannelOptions() {
+        return payChannelOptions;
+    }
+
+    public void setPayChannelOptions(List<PayChannelOptions> payChannelOptions) {
+        this.payChannelOptions = payChannelOptions;
     }
 
     public void initiateTransaction(String orderId,
@@ -142,13 +161,15 @@ public class PaymentGatewayBean {
                                 transactionToken = (String) bodyObjValue;
 //                                System.out.println("transactionToken: " + transactionToken);
                             }
-                            if (bodyObjKey.equals("resultInfo") && bodyObjValue instanceof JSONObject) {
-                                for (String resultInfoObjKey : ((JSONObject) bodyObjValue).keySet()) {
-                                    Object resultInfoObjValue = ((JSONObject) bodyObjValue).get(resultInfoObjKey);
+                            if (paymentOptions.isEmpty()) {
+                                if (bodyObjKey.equals("resultInfo") && bodyObjValue instanceof JSONObject) {
+                                    for (String resultInfoObjKey : ((JSONObject) bodyObjValue).keySet()) {
+                                        Object resultInfoObjValue = ((JSONObject) bodyObjValue).get(resultInfoObjKey);
 //                                            System.out.println("resultInfoObjKey: " + resultInfoObjKey + " resultInfoObjValue: " + resultInfoObjValue);
-                                    if (resultInfoObjKey.equals("resultCode") && resultInfoObjValue.equals("0000")) {
-                                        System.out.println("Call Payment Options API");
-                                        fetchPaymentOptions(orderId);
+                                        if (resultInfoObjKey.equals("resultCode") && resultInfoObjValue.equals("0000")) {
+//                                        System.out.println("Call Payment Options API");
+                                            fetchPaymentOptions(orderId);
+                                        }
                                     }
                                 }
                             }
@@ -252,19 +273,29 @@ public class PaymentGatewayBean {
                                         JSONArray jsonArray = (JSONArray) merchantPayOptionObjValue;
                                         for (int i = 0; i < jsonArray.length(); i++) {
                                             JSONObject obj = jsonArray.getJSONObject(i);
-                                            logger.log(Level.SEVERE, "Object is {0}", obj.toString());
+//                                            logger.log(Level.SEVERE, "Object is {0}", obj.toString());
                                             String paymentMode = obj.getString("paymentMode");
                                             String displayName = obj.getString("displayName");
                                             boolean isHybridDisabled = obj.getBoolean("isHybridDisabled");
                                             boolean onboarding = obj.getBoolean("onboarding");
                                             String priority = obj.getString("priority");
+
                                             paymentOptions.add(new PaymentOptions(paymentMode, displayName, isHybridDisabled, onboarding, priority));
-//                                            logger.log(Level.SEVERE, "List Size is {0}", Integer.toString(paymentOptions.size()));
                                             
-//                                            for (String objKey : obj.keySet()) {
-//                                                Object objValue = obj.get(objKey);
-//                                                System.out.println("objKey: " + objKey + " objValue: " + objValue);   
-//                                            }
+                                            if ((obj.getString("paymentMode")).equals("NET_BANKING") && (obj.get("payChannelOptions") instanceof JSONArray)) {
+                                                JSONArray jsonArray1 = (JSONArray) obj.get("payChannelOptions");
+                                                for (int j = 0; j < jsonArray1.length(); j++) {
+                                                    JSONObject obj1 = jsonArray1.getJSONObject(j);
+//                                                    logger.log(Level.SEVERE, "Object1 is {0}", obj1.toString());
+                                                    boolean isChannelOptionHybridDisabled = obj1.getBoolean("isHybridDisabled");
+                                                    String channelName = obj1.getString("channelName");
+                                                    String iconUrl = obj1.getString("iconUrl");
+                                                    String channelCode = obj1.getString("channelCode");
+
+                                                    payChannelOptions.add(new PayChannelOptions(isChannelOptionHybridDisabled, channelName, iconUrl, channelCode));
+//                                                    logger.log(Level.SEVERE, "PayChannelOptions List Size is {0}", Integer.toString(payChannelOptions.size()));
+                                                }
+                                            }
                                         }
                                     }
                                 }
