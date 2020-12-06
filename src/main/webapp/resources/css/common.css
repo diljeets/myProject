@@ -25,6 +25,22 @@ body .ui-panel .ui-panel-content {
     background: 0;
     padding: 0;    
 }
+.table-paymentoptions thead, .table-channeloptions thead{
+    display: none;
+}
+.ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight {
+    border: none;
+    background: none;
+    color: #222;
+}
+.ui-widget-content {
+    border: none;
+}
+    
+    
+/*body .table-channeloptions .ui-widget-content {
+    border: 1px solid #fff !important;
+}*/
 /*body .ui-progressbar .ui-progressbar-value {
     border: 0 none;
     margin: 0;

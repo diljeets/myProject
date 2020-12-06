@@ -23,6 +23,8 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Response;
+import org.json.JSONObject;
 
 /**
  *
@@ -32,24 +34,24 @@ import javax.servlet.http.HttpServletRequest;
 public class CheckoutServiceBean implements CheckoutService {
 
     private static final Logger logger = Logger.getLogger(CheckoutServiceBean.class.getCanonicalName());
-    
+
     @PersistenceContext(name = "my-persistence-unit")
     private EntityManager em;
-    
+
     @EJB
     PaymentGatewayBean paymentGatewayBean;
-    
+
     @Inject
     HttpServletRequest req;
-    
+
     @Inject
     TemplateController templateController;
-    
-    private String deliveryAddress;    
-    
-    private String deliveryTime;    
 
-    public CheckoutServiceBean() {        
+    private String deliveryAddress;
+    private String deliveryTime;
+//    private String orderId;
+
+    public CheckoutServiceBean() {
     }
 
     @PostConstruct
@@ -67,13 +69,13 @@ public class CheckoutServiceBean implements CheckoutService {
     }
 
     @Override
-    public void addDeliveryAddress(RegisteredUsersAddress selectedAddress) {            
-        deliveryAddress = selectedAddress.getHouseNo() + ", " +
-                selectedAddress.getBuildingNo() +  ", " +
-                selectedAddress.getStreet() +  ", " +
-                selectedAddress.getCity() +  ", " +
-                selectedAddress.getState() + "-" +
-                selectedAddress.getPincode();
+    public void addDeliveryAddress(RegisteredUsersAddress selectedAddress) {
+        deliveryAddress = selectedAddress.getHouseNo() + ", "
+                + selectedAddress.getBuildingNo() + ", "
+                + selectedAddress.getStreet() + ", "
+                + selectedAddress.getCity() + ", "
+                + selectedAddress.getState() + "-"
+                + selectedAddress.getPincode();
     }
 
     @Override
@@ -82,30 +84,63 @@ public class CheckoutServiceBean implements CheckoutService {
     }
 
     @Override
-    public void initiateTransaction(String payableAmount) {        
+    public void initiateTransaction(String payableAmount) {
         String orderId = MyProjectUtils.createOrderId();
         String username = req.getUserPrincipal().getName();
-        try {                
-            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username);            
+        try {
+            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    
+
+    @Override
+    public Response sendOTP(String paytmMobile) {
+        Response response = null;
+        try {
+            response = paymentGatewayBean.sendOTP(paytmMobile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    @Override
+    public Response validateOtpAndFetchBalanceInfo(String otp) {
+        Response response = null;
+        try {
+            response = paymentGatewayBean.validateOtpAndFetchBalanceInfo(otp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    @Override
+    public Response processTransaction(String paymentMode) {
+        Response response = null;
+        try {
+            response = paymentGatewayBean.processTransaction(paymentMode);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
     @Override
     public void placeOrder(CustomerOrder customerOrder) {
         String orderId = MyProjectUtils.createOrderId();
         String payableAmount = customerOrder.getPayableAmount();
         String customerName = templateController.getCurrentCustomer();
         String username = req.getUserPrincipal().getName();
-        try {                
+        try {
             paymentGatewayBean.initiateTransaction(orderId, payableAmount, username);
             customerOrder.setCustomerName(customerName);
             customerOrder.setUsername(username);
             customerOrder.setDateOrderCreated(new Date());
             customerOrder.setOrderId(orderId);
             List<Cart> cartItems = customerOrder.getOrders();
-            for(Cart cartItem : cartItems){
+            for (Cart cartItem : cartItems) {
                 cartItem.setCustomerOrder(customerOrder);
             }
 //            em.persist(customerOrder);
@@ -113,8 +148,5 @@ public class CheckoutServiceBean implements CheckoutService {
             e.printStackTrace();
         }
     }
-
-    
-    
 
 }

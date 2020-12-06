@@ -13,6 +13,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -21,31 +22,47 @@ import javax.ws.rs.core.MediaType;
 //@Remote
 @Path("/Checkout")
 public interface CheckoutService {
-    
+
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     public void addDeliveryTime(String selectedTime);
-    
+
     @GET
     @Path("delivery-time")
     @Produces({MediaType.TEXT_PLAIN})
-    public String getDeliveryTime(); 
-    
+    public String getDeliveryTime();
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public void addDeliveryAddress(RegisteredUsersAddress selectedAddress); 
-    
+    public void addDeliveryAddress(RegisteredUsersAddress selectedAddress);
+
     @GET
     @Path("delivery-address")
     @Produces({MediaType.TEXT_PLAIN})
-    public String getDeliveryAddress();  
-    
+    public String getDeliveryAddress();
+
     @POST
+    @Path("initiate-transaction")
     @Consumes(MediaType.APPLICATION_JSON)
     public void initiateTransaction(String payableAmount);
-    
+
+    @POST
+    @Path("sendOTP")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response sendOTP(String paytmMobile);
+
+    @POST
+    @Path("validateOTP/fetchBalance")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response validateOtpAndFetchBalanceInfo(String otp);
+
+    @POST
+    @Path("process-transaction")
+    @Consumes(MediaType.APPLICATION_JSON)    
+    public Response processTransaction(String paymentMode);
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public void placeOrder(CustomerOrder customerOrder);
-   
+
 }

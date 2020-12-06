@@ -13,7 +13,14 @@
     </h:head>
     <h:body>        
         <div id="top" class="top">
-            <h:form id="navForm">  
+            <h:form id="navForm">
+                <p:panel widgetVar="progressPanel"
+                         visible="false"
+                         style="border:none;"
+                         closable="true"
+                         toggleable="true">
+                    <p:progressBar mode="indeterminate"/>
+                </p:panel>
                 <p:growl id="messages"/>
 
                 <p:menubar>   
@@ -29,7 +36,7 @@
             <ui:insert name="top">Top Section</ui:insert>
         </div>
         <div>
-            <div id="content">
+            <div id="content">                
                 <ui:insert name="content">Main Content</ui:insert>
             </div>
         </div>  

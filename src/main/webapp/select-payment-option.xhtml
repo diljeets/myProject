@@ -4,7 +4,8 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>Select Payment Option</title>
     </h:head>
@@ -13,26 +14,102 @@
             <ui:define name="top"></ui:define>
             <ui:define name="content"> 
                 <h3>Select Payment Method</h3>
-                <h:form id="myDatatable">
+                <h:form id="form-payment-options">    
+                    <p:messages id="messages" showDetail="true" closable="true">
+                        <p:autoUpdate />
+                    </p:messages> 
                     <p>             
-                        <p:dataTable id="datatable"                              
+                        <p:dataTable id="datatable-paymentoptions"
+                                     class="table-paymentoptions"                                    
                                      value="#{checkoutController.paymentOptions}"        
-                                     var="option"
-                                     selection="#{checkoutController.option}"
-                                     rowKey="#{option.paymentMode}"
+                                     var="paymentOption"
+                                     selection="#{checkoutController.paymentOption}"
+                                     rowKey="#{paymentOption.paymentMode}"
                                      rendered="#{checkoutController.paymentOptions.size() > 0}"
-                                     summary="List of Payment Methods" 
-                                     draggableColumns="true" 
-                                     draggableRows="true">   
-                            <p:column selectionMode="single" style="width:40px;text-align:center"/>
+                                     summary="List of Payment Methods">  
+                            <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelect}" process="@this,paytm,creditcard,debitcard,netbanking" update="@this,paytm,creditcard,debitcard,netbanking"/>
+                            <p:column selectionMode="single" style="width:16px;text-align:center"/>                              
                             <p:column>
-                                <h:outputText value="#{option.displayName}"/>
+                                <h:outputText value="#{paymentOption.displayName}"/>                                
+                                <p:panel id="paytm" 
+                                         rendered="#{checkoutController.isModePaytm}"
+                                         style="border:none;"> 
+                                    <p:panel rendered="#{paymentOption.paymentMode eq 'BALANCE'}" style="border:none;">
+                                        <div class="ui-g ui-fluid">
+                                            <div class="ui-g-12 ui-md-2">
+                                                <div class="ui-inputgroup">
+                                                    <span class="ui-inputgroup-addon">Paytm Mobile</span>
+                                                    <p:inputText placeholder="Enter Mobile" id="paytm-mobile" value="#{checkoutController.paytmMobile}" maxlength="10"/>    
+                                                    <p:commandButton value="Send OTP" actionListener="#{checkoutController.sendOTP(checkoutController.paytmMobile)}" onclick="PF('progressPanel').show();PF('sendOtpBtn').disable();" oncomplete="PF('progressPanel').close();PF('sendOtpBtn').enable();" widgetVar="sendOtpBtn"/>
+                                                </div>
+                                            </div>
+                                        </div>                                            
+                                        <div class="ui-g ui-fluid">
+                                            <div class="ui-g-12 ui-md-2">
+                                                <div class="ui-inputgroup">
+                                                    <span class="ui-inputgroup-addon">Enter OTP</span>
+                                                    <p:inputText placeholder="Enter OTP" id="enter-otp" value="#{checkoutController.otp}" maxlength="6"/>    
+                                                    <p:commandButton value="Submit" actionListener="#{checkoutController.validateOtpAndFetchBalanceInfo(checkoutController.otp)}" onclick="PF('progressPanel').show();PF('enterOtpBtn').disable();" oncomplete="PF('progressPanel').close();PF('enterOtpBtn').enable();" widgetVar="enterOtpBtn" update="balance"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="ui-g ui-fluid">
+                                            <div class="ui-g-12 ui-md-2">
+                                                <div class="ui-inputgroup">                                                    
+                                                    <h:outputText id="balance" value="#{checkoutController.currency} #{checkoutController.balance}"/>  
+                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode)}" onclick="PF('progressPanel').show();PF('payBtn').disable();" oncomplete="PF('progressPanel').close();PF('payBtn').enable();" widgetVar="payBtn"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </p:panel>                                 
+                                </p:panel>
+                                <p:panel id="creditcard" 
+                                         rendered="#{checkoutController.isModeCC}"
+                                         style="border:none;">
+                                    <p:panel rendered="#{paymentOption.paymentMode eq 'CREDIT_CARD'}" style="border:none;">
+                                         <div class="ui-g ui-fluid">
+                                            <div class="ui-g-12 ui-md-2">
+                                                <div class="ui-inputgroup">  
+                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode)}" onclick="PF('progressPanel').show();PF('payByCCBtn').disable();" oncomplete="PF('progressPanel').close();PF('payByCCBtn').enable();" widgetVar="payByCCBtn"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </p:panel>                                                                    
+                                </p:panel>
+                                <p:panel id="debitcard" 
+                                         rendered="#{checkoutController.isModeDC}"
+                                         style="border:none;">
+                                    <p:panelGrid rendered="#{paymentOption.paymentMode eq 'DEBIT_CARD'}">
+                                        <span class="ui-float-label">
+                                            <p:inputText id="mobiledc"/>
+                                            <p:outputLabel for="mobiledc" value="Paytm Mobile" />
+                                            <p:message for="mobiledc"/>
+                                        </span>
+                                    </p:panelGrid>                                   
+                                </p:panel>
+                                <p:panel id="netbanking" 
+                                         rendered="#{checkoutController.isModeNB}"
+                                         style="border:none;">
+                                    <p:dataTable id="datatable-channeloptions" 
+                                                 class="table-channeloptions"
+                                                 value="#{checkoutController.payChannelOptions}"        
+                                                 var="payChannelOption"
+                                                 selection="#{checkoutController.payChannelOption}"
+                                                 rowKey="#{payChannelOption.channelCode}" 
+                                                 rendered="#{paymentOption.paymentMode eq 'NET_BANKING'}" 
+                                                 summary="List of Payment Banks">                                     
+                                        <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                                        <p:column>
+                                            <h:outputText value="#{payChannelOption.channelName}"/>                                
+                                        </p:column>                                                                    
+                                    </p:dataTable>
+                                </p:panel>
                             </p:column>
                             <f:facet name="footer">
-                                <p:commandButton process="datatable" actionListener="#{checkoutController.addDeliveryAddress(registeredUsersAddressController.address)}" value="Deliver at this Address"/>
+                                <p:commandButton process="datatable-paymentoptions" actionListener="#{checkoutController.addDeliveryAddress(registeredUsersAddressController.address)}" value="Deliver at this Address"/>
                             </f:facet>                                           
                         </p:dataTable>
-                    </p>                    
+                    </p>                       
                 </h:form>   
             </ui:define>
         </ui:composition>

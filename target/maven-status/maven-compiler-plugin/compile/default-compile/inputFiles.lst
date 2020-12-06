@@ -24,6 +24,7 @@
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/MealPlanCategoryServiceBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/customexceptions/PasswordsDontMatchException.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/CheckoutController.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/CheckoutBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/CheckoutServiceBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/MealPlanCategoryBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/entities/Cart.java
