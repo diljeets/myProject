@@ -30,7 +30,8 @@
                             <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelect}" process="@this,paytm,creditcard,debitcard,netbanking" update="@this,paytm,creditcard,debitcard,netbanking"/>
                             <p:column selectionMode="single" style="width:16px;text-align:center"/>                              
                             <p:column>
-                                <h:outputText value="#{paymentOption.displayName}"/>                                
+                                <h:outputText value="#{paymentOption.displayName}"/>      
+                                
                                 <p:panel id="paytm" 
                                          rendered="#{checkoutController.isModePaytm}"
                                          style="border:none;"> 
@@ -49,7 +50,7 @@
                                                 <div class="ui-inputgroup">
                                                     <span class="ui-inputgroup-addon">Enter OTP</span>
                                                     <p:inputText placeholder="Enter OTP" id="enter-otp" value="#{checkoutController.otp}" maxlength="6"/>    
-                                                    <p:commandButton value="Submit" actionListener="#{checkoutController.validateOtpAndFetchBalanceInfo(checkoutController.otp)}" onclick="PF('progressPanel').show();PF('enterOtpBtn').disable();" oncomplete="PF('progressPanel').close();PF('enterOtpBtn').enable();" widgetVar="enterOtpBtn" update="balance"/>
+                                                    <p:commandButton value="Submit" actionListener="#{checkoutController.validateOtpAndFetchPaytmBalance(checkoutController.otp)}" onclick="PF('progressPanel').show();PF('enterOtpBtn').disable();" oncomplete="PF('progressPanel').close();PF('enterOtpBtn').enable();" widgetVar="enterOtpBtn" update="balance"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -57,17 +58,36 @@
                                             <div class="ui-g-12 ui-md-2">
                                                 <div class="ui-inputgroup">                                                    
                                                     <h:outputText id="balance" value="#{checkoutController.currency} #{checkoutController.balance}"/>  
-                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode)}" onclick="PF('progressPanel').show();PF('payBtn').disable();" oncomplete="PF('progressPanel').close();PF('payBtn').enable();" widgetVar="payBtn"/>
+                                                    <p:commandButton value="Pay" action="#{checkoutController.processTransaction(paymentOption.paymentMode)}" onclick="PF('progressPanel').show();PF('payBtn').disable();" oncomplete="PF('progressPanel').close();PF('payBtn').enable();" widgetVar="payBtn"/>
                                                 </div>
                                             </div>
                                         </div>
                                     </p:panel>                                 
                                 </p:panel>
+                                
                                 <p:panel id="creditcard" 
                                          rendered="#{checkoutController.isModeCC}"
                                          style="border:none;">
-                                    <p:panel rendered="#{paymentOption.paymentMode eq 'CREDIT_CARD'}" style="border:none;">
-                                         <div class="ui-g ui-fluid">
+                                    <p:panel rendered="#{paymentOption.paymentMode eq 'CREDIT_CARD'}" style="border:none;">   
+                                        <div class="ui-g ui-fluid">
+                                            <div class="ui-g-12 ui-md-2" rendered="#{checkoutController.isCardValid}">
+                                                <h:outputText id="issuingBank" value="#{checkoutController.issuingBank}"/>
+                                            </div>
+                                        </div> 
+                                        <div class="ui-g ui-fluid">
+                                            <div class="ui-g-12 ui-md-2">
+                                                <div class="ui-inputgroup">
+                                                    <span class="ui-inputgroup-addon">Credit Card Number</span>    
+                                                    <p:inputText id="ccNumber" value="#{checkoutController.creditcardNumber}" maxlength="16">
+                                                        <p:ajax event="keyup" listener="#{checkoutController.fetchBinDetails}" process="@this,cardIcon,issuingBank" update="cardIcon,issuingBank"/>
+                                                    </p:inputText> 
+                                                    <span class="ui-inputgroup-addon" rendered="#{checkoutController.isCardValid}">
+                                                         <p:graphicImage id="cardIcon" value="#{checkoutController.cardIconUrl}"/>
+                                                    </span>                                                 
+                                                </div>
+                                            </div>
+                                        </div>         
+                                        <div class="ui-g ui-fluid">
                                             <div class="ui-g-12 ui-md-2">
                                                 <div class="ui-inputgroup">  
                                                     <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode)}" onclick="PF('progressPanel').show();PF('payByCCBtn').disable();" oncomplete="PF('progressPanel').close();PF('payByCCBtn').enable();" widgetVar="payByCCBtn"/>
@@ -76,6 +96,7 @@
                                         </div>
                                     </p:panel>                                                                    
                                 </p:panel>
+                                
                                 <p:panel id="debitcard" 
                                          rendered="#{checkoutController.isModeDC}"
                                          style="border:none;">
@@ -87,6 +108,7 @@
                                         </span>
                                     </p:panelGrid>                                   
                                 </p:panel>
+                                
                                 <p:panel id="netbanking" 
                                          rendered="#{checkoutController.isModeNB}"
                                          style="border:none;">

@@ -10,9 +10,11 @@ import com.diljeet.myProject.ejb.PaymentGatewayBean;
 import com.diljeet.myProject.entities.CustomerOrder;
 import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.interfaces.CheckoutService;
+import com.diljeet.myProject.utils.CardBinDetails;
 import com.diljeet.myProject.utils.PayChannelOptions;
 import com.diljeet.myProject.utils.PaymentOptions;
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.List;
@@ -56,6 +58,14 @@ public class CheckoutController implements Serializable {
     private String currency;
     private String balance;
     private boolean isModeCC;
+    private String creditcardNumber;
+    private boolean isCardValid;
+    private String issuingBank;
+    private String channelName;
+    private String isCvvRequired;
+    private String isExpRequired;
+    private String cardIconUrl;
+    private String isCardActive;
     private boolean isModeDC;
     private boolean isModeNB;
 //    private UIComponent sendOtpBtn;
@@ -187,6 +197,70 @@ public class CheckoutController implements Serializable {
         this.isModeCC = isModeCC;
     }
 
+    public String getCreditcardNumber() {
+        return creditcardNumber;
+    }
+
+    public void setCreditcardNumber(String creditcardNumber) {
+        this.creditcardNumber = creditcardNumber;
+    }
+
+    public boolean isIsCardValid() {
+        return isCardValid;
+    }
+
+    public void setIsCardValid(boolean isCardValid) {
+        this.isCardValid = isCardValid;
+    }
+
+    public String getIssuingBank() {
+        return issuingBank;
+    }
+
+    public void setIssuingBank(String issuingBank) {
+        this.issuingBank = issuingBank;
+    }
+
+    public String getChannelName() {
+        return channelName;
+    }
+
+    public void setChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
+    public String getIsCvvRequired() {
+        return isCvvRequired;
+    }
+
+    public void setIsCvvRequired(String isCvvRequired) {
+        this.isCvvRequired = isCvvRequired;
+    }
+
+    public String getIsExpRequired() {
+        return isExpRequired;
+    }
+
+    public void setIsExpRequired(String isExpRequired) {
+        this.isExpRequired = isExpRequired;
+    }
+
+    public String getCardIconUrl() {
+        return cardIconUrl;
+    }
+
+    public void setCardIconUrl(String cardIconUrl) {
+        this.cardIconUrl = cardIconUrl;
+    }
+
+    public String getIsCardActive() {
+        return isCardActive;
+    }
+
+    public void setIsCardActive(String isCardActive) {
+        this.isCardActive = isCardActive;
+    }
+
     public boolean isIsModeDC() {
         return isModeDC;
     }
@@ -234,17 +308,21 @@ public class CheckoutController implements Serializable {
     public void sendOTP(String paytmMobile) {
         checkoutBean.sendOTP(paytmMobile);
     }
-    
-    public void validateOtpAndFetchBalanceInfo(String otp) {
-        checkoutBean.validateOtpAndFetchBalanceInfo(otp);
+
+    public void validateOtpAndFetchPaytmBalance(String otp) {
+        checkoutBean.validateOtpAndFetchPaytmBalance(otp);
     }
-    
+
+    public void fetchPaytmBalance() {
+        paymentGatewayBean.fetchPaytmBalance();
+    }
+
     public void processTransaction(String paymentMode) {
         checkoutBean.processTransaction(paymentMode);
     }
 
     public void placeOrder(CustomerOrder customerOrder) {
-        checkoutService.placeOrder(customerOrder);
+//        checkoutService.placeOrder(customerOrder);
     }
 
     public void placeOrder() {
@@ -269,6 +347,29 @@ public class CheckoutController implements Serializable {
 //            logger.log(Level.SEVERE, "Pay mode is {0}", paymode);
         } else {
             isModeNB = true;
+        }
+    }
+
+    public void fetchBinDetails(AjaxBehaviorEvent event) {
+        String cardDigits = (String) ((UIOutput) event.getSource()).getValue();
+//        logger.log(Level.SEVERE, "Digits are {0}", cardDigits);
+        if (creditcardNumber.length() == 6) {
+            isCardValid = checkoutBean.fetchBinDetails(cardDigits);
+            if (isCardValid) {
+                List<CardBinDetails> cardBinDetails = paymentGatewayBean.getCardBinDetails();
+                Iterator<CardBinDetails> itr = cardBinDetails.iterator();
+                while (itr.hasNext()) {
+                    CardBinDetails cardDetails = itr.next();
+                    issuingBank = cardDetails.getIssuingBank();
+                    channelName = cardDetails.getChannelName();
+                    isCvvRequired = cardDetails.getIsCvvRequired();
+                    isExpRequired = cardDetails.getIsExpRequired();
+                    cardIconUrl = cardDetails.getCardIconUrl();
+                    isCardActive = cardDetails.getIsActive();
+                }
+            }
+        } else {
+            isCardValid = false;
         }
     }
 
