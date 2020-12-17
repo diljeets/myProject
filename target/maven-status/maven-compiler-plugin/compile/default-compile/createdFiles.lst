@@ -22,7 +22,6 @@ com/diljeet/myProject/controllers/RegisteredUsersAddressController.class
 com/diljeet/myProject/interfaces/MealPlanCategoryService.class
 com/diljeet/myProject/services/MealPlanCategoryServiceBean.class
 com/diljeet/myProject/ejb/CheckoutBean.class
-com/diljeet/myProject/utils/TransactionDetails.class
 com/diljeet/myProject/controllers/TemplateController.class
 com/diljeet/myProject/customexceptions/ErrorCreatingUserException.class
 com/diljeet/myProject/interfaces/RegisteredUsersAddressService.class

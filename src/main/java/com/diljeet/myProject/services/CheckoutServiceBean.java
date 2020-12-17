@@ -15,6 +15,8 @@ import javax.ejb.Stateful;
 import com.diljeet.myProject.interfaces.CheckoutService;
 import com.diljeet.myProject.utils.InitiateTransaction;
 import com.diljeet.myProject.utils.MyProjectUtils;
+import com.diljeet.myProject.utils.PayChannelOptions;
+import com.diljeet.myProject.utils.PaymentOptions;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -63,13 +65,14 @@ public class CheckoutServiceBean implements CheckoutService {
 
     @Override
     public void addDeliveryTime(String selectedTime) {
-        deliveryTime = selectedTime;
+        this.deliveryTime = selectedTime;
     }
-
-    @Override
-    public String getDeliveryTime() {
-        return deliveryTime;
-    }
+//
+//    @Override
+//    public Response getDeliveryTime() {
+//        logger.log(Level.SEVERE, "getDeliveryTime service bean {0}", deliveryTime);
+//        return Response.ok().entity(deliveryTime).build();
+//    }
 
     @Override
     public void addDeliveryAddress(RegisteredUsersAddress selectedAddress) {
@@ -97,17 +100,41 @@ public class CheckoutServiceBean implements CheckoutService {
 //        }
 //    }
     @Override
-    public void initiateTransaction(InitiateTransaction initiateTransaction) {
+    public Response initiateTransaction(InitiateTransaction initiateTransaction) {
         String orderId = MyProjectUtils.createOrderId();
         String username = req.getUserPrincipal().getName();
         String payableAmount = initiateTransaction.getPayableAmount();
         String channelId = initiateTransaction.getChannelId();
         String callbackUrl = initiateTransaction.getCallbackUrl();
+        Response response = null;
         try {
-            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username, channelId, callbackUrl);
+            response = paymentGatewayBean.initiateTransaction(orderId, payableAmount, username, channelId, callbackUrl);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return response;
+    }
+
+    @Override
+    public List<PaymentOptions> fetchPaymentOptions() {
+        List<PaymentOptions> paymentOptions = null;
+        try {
+            paymentOptions = paymentGatewayBean.getPaymentOptions();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return paymentOptions;
+    }
+
+    @Override
+    public List<PayChannelOptions> fetchPayChannelOptions() {
+        List<PayChannelOptions> payChannelOptions = null;
+        try {
+            payChannelOptions = paymentGatewayBean.getPayChannelOptions();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return payChannelOptions;
     }
 
     @Override
@@ -143,65 +170,37 @@ public class CheckoutServiceBean implements CheckoutService {
         return response;
     }
 
-//    @Override
-//    public Response processTransaction(String paymentMode, HttpServletRequest req, HttpServletResponse res) {
-//        Response response = null;
-//        try {
-//            response = paymentGatewayBean.processTransaction(paymentMode, req, res);
-//            String callbackUrl = response.getHeaderString("callbackUrl");
-//            RequestDispatcher dispatcher = req.getServletContext().getRequestDispatcher(callbackUrl);
-//            dispatcher.forward(req,res);
-//        } catch (Exception e) {
-//             e.printStackTrace();
-//        }
-//        return null;
-//    }
     @Override
     public Response processTransaction(String paymentMode) {
         Response response = null;
         try {
             response = paymentGatewayBean.processTransaction(paymentMode);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         return response;
     }
 
-//    @Override
-//    public String processTransaction(String paymentMode, 
-//            HttpServletRequest req, 
-//            HttpServletResponse res) {
-//        String returnUrl = null;
-//        try {
-//            returnUrl = paymentGatewayBean.processTransaction(paymentMode);            
-//            res.sendRedirect(returnUrl);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }        
-//        return returnUrl;
-//    }
-//    @Override
-//    public void placeOrder(CustomerOrder customerOrder) {
-//        String orderId = MyProjectUtils.createOrderId();
+    @Override
+    public void placeOrder(CustomerOrder customerOrder) {
+        String orderId = customerOrder.getCustomerTransaction().getOrderId();
 //        String payableAmount = customerOrder.getPayableAmount();
-//        String customerName = templateController.getCurrentCustomer();
-//        String username = req.getUserPrincipal().getName();
-//        try {
+        String customerName = templateController.getCurrentCustomer();
+        String username = req.getUserPrincipal().getName();
+        try {
 //            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username);
-//            customerOrder.setCustomerName(customerName);
-//            customerOrder.setUsername(username);
-//            customerOrder.setDateOrderCreated(new Date());
-//            customerOrder.setOrderId(orderId);
-//            List<Cart> cartItems = customerOrder.getOrders();
-//            for (Cart cartItem : cartItems) {
-//                cartItem.setCustomerOrder(customerOrder);
-//            }
-////            em.persist(customerOrder);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+            customerOrder.setCustomerName(customerName);
+            customerOrder.setUsername(username);
+            customerOrder.setDateOrderCreated(new Date());
+            customerOrder.setOrderId(orderId);
+            List<Cart> cartItems = customerOrder.getOrders();
+            for (Cart cartItem : cartItems) {
+                cartItem.setCustomerOrder(customerOrder);
+            }
+            em.persist(customerOrder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-    
 }

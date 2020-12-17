@@ -15,22 +15,15 @@ import com.diljeet.myProject.utils.PayChannelOptions;
 import com.diljeet.myProject.utils.PaymentOptions;
 import java.io.Serializable;
 import java.util.Iterator;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.event.AjaxBehaviorEvent;
-import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import org.primefaces.event.SelectEvent;
 
 /**
@@ -126,7 +119,7 @@ public class CheckoutController implements Serializable {
     }
 
     public List<PaymentOptions> getPaymentOptions() {
-        return paymentGatewayBean.getPaymentOptions();
+        return checkoutBean.fetchPaymentOptions();
     }
 
     public void setPaymentOptions(List<PaymentOptions> paymentOptions) {
@@ -142,7 +135,7 @@ public class CheckoutController implements Serializable {
     }
 
     public List<PayChannelOptions> getPayChannelOptions() {
-        return paymentGatewayBean.getPayChannelOptions();
+        return checkoutBean.fetchPayChannelOptions();
     }
 
     public void setPayChannelOptions(List<PayChannelOptions> payChannelOptions) {
@@ -296,8 +289,8 @@ public class CheckoutController implements Serializable {
         checkoutService.addDeliveryAddress(selectedAddress);
     }
 
-    public void addDeliveryTime(AjaxBehaviorEvent event) {
-        String selectedTime = (String) ((UIOutput) event.getSource()).getValue();
+    public void addDeliveryTime(SelectEvent event) {
+        String selectedTime = event.getObject().toString();
         checkoutService.addDeliveryTime(selectedTime);
     }
 
@@ -313,23 +306,8 @@ public class CheckoutController implements Serializable {
         checkoutBean.validateOtpAndFetchPaytmBalance(otp);
     }
 
-    public void fetchPaytmBalance() {
-        paymentGatewayBean.fetchPaytmBalance();
-    }
-
     public void processTransaction(String paymentMode) {
         checkoutBean.processTransaction(paymentMode);
-    }
-
-    public void placeOrder(CustomerOrder customerOrder) {
-//        checkoutService.placeOrder(customerOrder);
-    }
-
-    public void placeOrder() {
-        placeOrder(new CustomerOrder(getDeliveryTime(),
-                getDeliveryAddress(),
-                cartController.getCartItems(),
-                cartController.getPayableAmount()));
     }
 
     public void onRowSelect(SelectEvent<PaymentOptions> event) {

@@ -17,14 +17,13 @@
                     <h:form>
                         <p:panelGrid>
                             <span class="ui-float-label">
-                                <p:selectOneMenu id="time" value="#{checkoutController.deliveryTime}" effect="fold">
-                                    <f:selectItem itemLabel="Select One" itemValue="" />
-                                    <f:selectItem itemLabel="12:00 PM" itemValue="12:00" />
-                                    <f:selectItem itemLabel="12:30 PM" itemValue="12:30" />
-                                    <f:selectItem itemLabel="01:00 PM" itemValue="01:00" />                   
-                                    <f:selectItem itemLabel="01:30 PM" itemValue="01:30" />    
-                                    <f:selectItem itemLabel="02:00 PM" itemValue="02:00" />
-                                    <f:ajax listener="#{checkoutController.addDeliveryTime}"/>
+                                <p:selectOneMenu id="time" value="#{checkoutController.deliveryTime}" effect="fold">                                    
+                                    <f:selectItem itemLabel="12:00 PM" itemValue="12:00"/>
+                                    <f:selectItem itemLabel="12:30 PM" itemValue="12:30"/>
+                                    <f:selectItem itemLabel="01:00 PM" itemValue="01:00"/>                   
+                                    <f:selectItem itemLabel="01:30 PM" itemValue="01:30"/>    
+                                    <f:selectItem itemLabel="02:00 PM" itemValue="02:00"/>    
+                                    <p:ajax event="itemSelect" listener="#{checkoutController.addDeliveryTime}"/>
                                 </p:selectOneMenu>
                                 <p:outputLabel for="time" value="Delivery Time"/>
                                 <p:message for="time"/>
@@ -137,10 +136,7 @@
                         <p:commandButton value="Add Address" id="addAddressBtn" class="cmdBtn" action="#{registeredUsersAddressController.addAddress(registeredUsersAddressController.address)}" update="checkoutForm msgs myDatatable" onclick="PF('progressPanel').show();PF('addAddressBtn').disable();" oncomplete="PF('progressPanel').close();PF('addAddressBtn').enable();" widgetVar="addAddressBtn"/>
                         <p>
                             <p:commandButton value="Continue" action="select-payment-option.xhtml" actionListener="#{checkoutController.initiateTransaction(checkoutController.cartController.payableAmount)}" onclick="PF('progressPanel').show();PF('continueBtn').disable();" oncomplete="PF('progressPanel').close();PF('continueBtn').enable();" widgetVar="continueBtn"/>
-                        </p>
-                        <p>
-                            <p:commandButton actionListener="#{checkoutController.placeOrder}" value="Place Order"/>
-                        </p>                        
+                        </p>                                           
                     </h:form>
                 </p>
 

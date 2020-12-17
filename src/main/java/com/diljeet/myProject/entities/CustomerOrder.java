@@ -17,6 +17,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -38,21 +39,24 @@ public class CustomerOrder implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private String orderId;
-    
+
     private String customerName;
-    
+
     private String username;
 
     private String deliveryTime;
-    
+
     private String deliveryAddress;
-    
+
     private String payableAmount;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateOrderCreated;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)    
+    private CustomerTransaction customerTransaction;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "customerOrder")
     @JsonbTransient
@@ -62,14 +66,16 @@ public class CustomerOrder implements Serializable {
     public CustomerOrder() {
     }
 
-    public CustomerOrder(String deliveryTime, 
+    public CustomerOrder(String deliveryTime,
             String deliveryAddress,
             List<Cart> cartItems,
-            String payableAmount) {
+            String payableAmount,
+            CustomerTransaction customerTransaction) {
         this.deliveryTime = deliveryTime;
         this.deliveryAddress = deliveryAddress;
         this.orders = cartItems;
         this.payableAmount = payableAmount;
+        this.customerTransaction = customerTransaction;
     }
 
     public Long getId() {
@@ -111,7 +117,7 @@ public class CustomerOrder implements Serializable {
     public void setDeliveryTime(String deliveryTime) {
         this.deliveryTime = deliveryTime;
     }
-    
+
     public String getDeliveryAddress() {
         return deliveryAddress;
     }
@@ -134,6 +140,14 @@ public class CustomerOrder implements Serializable {
 
     public void setDateOrderCreated(Date dateOrderCreated) {
         this.dateOrderCreated = dateOrderCreated;
+    }
+
+    public CustomerTransaction getCustomerTransaction() {
+        return customerTransaction;
+    }
+
+    public void setCustomerTransaction(CustomerTransaction customerTransaction) {
+        this.customerTransaction = customerTransaction;
     }
 
     public List<Cart> getOrders() {

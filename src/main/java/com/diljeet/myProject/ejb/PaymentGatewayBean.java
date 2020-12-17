@@ -8,7 +8,7 @@ package com.diljeet.myProject.ejb;
 import com.diljeet.myProject.utils.CardBinDetails;
 import com.diljeet.myProject.utils.PayChannelOptions;
 import com.diljeet.myProject.utils.PaymentOptions;
-import com.diljeet.myProject.utils.TransactionDetails;
+import com.diljeet.myProject.utils.ProcessTransactionStatus;
 import com.paytm.pg.merchant.PaytmChecksum;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -16,18 +16,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -62,7 +57,6 @@ public class PaymentGatewayBean {
     private List<PayChannelOptions> payChannelOptions;
     private String currency;
     private String balance;
-    private List<TransactionDetails> transactionDetails;
     private List<CardBinDetails> cardBinDetails;
 
 //    @Inject
@@ -70,7 +64,6 @@ public class PaymentGatewayBean {
     public PaymentGatewayBean() {
         paymentOptions = new ArrayList<>();
         payChannelOptions = new ArrayList<>();
-        transactionDetails = new ArrayList<>();
         cardBinDetails = new ArrayList<>();
     }
 
@@ -106,14 +99,6 @@ public class PaymentGatewayBean {
         this.balance = balance;
     }
 
-    public List<TransactionDetails> getTransactionDetails() {
-        return transactionDetails;
-    }
-
-    public void setTransactionDetails(List<TransactionDetails> transactionDetails) {
-        this.transactionDetails = transactionDetails;
-    }
-
     public List<CardBinDetails> getCardBinDetails() {
         return cardBinDetails;
     }
@@ -122,7 +107,7 @@ public class PaymentGatewayBean {
         this.cardBinDetails = cardBinDetails;
     }
 
-    public void initiateTransaction(String orderId, String payableAmount, String username, String channelId, String callbackUrl) {
+    public Response initiateTransaction(String orderId, String payableAmount, String username, String channelId, String callbackUrl) {
         this.orderId = orderId;
         this.payableAmount = payableAmount;
         this.username = username;
@@ -207,15 +192,23 @@ public class PaymentGatewayBean {
 //                                logger.log(Level.SEVERE, "transactionToken1 is {0}", transactionToken);                                
                             }
                             if (paymentOptions.isEmpty()) {
-                                if (bodyObjKey.equals("resultInfo") && bodyObjValue instanceof JSONObject) {
-                                    for (String resultInfoObjKey : ((JSONObject) bodyObjValue).keySet()) {
-                                        Object resultInfoObjValue = ((JSONObject) bodyObjValue).get(resultInfoObjKey);
-//                                            System.out.println("resultInfoObjKey: " + resultInfoObjKey + " resultInfoObjValue: " + resultInfoObjValue);
-                                        if (resultInfoObjKey.equals("resultCode") && resultInfoObjValue.equals("0000")) {
-//                                        System.out.println("Call Payment Options API");
-                                            fetchPaymentOptions(orderId);
-                                        }
+                                if (bodyObjKey.equals("resultInfo")) {
+                                    JSONObject resultInfoObj = ((JSONObject) resObjValue).getJSONObject("resultInfo");
+                                    String resultCode = resultInfoObj.getString("resultCode");
+                                    String resultMsg = resultInfoObj.getString("resultMsg");
+                                    if (resultCode.equals("0000")) {
+                                        return fetchPaymentOptions(orderId);
+                                    } else {
+                                        return Response.status(Response.Status.NOT_ACCEPTABLE)
+                                                .header("resultMsg", resultMsg)
+                                                .build();
                                     }
+//                                    for (String resultInfoObjKey : ((JSONObject) bodyObjValue).keySet()) {
+//                                        Object resultInfoObjValue = ((JSONObject) bodyObjValue).get(resultInfoObjKey);
+//                                        if (resultInfoObjKey.equals("resultCode") && resultInfoObjValue.equals("0000")) {
+//                                            fetchPaymentOptions(orderId);
+//                                        }
+//                                    }
                                 }
                             }
                         }
@@ -226,12 +219,13 @@ public class PaymentGatewayBean {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+        return null;
     }
 
-    public void fetchPaymentOptions(String orderId) {
-//        paymentOptions.clear();
-//        payChannelOptions.clear();
+    public Response fetchPaymentOptions(String orderId) {
+
         boolean isResponseSuccess = false;
+        
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -288,13 +282,23 @@ public class PaymentGatewayBean {
                                 iconBaseUrl = (String) bodyObjValue;
 //                                System.out.println("iconBaseUrl: " + iconBaseUrl);
                             }
-                            if (bodyObjKey.equals("resultInfo") && bodyObjValue instanceof JSONObject) {
-                                for (String resultInfoObjKey : ((JSONObject) bodyObjValue).keySet()) {
-                                    Object resultInfoObjValue = ((JSONObject) bodyObjValue).get(resultInfoObjKey);
-                                    if (resultInfoObjKey.equals("resultCode") && resultInfoObjValue.equals("0000")) {
+                            if (bodyObjKey.equals("resultInfo")) {
+                                JSONObject resultInfoObj = ((JSONObject) resObjValue).getJSONObject("resultInfo");
+                                    String resultCode = resultInfoObj.getString("resultCode");
+                                    String resultMsg = resultInfoObj.getString("resultMsg");
+                                    if (resultCode.equals("0000")) {
                                         isResponseSuccess = true;
+                                    } else {
+                                        return Response.status(Response.Status.NOT_ACCEPTABLE)
+                                                .header("resultMsg", resultMsg)
+                                                .build();
                                     }
-                                }
+//                                for (String resultInfoObjKey : ((JSONObject) bodyObjValue).keySet()) {
+//                                    Object resultInfoObjValue = ((JSONObject) bodyObjValue).get(resultInfoObjKey);
+//                                    if (resultInfoObjKey.equals("resultCode") && resultInfoObjValue.equals("0000")) {
+//                                        isResponseSuccess = true;
+//                                    }
+//                                }
                             }
                             if (isResponseSuccess && bodyObjKey.equals("merchantPayOption") && bodyObjValue instanceof JSONObject) {
                                 for (String merchantPayOptionObjKey : ((JSONObject) bodyObjValue).keySet()) {
@@ -359,7 +363,7 @@ public class PaymentGatewayBean {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-
+        return Response.ok().build();
     }
 
     public Response sendOTP(String paytmMobile) {
@@ -841,40 +845,15 @@ public class PaymentGatewayBean {
                     if (resObjKey.equals("body") && resObjValue instanceof JSONObject) {
                         JSONObject resultInfoObj = ((JSONObject) resObjValue).getJSONObject("resultInfo");
                         String resultCode = resultInfoObj.getString("resultCode");
-//                        resultMsg = resultInfoObj.getString("resultMsg");
+                        resultMsg = resultInfoObj.getString("resultMsg");
                         if (!resultCode.equals("0000")) {
-//                            return Response.status(Response.Status.NOT_ACCEPTABLE)
-//                                    .header("resultMsg", resultMsg)
-//                                    .build();
+                            return Response.status(Response.Status.NOT_ACCEPTABLE)
+                                    .header("resultMsg", resultMsg)
+                                    .build();
                         } else {
-//                            JSONObject bodyObjValue = (JSONObject) resObjValue;
-//                            verifyChecksumHash(bodyObjValue);
-
-                            //Get callbackURL from response
-                            callBackUrl = ((JSONObject) resObjValue).getString("callBackUrl");
-                            logger.log(Level.SEVERE, "Callback URL is {0}", callBackUrl);
-
-                            //Get txnInfo Object from response
-                            JSONObject txnInfoObj = ((JSONObject) resObjValue).getJSONObject("txnInfo");
-                            String paytmChecksum = txnInfoObj.getString("CHECKSUMHASH");
-                            String BANKNAME = txnInfoObj.getString("BANKNAME");
-                            String BANKTXNID = txnInfoObj.getString("BANKTXNID");
-                            String _CURRENCY = txnInfoObj.getString("CURRENCY");
-                            String GATEWAYNAME = txnInfoObj.getString("GATEWAYNAME");
-                            String _MID = txnInfoObj.getString("MID");
-                            String ORDERID = txnInfoObj.getString("ORDERID");
-                            String PAYMENTMODE = txnInfoObj.getString("PAYMENTMODE");
-                            String RESPCODE = txnInfoObj.getString("RESPCODE");
-                            String RESPMSG = txnInfoObj.getString("RESPMSG");
-                            String STATUS = txnInfoObj.getString("STATUS");
-                            String TXNAMOUNT = txnInfoObj.getString("TXNAMOUNT");
-                            String TXNDATE = txnInfoObj.getString("TXNDATE");
-                            String TXNID = txnInfoObj.getString("TXNID");
-
-                            transactionDetails.add(new TransactionDetails(BANKNAME, BANKTXNID, _CURRENCY, GATEWAYNAME, ORDERID, PAYMENTMODE, RESPCODE, RESPMSG, TXNAMOUNT, TXNDATE, TXNID));
-
-                            return Response.temporaryRedirect(URI.create(callBackUrl+"?respCode="+RESPCODE)).build();
-
+                            return Response.ok()
+                                    .entity(resObjValue.toString())
+                                    .build();
                         }
                     }
                 }
@@ -885,71 +864,6 @@ public class PaymentGatewayBean {
         }
 
         return null;
-    }
-
-    public void verifyChecksumHash(JSONObject bodyObjValue) {
-        JSONObject resultInfoObj = bodyObjValue.getJSONObject("resultInfo");
-        String callBackUrl = bodyObjValue.getString("callBackUrl");
-        JSONObject riskContentObj = bodyObjValue.getJSONObject("riskContent");
-//        logger.log(Level.SEVERE, "callBackUrl is {0}", callBackUrl);
-        JSONObject txnInfoObj = bodyObjValue.getJSONObject("txnInfo");
-        String paytmChecksum = txnInfoObj.getString("CHECKSUMHASH");
-        String BANKNAME = txnInfoObj.getString("BANKNAME");
-        String BANKTXNID = txnInfoObj.getString("BANKTXNID");
-        String _CURRENCY = txnInfoObj.getString("CURRENCY");
-        String GATEWAYNAME = txnInfoObj.getString("GATEWAYNAME");
-        String _MID = txnInfoObj.getString("MID");
-        String ORDERID = txnInfoObj.getString("ORDERID");
-        String PAYMENTMODE = txnInfoObj.getString("PAYMENTMODE");
-        String RESPCODE = txnInfoObj.getString("RESPCODE");
-        String RESPMSG = txnInfoObj.getString("RESPMSG");
-        String STATUS = txnInfoObj.getString("STATUS");
-        String TXNAMOUNT = txnInfoObj.getString("TXNAMOUNT");
-        String TXNDATE = txnInfoObj.getString("TXNDATE");
-        String TXNID = txnInfoObj.getString("TXNID");
-
-        JSONObject body = new JSONObject();
-
-        JSONObject resultInfo = new JSONObject();
-        resultInfo.put("resultStatus", resultInfoObj.getString("resultStatus"));
-        resultInfo.put("resultCode", resultInfoObj.getString("resultCode"));
-        resultInfo.put("resultMsg", resultInfoObj.getString("resultMsg"));
-        resultInfo.put("retry", resultInfoObj.getBoolean("retry"));
-
-        JSONObject txnInfo = new JSONObject();
-        txnInfo.put("BANKNAME", BANKNAME);
-        txnInfo.put("BANKTXNID", BANKTXNID);
-//        txnInfo.put("CHECKSUMHASH", paytmChecksum);
-        txnInfo.put("CURRENCY", _CURRENCY);
-        txnInfo.put("GATEWAYNAME", GATEWAYNAME);
-        txnInfo.put("MID", _MID);
-        txnInfo.put("ORDERID", ORDERID);
-        txnInfo.put("PAYMENTMODE", PAYMENTMODE);
-        txnInfo.put("RESPCODE", RESPCODE);
-        txnInfo.put("RESPMSG", RESPMSG);
-        txnInfo.put("STATUS", STATUS);
-        txnInfo.put("TXNAMOUNT", TXNAMOUNT);
-        txnInfo.put("TXNDATE", TXNDATE);
-        txnInfo.put("TXNID", TXNID);
-
-        JSONObject riskContent = new JSONObject();
-        riskContent.put("eventLinkId", riskContentObj.getString("eventLinkId"));
-
-//        body.put("resultInfo", resultInfo);
-//        body.put("txnInfo", txnInfo);
-//        body.put("callBackUrl", callBackUrl);
-//        body.put("riskContent", riskContent);
-        Boolean isVerifySignature = null;
-        try {
-            isVerifySignature = PaytmChecksum.verifySignature(body.toString(), MERCHANT_KEY, paytmChecksum);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        if (isVerifySignature) {
-            logger.log(Level.SEVERE, "Checksum Matched");
-        } else {
-            logger.log(Level.SEVERE, "Checksum MisMatched");
-        }
     }
 
     public void transactionStatus(String paytmChecksum) {
@@ -1016,7 +930,7 @@ public class PaymentGatewayBean {
                 JSONObject resObj = new JSONObject(responseData);
 //                JSONObject headObj = resObj.getJSONObject("head");
 //                signature = headObj.getString("signature");
-                verifyChecksumHash2(resObj, paytmChecksum);
+//                verifyChecksumHash2(resObj, paytmChecksum);
 
             }
             // System.out.append("Request: " + post_data);
@@ -1027,43 +941,4 @@ public class PaymentGatewayBean {
 //        return signature;
     }
 
-    public void verifyChecksumHash2(JSONObject resObj, String paytmChecksum) {
-        JSONObject bodyObj = resObj.getJSONObject("body");
-        JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
-
-        JSONObject body = new JSONObject();
-
-        JSONObject txnInfo = new JSONObject();
-        txnInfo.put("txnId", bodyObj.getString("txnId"));
-        txnInfo.put("bankTxnId", bodyObj.getString("bankTxnId"));
-        txnInfo.put("orderId", bodyObj.getString("orderId"));
-        txnInfo.put("txnAmount", bodyObj.getString("txnAmount"));
-        txnInfo.put("txnType", bodyObj.getString("txnType"));
-        txnInfo.put("gatewayName", bodyObj.getString("gatewayName"));
-        txnInfo.put("bankName", bodyObj.getString("bankName"));
-        txnInfo.put("mid", bodyObj.getString("mid"));
-        txnInfo.put("paymentMode", bodyObj.getString("paymentMode"));
-        txnInfo.put("refundAmt", bodyObj.getString("refundAmt"));
-        txnInfo.put("txnDate", bodyObj.getString("txnDate"));
-
-        JSONObject resultInfo = new JSONObject();
-        resultInfo.put("resultStatus", resultInfoObj.getString("resultStatus"));
-        resultInfo.put("resultCode", resultInfoObj.getString("resultCode"));
-        resultInfo.put("resultMsg", resultInfoObj.getString("resultMsg"));
-
-        body.put("txnInfo", txnInfo);
-//        body.put("resultInfo", resultInfo);
-
-        Boolean isVerifySignature = null;
-        try {
-            isVerifySignature = PaytmChecksum.verifySignature(body.toString(), MERCHANT_KEY, paytmChecksum);
-        } catch (Exception ex) {
-            Logger.getLogger(PaymentGatewayBean.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (isVerifySignature) {
-            logger.log(Level.SEVERE, "Checksum Matched");
-        } else {
-            logger.log(Level.SEVERE, "Checksum MisMatched");
-        }
-    }
 }

@@ -8,6 +8,9 @@ package com.diljeet.myProject.interfaces;
 import com.diljeet.myProject.entities.CustomerOrder;
 import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.utils.InitiateTransaction;
+import com.diljeet.myProject.utils.PayChannelOptions;
+import com.diljeet.myProject.utils.PaymentOptions;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -29,20 +32,21 @@ import javax.ws.rs.core.Response;
 public interface CheckoutService {
 
     @POST
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("setDeliveryTime")
+    @Consumes(MediaType.APPLICATION_JSON)
     public void addDeliveryTime(String selectedTime);
 
-    @GET
-    @Path("delivery-time")
-    @Produces({MediaType.TEXT_PLAIN})
-    public String getDeliveryTime();
-
+//    @GET
+//    @Path("getDeliveryTime")
+//    @Produces({MediaType.APPLICATION_JSON})
+//    public Response getDeliveryTime();
     @POST
+    @Path("addDeliveryAddress")
     @Consumes(MediaType.APPLICATION_JSON)
     public void addDeliveryAddress(RegisteredUsersAddress selectedAddress);
 
     @GET
-    @Path("delivery-address")
+    @Path("getDeliveryAddress")
     @Produces({MediaType.TEXT_PLAIN})
     public String getDeliveryAddress();
 
@@ -53,7 +57,17 @@ public interface CheckoutService {
     @POST
     @Path("initiate-transaction")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void initiateTransaction(InitiateTransaction initiateTransaction);
+    public Response initiateTransaction(InitiateTransaction initiateTransaction);
+
+    @GET
+    @Path("fetchPaymentOptions")
+    @Produces({MediaType.APPLICATION_JSON})
+    public List<PaymentOptions> fetchPaymentOptions();
+
+    @GET
+    @Path("fetchPayChannelOptions")
+    @Produces({MediaType.APPLICATION_JSON})
+    public List<PayChannelOptions> fetchPayChannelOptions();
 
     @POST
     @Path("sendOTP")
@@ -72,10 +86,10 @@ public interface CheckoutService {
 
     @POST
     @Path("process-transaction")
-    @Consumes(MediaType.APPLICATION_JSON)    
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response processTransaction(String paymentMode);
 
-//    @POST
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public void placeOrder(CustomerOrder customerOrder);
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void placeOrder(CustomerOrder customerOrder);
 }
