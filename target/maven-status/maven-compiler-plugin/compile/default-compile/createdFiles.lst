@@ -31,10 +31,8 @@ com/diljeet/myProject/services/CartServiceBean.class
 com/diljeet/myProject/entities/MealPlanCategory.class
 com/diljeet/myProject/controllers/CheckoutController.class
 com/diljeet/myProject/controllers/CartController.class
-com/diljeet/myProject/utils/PayChannelOptions.class
 com/diljeet/myProject/controllers/RegisteredUsersController.class
 com/diljeet/myProject/entities/RegisteredUsersAddress.class
 com/diljeet/myProject/ejb/RegisteredUsersBean$1.class
 com/diljeet/myProject/utils/MyProjectUtils.class
-com/diljeet/myProject/services/JavaEE8Resource.class
 com/diljeet/myProject/ejb/IndexBean.class

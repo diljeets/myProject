@@ -15,21 +15,18 @@ import javax.ejb.Stateful;
 import com.diljeet.myProject.interfaces.CheckoutService;
 import com.diljeet.myProject.utils.InitiateTransaction;
 import com.diljeet.myProject.utils.MyProjectUtils;
-import com.diljeet.myProject.utils.PayChannelOptions;
+import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
+import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
-import org.json.JSONObject;
 
 /**
  *
@@ -54,9 +51,10 @@ public class CheckoutServiceBean implements CheckoutService {
 
     private String deliveryAddress;
     private String deliveryTime;
-//    private String orderId;
+//    private List<Cart> cartItems;
 
     public CheckoutServiceBean() {
+//        cartItems = new ArrayList<>();
     }
 
     @PostConstruct
@@ -100,7 +98,7 @@ public class CheckoutServiceBean implements CheckoutService {
 //        }
 //    }
     @Override
-    public Response initiateTransaction(InitiateTransaction initiateTransaction) {
+    public Response initiateTransaction(InitiateTransaction initiateTransaction) {        
         String orderId = MyProjectUtils.createOrderId();
         String username = req.getUserPrincipal().getName();
         String payableAmount = initiateTransaction.getPayableAmount();
@@ -127,14 +125,25 @@ public class CheckoutServiceBean implements CheckoutService {
     }
 
     @Override
-    public List<PayChannelOptions> fetchPayChannelOptions() {
-        List<PayChannelOptions> payChannelOptions = null;
+    public List<PayChannelOptionsPaytmBalance> fetchPayChannelOptionsPaytmBalance() {
+        List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance = null;
         try {
-            payChannelOptions = paymentGatewayBean.getPayChannelOptions();
+            payChannelOptionsPaytmBalance = paymentGatewayBean.getPayChannelOptionsPaytmBalance();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return payChannelOptions;
+        return payChannelOptionsPaytmBalance;
+    }
+
+    @Override
+    public List<PayChannelOptionsNetBanking> fetchPayChannelOptionsNetBanking() {
+        List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = null;
+        try {
+            payChannelOptionsNetBanking = paymentGatewayBean.getPayChannelOptionsNetBanking();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return payChannelOptionsNetBanking;
     }
 
     @Override
@@ -182,7 +191,7 @@ public class CheckoutServiceBean implements CheckoutService {
     }
 
     @Override
-    public void placeOrder(CustomerOrder customerOrder) {
+    public Response placeOrder(CustomerOrder customerOrder) {         
         String orderId = customerOrder.getCustomerTransaction().getOrderId();
 //        String payableAmount = customerOrder.getPayableAmount();
         String customerName = templateController.getCurrentCustomer();
@@ -193,14 +202,15 @@ public class CheckoutServiceBean implements CheckoutService {
             customerOrder.setUsername(username);
             customerOrder.setDateOrderCreated(new Date());
             customerOrder.setOrderId(orderId);
-            List<Cart> cartItems = customerOrder.getOrders();
-            for (Cart cartItem : cartItems) {
+            List<Cart> cartItems = customerOrder.getOrders();            
+            for (Cart cartItem : cartItems) {                
                 cartItem.setCustomerOrder(customerOrder);
             }
             em.persist(customerOrder);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return Response.ok().build();
     }
 
 }

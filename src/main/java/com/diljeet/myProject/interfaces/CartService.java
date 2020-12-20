@@ -7,6 +7,7 @@ package com.diljeet.myProject.interfaces;
 
 import com.diljeet.myProject.entities.Cart;
 import java.util.List;
+import javax.ejb.Local;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;

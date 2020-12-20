@@ -11,7 +11,8 @@ import com.diljeet.myProject.entities.CustomerOrder;
 import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.interfaces.CheckoutService;
 import com.diljeet.myProject.utils.CardBinDetails;
-import com.diljeet.myProject.utils.PayChannelOptions;
+import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
+import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import java.io.Serializable;
 import java.util.Iterator;
@@ -43,13 +44,13 @@ public class CheckoutController implements Serializable {
     private String deliveryAddress;
     private PaymentOptions paymentOption;
     private List<PaymentOptions> paymentOptions;
-    private PayChannelOptions payChannelOption;
-    private List<PayChannelOptions> payChannelOptions;
+    private PayChannelOptionsPaytmBalance payChannelOptionPaytmBalance;
+    private List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance;
+    private PayChannelOptionsNetBanking payChannelOptionNetBanking;
+    private List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking;
     private boolean isModePaytm;
     private String paytmMobile;
-    private String otp;
-    private String currency;
-    private String balance;
+    private String otp;    
     private boolean isModeCC;
     private String creditcardNumber;
     private boolean isCardValid;
@@ -61,7 +62,6 @@ public class CheckoutController implements Serializable {
     private String isCardActive;
     private boolean isModeDC;
     private boolean isModeNB;
-//    private UIComponent sendOtpBtn;
 
     @Inject
     CartController cartController;
@@ -126,20 +126,36 @@ public class CheckoutController implements Serializable {
         this.paymentOptions = paymentOptions;
     }
 
-    public PayChannelOptions getPayChannelOption() {
-        return payChannelOption;
+    public PayChannelOptionsPaytmBalance getPayChannelOptionPaytmBalance() {
+        return payChannelOptionPaytmBalance;
     }
 
-    public void setPayChannelOption(PayChannelOptions payChannelOption) {
-        this.payChannelOption = payChannelOption;
+    public void setPayChannelOptionPaytmBalance(PayChannelOptionsPaytmBalance payChannelOptionPaytmBalance) {
+        this.payChannelOptionPaytmBalance = payChannelOptionPaytmBalance;
     }
 
-    public List<PayChannelOptions> getPayChannelOptions() {
-        return checkoutBean.fetchPayChannelOptions();
+    public List<PayChannelOptionsPaytmBalance> getPayChannelOptionsPaytmBalance() {
+        return checkoutBean.fetchPayChannelOptionsPaytmBalance();
     }
 
-    public void setPayChannelOptions(List<PayChannelOptions> payChannelOptions) {
-        this.payChannelOptions = payChannelOptions;
+    public void setPayChannelOptionsPaytmBalance(List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance) {
+        this.payChannelOptionsPaytmBalance = payChannelOptionsPaytmBalance;
+    }
+
+    public PayChannelOptionsNetBanking getPayChannelOptionNetBanking() {
+        return payChannelOptionNetBanking;
+    }
+
+    public void setPayChannelOptionNetBanking(PayChannelOptionsNetBanking payChannelOptionNetBanking) {
+        this.payChannelOptionNetBanking = payChannelOptionNetBanking;
+    }
+
+    public List<PayChannelOptionsNetBanking> getPayChannelOptionsNetBanking() {
+        return checkoutBean.fetchPayChannelOptionsNetBanking();
+    }
+
+    public void setPayChannelOptionsNetBanking(List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking) {
+        this.payChannelOptionsNetBanking = payChannelOptionsNetBanking;
     }
 
     public boolean isIsModePaytm() {
@@ -165,23 +181,7 @@ public class CheckoutController implements Serializable {
     public void setOtp(String otp) {
         this.otp = otp;
     }
-
-    public String getCurrency() {
-        return paymentGatewayBean.getCurrency();
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public String getBalance() {
-        return paymentGatewayBean.getBalance();
-    }
-
-    public void setBalance(String balance) {
-        this.balance = balance;
-    }
-
+    
     public boolean isIsModeCC() {
         return isModeCC;
     }
@@ -270,13 +270,6 @@ public class CheckoutController implements Serializable {
         this.isModeNB = isModeNB;
     }
 
-//    public UIComponent getSendOtpBtn() {
-//        return sendOtpBtn;
-//    }
-//
-//    public void setSendOtpBtn(UIComponent sendOtpBtn) {
-//        this.sendOtpBtn = sendOtpBtn;
-//    }
     public CartController getCartController() {
         return cartController;
     }
@@ -322,7 +315,6 @@ public class CheckoutController implements Serializable {
             isModeCC = true;
         } else if (paymode.equals("DEBIT_CARD")) {
             isModeDC = true;
-//            logger.log(Level.SEVERE, "Pay mode is {0}", paymode);
         } else {
             isModeNB = true;
         }
@@ -330,7 +322,6 @@ public class CheckoutController implements Serializable {
 
     public void fetchBinDetails(AjaxBehaviorEvent event) {
         String cardDigits = (String) ((UIOutput) event.getSource()).getValue();
-//        logger.log(Level.SEVERE, "Digits are {0}", cardDigits);
         if (creditcardNumber.length() == 6) {
             isCardValid = checkoutBean.fetchBinDetails(cardDigits);
             if (isCardValid) {

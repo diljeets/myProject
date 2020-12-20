@@ -29,9 +29,9 @@ public class CartController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String itemsInCart;
-    
+
     private String payableAmount;
-    
+
     private Cart cartItem;
 
     private List<Cart> cartItems;
@@ -76,9 +76,9 @@ public class CartController implements Serializable {
     public void setCartItem(Cart cartItem) {
         this.cartItem = cartItem;
     }
-    
+
     public List<Cart> getCartItems() {
-        return cartService.getItemsFromCart();
+        return cartService.getItemsFromCart();        
     }
 
     public void setCartItems(List<Cart> cartItems) {
@@ -101,11 +101,4 @@ public class CartController implements Serializable {
         cartService.removeFromCart(cartItem);
     }
 
-//    public void updateMealPlanQuantity(AjaxBehaviorEvent event, Cart cartItem) {        
-//        int mealPlanQuantity = (Integer) ((UIOutput) event.getSource()).getValue();
-//        logger.log(Level.SEVERE, "Cart Meal Quantity is {0}", Integer.toString(mealPlanQuantity));
-//        logger.log(Level.SEVERE, "Cart Meal Name is {0}", cartItem.getMealPlanName());
-//        logger.log(Level.SEVERE, "Cart Meal Rate is {0}", Double.toString(cartItem.getMealPlanRate()));
-//        logger.log(Level.SEVERE, "Cart Meal Total Rate is {0}", Double.toString(cartItem.getTotalMealPlanRate()));
-//    }
 }

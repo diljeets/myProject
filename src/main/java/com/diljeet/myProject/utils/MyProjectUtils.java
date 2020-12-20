@@ -6,16 +6,12 @@
 package com.diljeet.myProject.utils;
 
 import com.diljeet.myProject.entities.Cart;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Base64.Encoder;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.logging.Level;

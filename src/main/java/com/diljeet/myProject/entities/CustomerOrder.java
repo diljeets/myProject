@@ -21,6 +21,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.xml.bind.annotation.XmlRootElement;
 //import org.jboss.security.auth.spi.Util;
 
 /**
@@ -31,6 +32,7 @@ import javax.persistence.TemporalType;
 @Entity
 //@NamedQuery(name = "getAllUsers",
 //        query = "Select u from RegisteredUsers u")
+@XmlRootElement
 public class CustomerOrder implements Serializable {
 
     private static final Logger logger = Logger.getLogger(CustomerOrder.class.getCanonicalName());

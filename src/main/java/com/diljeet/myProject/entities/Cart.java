@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
@@ -24,6 +25,7 @@ import javax.persistence.Table;
 @Entity
 //@NamedQuery(name = "getMealPlanCategories",
 //        query = "Select c from Cart c")
+@XmlRootElement
 public class Cart implements Serializable {
 
     private static final Logger logger = Logger.getLogger(Cart.class.getCanonicalName());
@@ -51,7 +53,7 @@ public class Cart implements Serializable {
     public void init() {
     }
 
-    public Cart() {
+    public Cart() {        
     }
 
     public Cart(Long mealPlanId,

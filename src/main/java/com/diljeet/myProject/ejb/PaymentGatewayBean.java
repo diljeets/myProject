@@ -6,9 +6,9 @@
 package com.diljeet.myProject.ejb;
 
 import com.diljeet.myProject.utils.CardBinDetails;
-import com.diljeet.myProject.utils.PayChannelOptions;
+import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
+import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
-import com.diljeet.myProject.utils.ProcessTransactionStatus;
 import com.paytm.pg.merchant.PaytmChecksum;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -42,7 +42,6 @@ public class PaymentGatewayBean {
     private static final String MID = "FyrHkG61747292942551";
     private static final String MERCHANT_KEY = "#vuq3t2aGydWCBW_";
     private static final String WEBSITE_NAME = "WEBSTAGING";
-//    private static final String CALLBACK_URL = "/callback.xhtml";
     private static final String CURRENCY = "INR";
     private static final String TOKEN_TYPE = "TXN_TOKEN";
 
@@ -54,16 +53,14 @@ public class PaymentGatewayBean {
     private String transactionToken;
     private String iconBaseUrl;
     private List<PaymentOptions> paymentOptions;
-    private List<PayChannelOptions> payChannelOptions;
-    private String currency;
-    private String balance;
+    private List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance;
+    private List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking;
     private List<CardBinDetails> cardBinDetails;
 
-//    @Inject
-//    HttpServletResponse res;
     public PaymentGatewayBean() {
         paymentOptions = new ArrayList<>();
-        payChannelOptions = new ArrayList<>();
+        payChannelOptionsPaytmBalance = new ArrayList<>();
+        payChannelOptionsNetBanking = new ArrayList<>();
         cardBinDetails = new ArrayList<>();
     }
 
@@ -75,28 +72,20 @@ public class PaymentGatewayBean {
         this.paymentOptions = paymentOptions;
     }
 
-    public List<PayChannelOptions> getPayChannelOptions() {
-        return payChannelOptions;
+    public List<PayChannelOptionsPaytmBalance> getPayChannelOptionsPaytmBalance() {
+        return payChannelOptionsPaytmBalance;
     }
 
-    public void setPayChannelOptions(List<PayChannelOptions> payChannelOptions) {
-        this.payChannelOptions = payChannelOptions;
+    public void setPayChannelOptionsPaytmBalance(List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance) {
+        this.payChannelOptionsPaytmBalance = payChannelOptionsPaytmBalance;
     }
 
-    public String getCurrency() {
-        return currency;
+    public List<PayChannelOptionsNetBanking> getPayChannelOptionsNetBanking() {
+        return payChannelOptionsNetBanking;
     }
 
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public String getBalance() {
-        return balance;
-    }
-
-    public void setBalance(String balance) {
-        this.balance = balance;
+    public void setPayChannelOptionsNetBanking(List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking) {
+        this.payChannelOptionsNetBanking = payChannelOptionsNetBanking;
     }
 
     public List<CardBinDetails> getCardBinDetails() {
@@ -113,7 +102,12 @@ public class PaymentGatewayBean {
         this.username = username;
         this.channelId = channelId;
         this.callbackUrl = callbackUrl;
-//        logger.log(Level.SEVERE, "ChannelId is {0}", channelId);
+
+        paymentOptions.clear();
+        payChannelOptionsPaytmBalance.clear();
+        payChannelOptionsNetBanking.clear();
+        cardBinDetails.clear();
+
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -178,41 +172,20 @@ public class PaymentGatewayBean {
             InputStream is = connection.getInputStream();
             BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
             if ((responseData = responseReader.readLine()) != null) {
-//                System.out.append("Response: " + responseData);
                 JSONObject resObj = new JSONObject(responseData);
-                for (String resObjKey : resObj.keySet()) {
-                    Object resObjValue = resObj.get(resObjKey);
-                    if (resObjKey.equals("body") && resObjValue instanceof JSONObject) {
-//                        System.out.println("key: " + keyStr + " value: " + keyvalue);  
-                        for (String bodyObjKey : ((JSONObject) resObjValue).keySet()) {
-                            Object bodyObjValue = ((JSONObject) resObjValue).get(bodyObjKey);
-//                                System.out.println("bodyObjKey: " + bodyObjKey + " bodyObjValue: " + bodyObjValue);
-                            if (bodyObjKey.equals("txnToken")) {
-                                transactionToken = (String) bodyObjValue;
-//                                logger.log(Level.SEVERE, "transactionToken1 is {0}", transactionToken);                                
-                            }
-                            if (paymentOptions.isEmpty()) {
-                                if (bodyObjKey.equals("resultInfo")) {
-                                    JSONObject resultInfoObj = ((JSONObject) resObjValue).getJSONObject("resultInfo");
-                                    String resultCode = resultInfoObj.getString("resultCode");
-                                    String resultMsg = resultInfoObj.getString("resultMsg");
-                                    if (resultCode.equals("0000")) {
-                                        return fetchPaymentOptions(orderId);
-                                    } else {
-                                        return Response.status(Response.Status.NOT_ACCEPTABLE)
-                                                .header("resultMsg", resultMsg)
-                                                .build();
-                                    }
-//                                    for (String resultInfoObjKey : ((JSONObject) bodyObjValue).keySet()) {
-//                                        Object resultInfoObjValue = ((JSONObject) bodyObjValue).get(resultInfoObjKey);
-//                                        if (resultInfoObjKey.equals("resultCode") && resultInfoObjValue.equals("0000")) {
-//                                            fetchPaymentOptions(orderId);
-//                                        }
-//                                    }
-                                }
-                            }
-                        }
-                    }
+                JSONObject bodyObj = resObj.getJSONObject("body");
+                //Get Transaction Token from body object and save in variable to be used in successive API calls
+                transactionToken = bodyObj.getString("txnToken");
+                //Get Result Info object from body Object
+                JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
+                String resultCode = resultInfoObj.getString("resultCode");
+                if (!resultCode.equals("0000")) {
+                    String resultMsg = resultInfoObj.getString("resultMsg");
+                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                            .header("resultMsg", resultMsg)
+                            .build();
+                } else {
+                    return fetchPaymentOptions(orderId);
                 }
             }
             responseReader.close();
@@ -224,8 +197,6 @@ public class PaymentGatewayBean {
 
     public Response fetchPaymentOptions(String orderId) {
 
-        boolean isResponseSuccess = false;
-        
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -233,7 +204,6 @@ public class PaymentGatewayBean {
         JSONObject head = new JSONObject();
         head.put("tokenType", TOKEN_TYPE);
         head.put("token", transactionToken);
-//        head.put("txnToken", transactionToken);
 
         paytmParams.put("body", body);
         paytmParams.put("head", head);
@@ -264,100 +234,54 @@ public class PaymentGatewayBean {
             InputStream is = connection.getInputStream();
             BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
             if ((responseData = responseReader.readLine()) != null) {
-                logger.log(Level.SEVERE, "Payments Options Response {0}", responseData);
-//                boolean isUserLoggedIn = false;
+//                logger.log(Level.SEVERE, "Payments Options Response {0}", responseData);
                 JSONObject resObj = new JSONObject(responseData);
-                for (String resObjKey : resObj.keySet()) {
-                    Object resObjValue = resObj.get(resObjKey);
-                    if (resObjKey.equals("body") && resObjValue instanceof JSONObject) {
-//                        System.out.println("resObjKey: " + resObjKey + " resObjValue: " + resObjValue);
-                        for (String bodyObjKey : ((JSONObject) resObjValue).keySet()) {
-                            Object bodyObjValue = ((JSONObject) resObjValue).get(bodyObjKey);
-//                            System.out.println("bodyObjKey: " + bodyObjKey + " bodyObjValue: " + bodyObjValue);                            
-//                            if (bodyObjKey.equals("loginInfo") && bodyObjValue instanceof JSONObject) {                                
-//                                isUserLoggedIn = ((JSONObject) bodyObjValue).getBoolean("userLoggedIn");
-//                                logger.log(Level.SEVERE, "is user logged in {0}", Boolean.toString(isUserLoggedIn));
-//                            }                            
-                            if (bodyObjKey.equals("iconBaseUrl")) {
-                                iconBaseUrl = (String) bodyObjValue;
-//                                System.out.println("iconBaseUrl: " + iconBaseUrl);
-                            }
-                            if (bodyObjKey.equals("resultInfo")) {
-                                JSONObject resultInfoObj = ((JSONObject) resObjValue).getJSONObject("resultInfo");
-                                    String resultCode = resultInfoObj.getString("resultCode");
-                                    String resultMsg = resultInfoObj.getString("resultMsg");
-                                    if (resultCode.equals("0000")) {
-                                        isResponseSuccess = true;
-                                    } else {
-                                        return Response.status(Response.Status.NOT_ACCEPTABLE)
-                                                .header("resultMsg", resultMsg)
-                                                .build();
-                                    }
-//                                for (String resultInfoObjKey : ((JSONObject) bodyObjValue).keySet()) {
-//                                    Object resultInfoObjValue = ((JSONObject) bodyObjValue).get(resultInfoObjKey);
-//                                    if (resultInfoObjKey.equals("resultCode") && resultInfoObjValue.equals("0000")) {
-//                                        isResponseSuccess = true;
-//                                    }
-//                                }
-                            }
-                            if (isResponseSuccess && bodyObjKey.equals("merchantPayOption") && bodyObjValue instanceof JSONObject) {
-                                for (String merchantPayOptionObjKey : ((JSONObject) bodyObjValue).keySet()) {
-                                    Object merchantPayOptionObjValue = ((JSONObject) bodyObjValue).get(merchantPayOptionObjKey);
-//                                    System.out.println("merchantPayOptionObjKey: " + merchantPayOptionObjKey + " merchantPayOptionObjValue: " + merchantPayOptionObjValue);
-                                    if (merchantPayOptionObjKey.equals("paymentModes") && merchantPayOptionObjValue instanceof JSONArray) {
-                                        JSONArray jsonArray = (JSONArray) merchantPayOptionObjValue;
-                                        for (int i = 0; i < jsonArray.length(); i++) {
-                                            JSONObject obj = jsonArray.getJSONObject(i);
-//                                            logger.log(Level.SEVERE, "Object is {0}", obj.toString());
-                                            String paymentMode = obj.getString("paymentMode");
-                                            String displayName = obj.getString("displayName");
-                                            boolean isHybridDisabled = obj.getBoolean("isHybridDisabled");
-                                            boolean onboarding = obj.getBoolean("onboarding");
-                                            String priority = obj.getString("priority");
+                JSONObject bodyObj = resObj.getJSONObject("body");
+                iconBaseUrl = bodyObj.getString("iconBaseUrl");
+                JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
+                String resultCode = resultInfoObj.getString("resultCode");
+                if (!resultCode.equals("0000")) {
+                    String resultMsg = resultInfoObj.getString("resultMsg");
+                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                            .header("resultMsg", resultMsg)
+                            .build();
+                } else {
+                    JSONObject merchantPayOptionObj = bodyObj.getJSONObject("merchantPayOption");
+                    JSONArray paymentModesJsonArray = merchantPayOptionObj.getJSONArray("paymentModes");
+                    for (int i = 0; i < paymentModesJsonArray.length(); i++) {
+                        JSONObject obj = paymentModesJsonArray.getJSONObject(i);
+                        String paymentMode = obj.getString("paymentMode");
+                        String displayName = obj.getString("displayName");
+                        boolean isHybridDisabled = obj.getBoolean("isHybridDisabled");
+                        boolean onboarding = obj.getBoolean("onboarding");
+                        String priority = obj.getString("priority");
 
-                                            paymentOptions.add(new PaymentOptions(paymentMode, displayName, isHybridDisabled, onboarding, priority));
+                        paymentOptions.add(new PaymentOptions(
+                                paymentMode,
+                                displayName,
+                                isHybridDisabled,
+                                onboarding,
+                                priority
+                        ));
+                        if ((obj.getString("paymentMode")).equals("NET_BANKING") && (obj.get("payChannelOptions") instanceof JSONArray)) {
+                            JSONArray payChannelOptionsJsonArray = (JSONArray) obj.get("payChannelOptions");
+                            for (int j = 0; j < payChannelOptionsJsonArray.length(); j++) {
+                                JSONObject obj1 = payChannelOptionsJsonArray.getJSONObject(j);
+                                boolean isChannelOptionHybridDisabled = obj1.getBoolean("isHybridDisabled");
+                                String channelName = obj1.getString("channelName");
+                                String iconUrl = obj1.getString("iconUrl");
+                                String channelCode = obj1.getString("channelCode");
 
-//                                            if ((obj.getString("paymentMode")).equals("BALANCE")) {
-//                                                logger.log(Level.SEVERE, "I'm here for fetch");
-//                                                fetchBalanceInfo();
-//                                            }
-//                                            if ((obj.getString("paymentMode")).equals("BALANCE") && (obj.get("payChannelOptions") instanceof JSONArray)) {
-//                                                JSONArray payChannelOptionsJsonArray = (JSONArray) obj.get("payChannelOptions");
-//                                                for (int j = 0; j < payChannelOptionsJsonArray.length(); j++) {
-//                                                    JSONObject jsonObject = payChannelOptionsJsonArray.getJSONObject(j);
-////                                                    logger.log(Level.SEVERE, "Object in payChannelOptionsJsonArray is {0}", jsonObject.toString());
-//                                                    JSONObject balanceInfoObject = (JSONObject) jsonObject.get("balanceInfo");
-//                                                    JSONObject accountBalanceObject = (JSONObject) balanceInfoObject.get("accountBalance");
-//                                                    currency = accountBalanceObject.getString("currency");
-//                                                    balance = accountBalanceObject.getString("value");
-//                                                    logger.log(Level.SEVERE, "currency is {0}", currency);
-//                                                    logger.log(Level.SEVERE, "balance is {0}", balance);
-//
-////                                                    logger.log(Level.SEVERE, "PayChannelOptions List Size is {0}", Integer.toString(payChannelOptions.size()));
-//                                                }
-//                                            }
-                                            if ((obj.getString("paymentMode")).equals("NET_BANKING") && (obj.get("payChannelOptions") instanceof JSONArray)) {
-                                                JSONArray jsonArray1 = (JSONArray) obj.get("payChannelOptions");
-                                                for (int j = 0; j < jsonArray1.length(); j++) {
-                                                    JSONObject obj1 = jsonArray1.getJSONObject(j);
-//                                                    logger.log(Level.SEVERE, "Object1 is {0}", obj1.toString());
-                                                    boolean isChannelOptionHybridDisabled = obj1.getBoolean("isHybridDisabled");
-                                                    String channelName = obj1.getString("channelName");
-                                                    String iconUrl = obj1.getString("iconUrl");
-                                                    String channelCode = obj1.getString("channelCode");
-
-                                                    payChannelOptions.add(new PayChannelOptions(isChannelOptionHybridDisabled, channelName, iconUrl, channelCode));
-//                                                    logger.log(Level.SEVERE, "PayChannelOptions List Size is {0}", Integer.toString(payChannelOptions.size()));
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                payChannelOptionsNetBanking.add(new PayChannelOptionsNetBanking(
+                                        isChannelOptionHybridDisabled,
+                                        channelName,
+                                        iconUrl,
+                                        channelCode
+                                ));
                             }
                         }
                     }
                 }
-
             }
             responseReader.close();
         } catch (Exception exception) {
@@ -367,7 +291,7 @@ public class PaymentGatewayBean {
     }
 
     public Response sendOTP(String paytmMobile) {
-//        logger.log(Level.SEVERE, "send OTP OrderID is {0}", orderId);
+
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -390,8 +314,6 @@ public class PaymentGatewayBean {
 
         /* for Production */
 // URL url = new URL("https://securegw.paytm.in/login/sendOtp?mid=YOUR_MID_HERE&orderId=ORDERID_98765");
-//        JSONObject resultInfoObj = null;
-//        String resultCode = null;
         String resultMsg = null;
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -406,21 +328,17 @@ public class PaymentGatewayBean {
             InputStream is = connection.getInputStream();
             BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
             if ((responseData = responseReader.readLine()) != null) {
-//                System.out.append("Send OTP API Response: " + responseData);
                 JSONObject resObj = new JSONObject(responseData);
-                for (String resObjKey : resObj.keySet()) {
-                    Object resObjValue = resObj.get(resObjKey);
-                    if (resObjKey.equals("body") && resObjValue instanceof JSONObject) {
-                        JSONObject resultInfoObj = ((JSONObject) resObjValue).getJSONObject("resultInfo");
-                        String resultCode = resultInfoObj.getString("resultCode");
-                        resultMsg = resultInfoObj.getString("resultMsg");
-                        if (!resultCode.equals("01")) {
-                            return Response.status(Response.Status.NOT_ACCEPTABLE)
-                                    .header("resultMsg", resultMsg)
-                                    .build();
-                        }
-                    }
+                JSONObject bodyObj = resObj.getJSONObject("body");
+                JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
+                String resultCode = resultInfoObj.getString("resultCode");
+                resultMsg = resultInfoObj.getString("resultMsg");
+                if (!resultCode.equals("01")) {
+                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                            .header("resultMsg", resultMsg)
+                            .build();
                 }
+
             }
             responseReader.close();
         } catch (Exception exception) {
@@ -455,7 +373,6 @@ public class PaymentGatewayBean {
 
         /* for Production */
 // URL url = new URL("https://securegw.paytm.in/login/validateOtp?mid=YOUR_MID_HERE&orderId=ORDERID_98765");
-//        boolean isAuthenticated = false;
         String resultMsg = null;
         String resultStatus = null;
         try {
@@ -471,28 +388,19 @@ public class PaymentGatewayBean {
             InputStream is = connection.getInputStream();
             BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
             if ((responseData = responseReader.readLine()) != null) {
-//                System.out.append("ValidateOTP API Response: " + responseData);
+                logger.log(Level.SEVERE, "Validate OTP response is {0}", responseData);
                 JSONObject resObj = new JSONObject(responseData);
-                for (String resObjKey : resObj.keySet()) {
-                    Object resObjValue = resObj.get(resObjKey);
-                    if (resObjKey.equals("body") && resObjValue instanceof JSONObject) {
-                        JSONObject resultInfoObj = ((JSONObject) resObjValue).getJSONObject("resultInfo");
-//                        logger.log(Level.SEVERE, "resultInfoObj in Valid OTP {0}", resultInfoObj.toString());
-                        String resultCode = resultInfoObj.getString("resultCode");
-                        resultStatus = resultInfoObj.getString("resultStatus");
-                        if (!resultCode.equals("01")) {
-                            resultMsg = resultInfoObj.getString("resultMsg");
-                            return Response.status(Response.Status.NOT_ACCEPTABLE)
-                                    .header("resultMsg", resultMsg)
-                                    .build();
-                        } else {
-//                            isAuthenticated = ((JSONObject) resObjValue).getBoolean("authenticated");
-//                            fetchPaymentOptions(orderId);
-                            fetchPaytmBalance();
-//                            return fetchBalanceInfo();
-
-                        }
-                    }
+                JSONObject bodyObj = resObj.getJSONObject("body");
+                JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
+                String resultCode = resultInfoObj.getString("resultCode");
+                resultStatus = resultInfoObj.getString("resultStatus");
+                if (!resultCode.equals("01")) {
+                    resultMsg = resultInfoObj.getString("resultMsg");
+                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                            .header("resultMsg", resultMsg)
+                            .build();
+                } else {
+                    return fetchPaytmBalance();
                 }
             }
             responseReader.close();
@@ -500,14 +408,11 @@ public class PaymentGatewayBean {
             exception.printStackTrace();
         }
         return Response.status(Response.Status.OK)
-                .header("resultMsg", resultStatus)
                 .build();
     }
 
-    public void fetchPaytmBalance() {
-//        paymentOptions.clear();
-//        payChannelOptions.clear();
-        boolean isResponseSuccess = false;
+    public Response fetchPaytmBalance() {
+
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -546,162 +451,51 @@ public class PaymentGatewayBean {
             BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
             if ((responseData = responseReader.readLine()) != null) {
                 logger.log(Level.SEVERE, "fetchPaytmBalance Response {0}", responseData);
-//                boolean isUserLoggedIn = false;
                 JSONObject resObj = new JSONObject(responseData);
-                for (String resObjKey : resObj.keySet()) {
-                    Object resObjValue = resObj.get(resObjKey);
-                    if (resObjKey.equals("body") && resObjValue instanceof JSONObject) {
-//                        System.out.println("resObjKey: " + resObjKey + " resObjValue: " + resObjValue);
-                        for (String bodyObjKey : ((JSONObject) resObjValue).keySet()) {
-                            Object bodyObjValue = ((JSONObject) resObjValue).get(bodyObjKey);
-//                            System.out.println("bodyObjKey: " + bodyObjKey + " bodyObjValue: " + bodyObjValue);                            
-//                            if (bodyObjKey.equals("loginInfo") && bodyObjValue instanceof JSONObject) {                                
-//                                isUserLoggedIn = ((JSONObject) bodyObjValue).getBoolean("userLoggedIn");
-//                                logger.log(Level.SEVERE, "is user logged in {0}", Boolean.toString(isUserLoggedIn));
-//                            }                            
-//                            if (bodyObjKey.equals("iconBaseUrl")) {
-//                                iconBaseUrl = (String) bodyObjValue;
-//                            }
-                            if (bodyObjKey.equals("resultInfo") && bodyObjValue instanceof JSONObject) {
-                                for (String resultInfoObjKey : ((JSONObject) bodyObjValue).keySet()) {
-                                    Object resultInfoObjValue = ((JSONObject) bodyObjValue).get(resultInfoObjKey);
-                                    if (resultInfoObjKey.equals("resultCode") && resultInfoObjValue.equals("0000")) {
-                                        isResponseSuccess = true;
-                                    }
-                                }
-                            }
-                            if (isResponseSuccess && bodyObjKey.equals("merchantPayOption") && bodyObjValue instanceof JSONObject) {
-                                for (String merchantPayOptionObjKey : ((JSONObject) bodyObjValue).keySet()) {
-                                    Object merchantPayOptionObjValue = ((JSONObject) bodyObjValue).get(merchantPayOptionObjKey);
-//                                    System.out.println("merchantPayOptionObjKey: " + merchantPayOptionObjKey + " merchantPayOptionObjValue: " + merchantPayOptionObjValue);
-                                    if (merchantPayOptionObjKey.equals("paymentModes") && merchantPayOptionObjValue instanceof JSONArray) {
-                                        JSONArray jsonArray = (JSONArray) merchantPayOptionObjValue;
-                                        for (int i = 0; i < jsonArray.length(); i++) {
-                                            JSONObject obj = jsonArray.getJSONObject(i);
-//                                            logger.log(Level.SEVERE, "Object is {0}", obj.toString());
-//                                            String paymentMode = obj.getString("paymentMode");
-//                                            String displayName = obj.getString("displayName");
-//                                            boolean isHybridDisabled = obj.getBoolean("isHybridDisabled");
-//                                            boolean onboarding = obj.getBoolean("onboarding");
-//                                            String priority = obj.getString("priority");
-//
-//                                            paymentOptions.add(new PaymentOptions(paymentMode, displayName, isHybridDisabled, onboarding, priority));
+                JSONObject bodyObj = resObj.getJSONObject("body");
+                JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
+                String resultCode = resultInfoObj.getString("resultCode");
+                if (!resultCode.equals("0000")) {
+                    String resultMsg = resultInfoObj.getString("resultMsg");
+                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                            .header("resultMsg", resultMsg)
+                            .build();
+                } else {
+                    JSONObject merchantPayOptionObj = bodyObj.getJSONObject("merchantPayOption");
+                    JSONArray paymentModesJsonArray = merchantPayOptionObj.getJSONArray("paymentModes");
+                    for (int i = 0; i < paymentModesJsonArray.length(); i++) {
+                        JSONObject obj = paymentModesJsonArray.getJSONObject(i);
+                        if ((obj.getString("paymentMode")).equals("BALANCE") && (obj.get("payChannelOptions") instanceof JSONArray)) {
+                            JSONArray payChannelOptionsJsonArray = (JSONArray) obj.get("payChannelOptions");
+                            for (int j = 0; j < payChannelOptionsJsonArray.length(); j++) {
+                                JSONObject jsonObject = payChannelOptionsJsonArray.getJSONObject(j);
+                                JSONObject balanceInfoObject = (JSONObject) jsonObject.get("balanceInfo");
+                                JSONArray subWalletDetailsJsonArray = balanceInfoObject.getJSONArray("subWalletDetails");
+                                for (int k = 0; k < subWalletDetailsJsonArray.length(); k++) {
+                                    JSONObject objsInSubWalletDetailsJsonArray = subWalletDetailsJsonArray.getJSONObject(k);
+                                    String balance = objsInSubWalletDetailsJsonArray.getString("balance");
+                                    String displayName = objsInSubWalletDetailsJsonArray.getString("displayName");
+                                    String imageUrl = objsInSubWalletDetailsJsonArray.getString("imageUrl");
 
-//                                            if ((obj.getString("paymentMode")).equals("BALANCE")) {
-//                                                logger.log(Level.SEVERE, "I'm here for fetch");
-//                                                fetchBalanceInfo();
-//                                            }
-                                            if ((obj.getString("paymentMode")).equals("BALANCE") && (obj.get("payChannelOptions") instanceof JSONArray)) {
-                                                JSONArray payChannelOptionsJsonArray = (JSONArray) obj.get("payChannelOptions");
-                                                for (int j = 0; j < payChannelOptionsJsonArray.length(); j++) {
-                                                    JSONObject jsonObject = payChannelOptionsJsonArray.getJSONObject(j);
-//                                                    logger.log(Level.SEVERE, "Object in payChannelOptionsJsonArray is {0}", jsonObject.toString());
-                                                    JSONObject balanceInfoObject = (JSONObject) jsonObject.get("balanceInfo");
-                                                    JSONObject accountBalanceObject = (JSONObject) balanceInfoObject.get("accountBalance");
-                                                    currency = accountBalanceObject.getString("currency");
-                                                    balance = accountBalanceObject.getString("value");
-                                                    logger.log(Level.SEVERE, "currency is {0}", currency);
-                                                    logger.log(Level.SEVERE, "balance is {0}", balance);
-
-//                                                    logger.log(Level.SEVERE, "PayChannelOptions List Size is {0}", Integer.toString(payChannelOptions.size()));
-                                                }
-                                            }
-//                                            if ((obj.getString("paymentMode")).equals("NET_BANKING") && (obj.get("payChannelOptions") instanceof JSONArray)) {
-//                                                JSONArray jsonArray1 = (JSONArray) obj.get("payChannelOptions");
-//                                                for (int j = 0; j < jsonArray1.length(); j++) {
-//                                                    JSONObject obj1 = jsonArray1.getJSONObject(j);
-////                                                    logger.log(Level.SEVERE, "Object1 is {0}", obj1.toString());
-//                                                    boolean isChannelOptionHybridDisabled = obj1.getBoolean("isHybridDisabled");
-//                                                    String channelName = obj1.getString("channelName");
-//                                                    String iconUrl = obj1.getString("iconUrl");
-//                                                    String channelCode = obj1.getString("channelCode");
-//
-//                                                    payChannelOptions.add(new PayChannelOptions(isChannelOptionHybridDisabled, channelName, iconUrl, channelCode));
-////                                                    logger.log(Level.SEVERE, "PayChannelOptions List Size is {0}", Integer.toString(payChannelOptions.size()));
-//                                                }
-//                                            }
-                                        }
-                                    }
+                                    payChannelOptionsPaytmBalance.add(new PayChannelOptionsPaytmBalance(
+                                            balance,
+                                            displayName,
+                                            imageUrl
+                                    ));
                                 }
                             }
                         }
                     }
                 }
-
             }
             responseReader.close();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-
+        return Response.status(Response.Status.OK)
+                .build();
     }
 
-//    public Response fetchBalanceInfo() {
-//        JSONObject paytmParams = new JSONObject();
-//
-//        JSONObject body = new JSONObject();
-//        body.put("paymentMode", "BALANCE");
-//
-//        JSONObject head = new JSONObject();
-//        head.put("txnToken", transactionToken);
-//
-//        paytmParams.put("body", body);
-//        paytmParams.put("head", head);
-//
-//        String post_data = paytmParams.toString();
-//
-//        /* for Staging */
-//        URL url = null;
-//        try {
-//            url = new URL("https://securegw-stage.paytm.in/userAsset/fetchBalanceInfo?mid=" + MID + "&orderId=" + orderId);
-//        } catch (MalformedURLException ex) {
-//            ex.printStackTrace();
-//        }
-//
-//        /* for Production */
-//// URL url = new URL("https://securegw.paytm.in/userAsset/fetchBalanceInfo?mid=YOUR_MID_HERE&orderId=ORDERID_98765");
-//        String resultMsg = null;
-//        try {
-//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//            connection.setRequestMethod("POST");
-//            connection.setRequestProperty("Content-Type", "application/json");
-//            connection.setDoOutput(true);
-//
-//            DataOutputStream requestWriter = new DataOutputStream(connection.getOutputStream());
-//            requestWriter.writeBytes(post_data);
-//            requestWriter.close();
-//            String responseData = "";
-//            InputStream is = connection.getInputStream();
-//            BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
-//            if ((responseData = responseReader.readLine()) != null) {
-////                logger.log(Level.SEVERE, "Fetch Balance API Response is {0}", responseData);
-//                JSONObject resObj = new JSONObject(responseData);
-//                for (String resObjKey : resObj.keySet()) {
-//                    Object resObjValue = resObj.get(resObjKey);
-//                    if (resObjKey.equals("body") && resObjValue instanceof JSONObject) {
-//                        JSONObject resultInfoObj = ((JSONObject) resObjValue).getJSONObject("resultInfo");
-//                        String resultCode = resultInfoObj.getString("resultCode");
-//                        resultMsg = resultInfoObj.getString("resultMsg");
-//                        if (!resultCode.equals("0000")) {
-//                            return Response.status(Response.Status.NOT_ACCEPTABLE)
-//                                    .header("resultMsg", resultMsg)
-//                                    .build();
-//                        } else {
-//                            JSONObject balanceInfoObj = ((JSONObject) resObjValue).getJSONObject("balanceInfo");
-//                            currency = balanceInfoObj.getString("currency");
-//                            balance = balanceInfoObj.getString("value");
-//                        }
-//                    }
-//                }
-//            }
-//            responseReader.close();
-//        } catch (Exception exception) {
-//            exception.printStackTrace();
-//        }
-//        return Response.status(Response.Status.OK)
-//                .header("resultMsg", resultMsg)
-//                .build();
-//    }
     public Response fetchBinDetails(String firstSixCardDigits) {
         JSONObject paytmParams = new JSONObject();
 
@@ -727,7 +521,6 @@ public class PaymentGatewayBean {
 
         /* for Production */
 // URL url = new URL("https://securegw.paytm.in/fetchBinDetail?mid=YOUR_MID_HERE&orderId=ORDERID_98765");
-        String resultMsg = null;
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -743,40 +536,48 @@ public class PaymentGatewayBean {
             if ((responseData = responseReader.readLine()) != null) {
                 logger.log(Level.SEVERE, "Fetch Bin Response is {0}", responseData);
                 JSONObject resObj = new JSONObject(responseData);
-                for (String resObjKey : resObj.keySet()) {
-                    Object resObjValue = resObj.get(resObjKey);
-                    if (resObjKey.equals("body") && resObjValue instanceof JSONObject) {
-                        JSONObject resultInfoObj = ((JSONObject) resObjValue).getJSONObject("resultInfo");
-                        String resultCode = resultInfoObj.getString("resultCode");
-                        resultMsg = resultInfoObj.getString("resultMsg");
-                        if (!resultCode.equals("0000")) {
-                            return Response.status(Response.Status.NOT_ACCEPTABLE)
-                                    .header("resultMsg", resultMsg)
-                                    .build();
-                        } else {
-                            //Get attributes from binDetail Object
-                            JSONObject binDetailObj = ((JSONObject) resObjValue).getJSONObject("binDetail");
-                            String issuingBank = binDetailObj.getString("issuingBank");
-                            String issuingBankCode = binDetailObj.getString("issuingBankCode");
-                            String paymentMode = binDetailObj.getString("paymentMode");
-                            String channelName = binDetailObj.getString("channelName");
-                            String channelCode = binDetailObj.getString("channelCode");
-                            String isCvvRequired = binDetailObj.getString("cvvR");
-                            String isExpRequired = binDetailObj.getString("expR");
-                            String isActive = binDetailObj.getString("isActive");
+                JSONObject bodyObj = resObj.getJSONObject("body");
+                JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
+                String resultCode = resultInfoObj.getString("resultCode");
+                if (!resultCode.equals("0000")) {
+                    String resultMsg = resultInfoObj.getString("resultMsg");
+                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                            .header("resultMsg", resultMsg)
+                            .build();
+                } else {
+                    //Get attributes from binDetail Object
+                    JSONObject binDetailObj = bodyObj.getJSONObject("binDetail");
+                    String issuingBank = binDetailObj.getString("issuingBank");
+                    String issuingBankCode = binDetailObj.getString("issuingBankCode");
+                    String paymentMode = binDetailObj.getString("paymentMode");
+                    String channelName = binDetailObj.getString("channelName");
+                    String channelCode = binDetailObj.getString("channelCode");
+                    String isCvvRequired = binDetailObj.getString("cvvR");
+                    String isExpRequired = binDetailObj.getString("expR");
+                    String isActive = binDetailObj.getString("isActive");
 
-                            //Get attributes from hasLowSuccessRate Object
-                            JSONObject hasLowSuccessRateObj = ((JSONObject) resObjValue).getJSONObject("hasLowSuccessRate");
-                            String hasLowSuccessRateStatus = hasLowSuccessRateObj.getString("status");
-                            String hasLowSuccessRateMsg = hasLowSuccessRateObj.getString("msg");
+                    //Get attributes from hasLowSuccessRate Object
+                    JSONObject hasLowSuccessRateObj = bodyObj.getJSONObject("hasLowSuccessRate");
+                    String hasLowSuccessRateStatus = hasLowSuccessRateObj.getString("status");
+                    String hasLowSuccessRateMsg = hasLowSuccessRateObj.getString("msg");
 
-                            //Get iconUrl Object
-                            String cardIconUrl = ((JSONObject) resObjValue).getString("iconUrl");
+                    //Get iconUrl Object
+                    String cardIconUrl = bodyObj.getString("iconUrl");
 
-                            cardBinDetails.add(new CardBinDetails(issuingBank, issuingBankCode, paymentMode, channelName, channelCode, isCvvRequired, isExpRequired, isActive, hasLowSuccessRateStatus, hasLowSuccessRateMsg, cardIconUrl));
+                    cardBinDetails.add(new CardBinDetails(
+                            issuingBank,
+                            issuingBankCode,
+                            paymentMode,
+                            channelName,
+                            channelCode,
+                            isCvvRequired,
+                            isExpRequired,
+                            isActive,
+                            hasLowSuccessRateStatus,
+                            hasLowSuccessRateMsg,
+                            cardIconUrl
+                    ));
 
-                        }
-                    }
                 }
             }
             responseReader.close();
@@ -784,12 +585,11 @@ public class PaymentGatewayBean {
             exception.printStackTrace();
         }
         return Response.status(Response.Status.OK)
-                .header("resultMsg", resultMsg)
                 .build();
     }
 
     public Response processTransaction(String paymentMode) {
-//        logger.log(Level.SEVERE, "In PT methos paymentModei is {0}", paymentMode);
+
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -823,8 +623,6 @@ public class PaymentGatewayBean {
 
         /* for Production */
 // URL url = new URL("https://securegw.paytm.in/theia/api/v1/processTransaction?mid=YOUR_MID_HERE&orderId=ORDERID_98765");
-        String resultMsg = null;
-        String callBackUrl = null;
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -840,29 +638,25 @@ public class PaymentGatewayBean {
             if ((responseData = responseReader.readLine()) != null) {
                 logger.log(Level.SEVERE, "PT ResponseData {0}", responseData);
                 JSONObject resObj = new JSONObject(responseData);
-                for (String resObjKey : resObj.keySet()) {
-                    Object resObjValue = resObj.get(resObjKey);
-                    if (resObjKey.equals("body") && resObjValue instanceof JSONObject) {
-                        JSONObject resultInfoObj = ((JSONObject) resObjValue).getJSONObject("resultInfo");
-                        String resultCode = resultInfoObj.getString("resultCode");
-                        resultMsg = resultInfoObj.getString("resultMsg");
-                        if (!resultCode.equals("0000")) {
-                            return Response.status(Response.Status.NOT_ACCEPTABLE)
-                                    .header("resultMsg", resultMsg)
-                                    .build();
-                        } else {
-                            return Response.ok()
-                                    .entity(resObjValue.toString())
-                                    .build();
-                        }
-                    }
+                JSONObject bodyObj = resObj.getJSONObject("body");
+                JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
+
+                String resultCode = resultInfoObj.getString("resultCode");
+                if (!resultCode.equals("0000")) {
+                    String resultMsg = resultInfoObj.getString("resultMsg");
+                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                            .header("resultMsg", resultMsg)
+                            .build();
+                } else {
+                    return Response.ok()
+                            .entity(bodyObj.toString())
+                            .build();
                 }
             }
             responseReader.close();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-
         return null;
     }
 

@@ -9,11 +9,11 @@ import com.diljeet.myProject.controllers.CartController;
 import com.diljeet.myProject.controllers.CheckoutController;
 import com.diljeet.myProject.entities.CustomerOrder;
 import com.diljeet.myProject.entities.CustomerTransaction;
-import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.interfaces.CartService;
 import com.diljeet.myProject.interfaces.CheckoutService;
 import com.diljeet.myProject.utils.InitiateTransaction;
-import com.diljeet.myProject.utils.PayChannelOptions;
+import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
+import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import java.util.List;
 import java.util.logging.Level;
@@ -56,13 +56,7 @@ public class CheckoutBean {
     CheckoutController checkoutController;
 
     @Inject
-    CartController cartController;
-
-    @EJB
-    CartService cartService;
-
-    @EJB
-    CheckoutService checkoutService;
+    CartController cartController;    
 
     @PostConstruct
     public void init() {
@@ -74,79 +68,6 @@ public class CheckoutBean {
         client.close();
     }
 
-//    public void addDeliveryTime(String selectedTime) {
-//        if (selectedTime == null) {
-//            return;
-//        }       
-//        try {
-//            Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/setDeliveryTime")
-//                    .request(MediaType.APPLICATION_JSON)
-//                    .header("Cookie", req.getHeader("Cookie"))
-//                    .post(Entity.entity(selectedTime, MediaType.APPLICATION_JSON), Response.class);
-//        } catch (Exception e) {
-//            logger.log(Level.SEVERE, e.getMessage());
-////            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
-////            FacesContext.getCurrentInstance().addMessage(registeredUsersController.getCreateBtn().getClientId(), msg);
-//        }
-//    }
-//    
-//    public String getDeliveryTime() {  
-//        Response response = null;
-//        String deliveryTime = null;
-//        try {
-//            response = client.target("http://localhost:8080/myProject/webapi/Checkout/getDeliveryTime")
-//                    .request(MediaType.APPLICATION_JSON)
-//                    .header("Cookie", req.getHeader("Cookie"))
-//                    .get();
-//            if(response.getStatus() == Response.Status.OK.getStatusCode()){
-//                deliveryTime = response.readEntity(String.class);
-//                logger.log(Level.SEVERE, "getDeliveryTime {0}",deliveryTime);
-//            }
-//            
-//        } catch (Exception e) {
-//            logger.log(Level.SEVERE, e.getMessage());
-////            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
-////            FacesContext.getCurrentInstance().addMessage(registeredUsersController.getCreateBtn().getClientId(), msg);
-//        }
-//        return deliveryTime;
-//    }
-//    
-//    public void addDeliveryAddress(RegisteredUsersAddress selectedAddress) {
-//        if (selectedAddress == null) {
-//            return;
-//        }       
-//        try {
-//            Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/setDeliveryAddress")
-//                    .request(MediaType.APPLICATION_JSON)
-//                    .header("Cookie", req.getHeader("Cookie"))
-//                    .post(Entity.entity(selectedAddress, MediaType.APPLICATION_JSON), Response.class);
-//        } catch (Exception e) {
-//            logger.log(Level.SEVERE, e.getMessage());
-////            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
-////            FacesContext.getCurrentInstance().addMessage(registeredUsersController.getCreateBtn().getClientId(), msg);
-//        }
-//    }
-//
-//    public String getDeliveryAddress() {  
-////        Response response = null;
-//        String deliveryAddress = null;
-//        try {
-//            deliveryAddress = client.target("http://localhost:8080/myProject/webapi/Checkout/getDeliveryAddress")
-//                    .request(MediaType.TEXT_PLAIN)
-//                    .header("Cookie", req.getHeader("Cookie"))
-//                    .get(String.class);
-////            if(response.getStatus() == Response.Status.OK.getStatusCode()){
-////                deliveryTime = response.readEntity(String.class);
-////                logger.log(Level.SEVERE, "getDeliveryTime {0}",deliveryTime);
-////            }
-////            
-//        } catch (Exception e) {
-//            logger.log(Level.SEVERE, e.getMessage());
-////            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
-////            FacesContext.getCurrentInstance().addMessage(registeredUsersController.getCreateBtn().getClientId(), msg);
-//        }
-//        return deliveryAddress;
-//    }
     public void initiateTransaction(String payableAmount) {
         if (payableAmount == null) {
             return;
@@ -155,18 +76,18 @@ public class CheckoutBean {
                 "WEB",
                 "http://localhost:8080/myProject/process-transaction-status.xhtml");
         try {
-            Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/initiate-transaction")
+            Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/initiateTransaction")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(initiateTransaction, MediaType.APPLICATION_JSON), Response.class);
-//                    .post(Entity.entity(payableAmount, MediaType.APPLICATION_JSON), Response.class);
+
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 logger.log(Level.SEVERE, "Call PaymentOptions API");
-//                fetchPaymentOptions();
             } else {
                 logger.log(Level.SEVERE, "There is an error");
+                logger.log(Level.SEVERE, "response code is {0}", Integer.toString(response.getStatus()));
                 String resultMsg = response.getHeaderString("resultMsg");
-                msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Something went wrong. Please try again.");
+                msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "1Something went wrong. Please try again.");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }
 
@@ -194,20 +115,36 @@ public class CheckoutBean {
         return paymentOptions;
     }
 
-    public List<PayChannelOptions> fetchPayChannelOptions() {
-        List<PayChannelOptions> payChannelOptions = null;
+    public List<PayChannelOptionsPaytmBalance> fetchPayChannelOptionsPaytmBalance() {
+        List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance = null;
         try {
-            payChannelOptions = client.target("http://localhost:8080/myProject/webapi/Checkout/fetchPayChannelOptions")
+            payChannelOptionsPaytmBalance = client.target("http://localhost:8080/myProject/webapi/Checkout/fetchPayChannelOptionsPaytmBalance")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .get(new GenericType<List<PayChannelOptions>>() {
+                    .get(new GenericType<List<PayChannelOptionsPaytmBalance>>() {
+                    });
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
+            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Balance Options. Please try again.");
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        }
+        return payChannelOptionsPaytmBalance;
+    }
+
+    public List<PayChannelOptionsNetBanking> fetchPayChannelOptionsNetBanking() {
+        List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = null;
+        try {
+            payChannelOptionsNetBanking = client.target("http://localhost:8080/myProject/webapi/Checkout/fetchPayChannelOptionsNetBanking")
+                    .request(MediaType.APPLICATION_JSON)
+                    .header("Cookie", req.getHeader("Cookie"))
+                    .get(new GenericType<List<PayChannelOptionsNetBanking>>() {
                     });
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage());
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Banking Options. Please try again.");
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }
-        return payChannelOptions;
+        return payChannelOptionsNetBanking;
     }
 
     public void sendOTP(String paytmMobile) {
@@ -221,20 +158,13 @@ public class CheckoutBean {
                     .post(Entity.entity(paytmMobile, MediaType.APPLICATION_JSON), Response.class);
             String resultMsg = response.getHeaderString("resultMsg");
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-//                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, resultMsg, null);
-//                FacesContext.getCurrentInstance().addMessage(checkoutController.getSendOtpBtn().getClientId(), msg);
                 msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", resultMsg);
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             } else {
-//                msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, resultMsg, null);
-//                FacesContext.getCurrentInstance().addMessage(checkoutController.getSendOtpBtn().getClientId(), msg);
                 msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }
-
         } catch (Exception e) {
-//            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null);
-//            FacesContext.getCurrentInstance().addMessage(checkoutController.getSendOtpBtn().getClientId(), msg);
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", e.getMessage());
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }
@@ -251,10 +181,7 @@ public class CheckoutBean {
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(otp, MediaType.APPLICATION_JSON), Response.class);
             String resultMsg = response.getHeaderString("resultMsg");
-            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", resultMsg);
-                FacesContext.getCurrentInstance().addMessage(null, msg);
-            } else {
+            if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
                 msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }
@@ -290,7 +217,7 @@ public class CheckoutBean {
     public void processTransaction(String paymentMode) {
         Response response = null;
         try {
-            response = client.target("http://localhost:8080/myProject/webapi/Checkout/process-transaction")
+            response = client.target("http://localhost:8080/myProject/webapi/Checkout/processTransaction")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(paymentMode, MediaType.APPLICATION_JSON), Response.class);
@@ -299,11 +226,12 @@ public class CheckoutBean {
                     && response.hasEntity()) {
                 String stringEntity = response.readEntity(String.class);
                 JSONObject jsonObject = new JSONObject(stringEntity);
+                String callBackUrl = jsonObject.getString("callBackUrl");
                 JSONObject txnInfoObj = jsonObject.getJSONObject("txnInfo");
 
                 String BANKNAME = txnInfoObj.getString("BANKNAME");
                 String BANKTXNID = txnInfoObj.getString("BANKTXNID");
-                String _CURRENCY = txnInfoObj.getString("CURRENCY");
+                String CURRENCY = txnInfoObj.getString("CURRENCY");
                 String GATEWAYNAME = txnInfoObj.getString("GATEWAYNAME");
 //                    String _MID = txnInfoObj.getString("MID");
                 String ORDERID = txnInfoObj.getString("ORDERID");
@@ -315,13 +243,30 @@ public class CheckoutBean {
                 String TXNDATE = txnInfoObj.getString("TXNDATE");
                 String TXNID = txnInfoObj.getString("TXNID");
 
-                CustomerTransaction customerTransaction = new CustomerTransaction(BANKNAME, BANKTXNID, _CURRENCY, GATEWAYNAME, ORDERID, PAYMENTMODE, RESPCODE, RESPMSG, TXNAMOUNT, TXNDATE, TXNID);
+                CustomerTransaction customerTransaction = new CustomerTransaction(
+                        BANKNAME,
+                        BANKTXNID,
+                        CURRENCY,
+                        GATEWAYNAME,
+                        ORDERID,
+                        PAYMENTMODE,
+                        RESPCODE,
+                        RESPMSG,
+                        TXNAMOUNT,
+                        TXNDATE,
+                        TXNID
+                );
 
+                //Place Customer Order and Transaction details in Database
                 placeOrder(new CustomerOrder(checkoutController.getDeliveryTime(),
                         checkoutController.getDeliveryAddress(),
                         cartController.getCartItems(),
                         cartController.getPayableAmount(),
                         customerTransaction));
+
+                //Redirect to intimate Customer whether or not Order/Transaction is successful
+                FacesContext.getCurrentInstance().getExternalContext().redirect(callBackUrl);
+
             } else {
                 String resultMsg = response.getHeaderString("resultMsg");
                 msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
@@ -336,29 +281,22 @@ public class CheckoutBean {
     }
 
     public void placeOrder(CustomerOrder customerOrder) {
-        checkoutService.placeOrder(customerOrder);
+//        checkoutService.placeOrder(customerOrder);
+        Response response = null;
+        try {
+            response = client.target("http://localhost:8080/myProject/webapi/Checkout/placeOrder")
+                    .request(MediaType.APPLICATION_JSON)
+                    .header("Cookie", req.getHeader("Cookie"))
+                    .post(Entity.entity(customerOrder, MediaType.APPLICATION_JSON), Response.class);
+//                    .buildPost(Entity.entity(customerOrder, MediaType.APPLICATION_JSON))
+//                    .submit(Response.class);
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                logger.log(Level.SEVERE, "Order Placed Successfully");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
-//    public void processTransaction(String paymentMode) {
-//        Response response = null;
-//        try {
-//            response = client.target("http://localhost:8080/myProject/webapi/Checkout/process-transaction")
-//                    .request(MediaType.APPLICATION_JSON)
-//                    .header("Cookie", req.getHeader("Cookie"))
-//                    .post(Entity.entity(paymentMode, MediaType.APPLICATION_JSON), Response.class);
-//            
-//            if (response.getStatus() == Response.Status.TEMPORARY_REDIRECT.getStatusCode()) {                
-//                FacesContext.getCurrentInstance().getExternalContext().redirect(response.getLocation().toString());
-//            } else {
-//                String resultMsg = response.getHeaderString("resultMsg");
-//                msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
-//                FacesContext.getCurrentInstance().addMessage(null, msg);
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Something went wrong. Please try again.");
-//            FacesContext.getCurrentInstance().addMessage(null, msg);
-//        }
-//    }
 
 }
