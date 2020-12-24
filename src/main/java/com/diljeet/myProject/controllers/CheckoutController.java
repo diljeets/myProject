@@ -10,7 +10,7 @@ import com.diljeet.myProject.ejb.PaymentGatewayBean;
 import com.diljeet.myProject.entities.CustomerOrder;
 import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.interfaces.CheckoutService;
-import com.diljeet.myProject.utils.CardBinDetails;
+import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
@@ -25,6 +25,8 @@ import javax.enterprise.context.SessionScoped;
 import javax.faces.component.UIOutput;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Context;
 import org.primefaces.event.SelectEvent;
 
 /**
@@ -64,7 +66,7 @@ public class CheckoutController implements Serializable {
     private boolean isModeNB;
 
     @Inject
-    CartController cartController;
+    CartController cartController;   
 
     @EJB
     CheckoutBean checkoutBean;
@@ -325,16 +327,16 @@ public class CheckoutController implements Serializable {
         if (creditcardNumber.length() == 6) {
             isCardValid = checkoutBean.fetchBinDetails(cardDigits);
             if (isCardValid) {
-                List<CardBinDetails> cardBinDetails = paymentGatewayBean.getCardBinDetails();
-                Iterator<CardBinDetails> itr = cardBinDetails.iterator();
+                List<CardDetails> cardDetails = checkoutBean.fetchCardDetails();
+                Iterator<CardDetails> itr = cardDetails.iterator();
                 while (itr.hasNext()) {
-                    CardBinDetails cardDetails = itr.next();
-                    issuingBank = cardDetails.getIssuingBank();
-                    channelName = cardDetails.getChannelName();
-                    isCvvRequired = cardDetails.getIsCvvRequired();
-                    isExpRequired = cardDetails.getIsExpRequired();
-                    cardIconUrl = cardDetails.getCardIconUrl();
-                    isCardActive = cardDetails.getIsActive();
+                    CardDetails cardDetail = itr.next();
+                    issuingBank = cardDetail.getIssuingBank();
+                    channelName = cardDetail.getChannelName();
+                    isCvvRequired = cardDetail.getIsCvvRequired();
+                    isExpRequired = cardDetail.getIsExpRequired();
+                    cardIconUrl = cardDetail.getCardIconUrl();
+                    isCardActive = cardDetail.getIsActive();
                 }
             }
         } else {

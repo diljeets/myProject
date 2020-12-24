@@ -5,6 +5,7 @@
  */
 package com.diljeet.myProject.services;
 
+import com.diljeet.myProject.controllers.RedirectFormController;
 import com.diljeet.myProject.controllers.TemplateController;
 import com.diljeet.myProject.ejb.PaymentGatewayBean;
 import com.diljeet.myProject.entities.Cart;
@@ -13,19 +14,29 @@ import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import java.util.logging.Logger;
 import javax.ejb.Stateful;
 import com.diljeet.myProject.interfaces.CheckoutService;
+import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.InitiateTransaction;
 import com.diljeet.myProject.utils.MyProjectUtils;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
+import com.diljeet.myProject.utils.RedirectForm;
+import java.io.IOException;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
 /**
@@ -98,7 +109,7 @@ public class CheckoutServiceBean implements CheckoutService {
 //        }
 //    }
     @Override
-    public Response initiateTransaction(InitiateTransaction initiateTransaction) {        
+    public Response initiateTransaction(InitiateTransaction initiateTransaction) {
         String orderId = MyProjectUtils.createOrderId();
         String username = req.getUserPrincipal().getName();
         String payableAmount = initiateTransaction.getPayableAmount();
@@ -180,6 +191,17 @@ public class CheckoutServiceBean implements CheckoutService {
     }
 
     @Override
+    public List<CardDetails> fetchCardDetails() {
+        List<CardDetails> cardDetails = null;
+        try {
+            cardDetails = paymentGatewayBean.getCardDetails();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return cardDetails;
+    }  
+
+    @Override
     public Response processTransaction(String paymentMode) {
         Response response = null;
         try {
@@ -188,10 +210,30 @@ public class CheckoutServiceBean implements CheckoutService {
             e.printStackTrace();
         }
         return response;
+    }   
+
+    @Override
+    public String pgResponse(HttpServletRequest req, HttpServletResponse resp) {        
+        Map<String, String[]> mapData = req.getParameterMap();
+        TreeMap<String, String> parameters = new TreeMap<String, String>();
+        mapData.forEach((key, val) -> parameters.put(key, val[0]));
+        logger.log(Level.SEVERE, "Final CC response is {0}", parameters.toString());
+        return "process-transaction-status.xhtml";
     }
 
     @Override
-    public Response placeOrder(CustomerOrder customerOrder) {         
+    public Response transactionStatus(String orderId) {
+        Response response = null;
+        try {
+            response = paymentGatewayBean.transactionStatus(orderId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    @Override
+    public Response placeOrder(CustomerOrder customerOrder) {
         String orderId = customerOrder.getCustomerTransaction().getOrderId();
 //        String payableAmount = customerOrder.getPayableAmount();
         String customerName = templateController.getCurrentCustomer();
@@ -202,8 +244,8 @@ public class CheckoutServiceBean implements CheckoutService {
             customerOrder.setUsername(username);
             customerOrder.setDateOrderCreated(new Date());
             customerOrder.setOrderId(orderId);
-            List<Cart> cartItems = customerOrder.getOrders();            
-            for (Cart cartItem : cartItems) {                
+            List<Cart> cartItems = customerOrder.getOrders();
+            for (Cart cartItem : cartItems) {
                 cartItem.setCustomerOrder(customerOrder);
             }
             em.persist(customerOrder);

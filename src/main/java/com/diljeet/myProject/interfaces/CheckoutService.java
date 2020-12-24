@@ -7,16 +7,22 @@ package com.diljeet.myProject.interfaces;
 
 import com.diljeet.myProject.entities.CustomerOrder;
 import com.diljeet.myProject.entities.RegisteredUsersAddress;
+import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.InitiateTransaction;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -60,7 +66,7 @@ public interface CheckoutService {
     @Path("fetchPaymentOptions")
     @Produces({MediaType.APPLICATION_JSON})
     public List<PaymentOptions> fetchPaymentOptions();
-    
+
     @GET
     @Path("fetchPayChannelOptionsPaytmBalance")
     @Produces({MediaType.APPLICATION_JSON})
@@ -86,12 +92,27 @@ public interface CheckoutService {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response fetchBinDetails(String firstSixCardDigits);
 
+    @GET
+    @Path("fetchCardDetails")
+    @Produces({MediaType.APPLICATION_JSON})
+    public List<CardDetails> fetchCardDetails();
+
     @POST
     @Path("processTransaction")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response processTransaction(String paymentMode);
+    public Response processTransaction(String paymentMode);    
+      
+    @POST
+    @Path("pgResponse")    
+    @Produces(MediaType.TEXT_PLAIN)
+    public String pgResponse(@Context HttpServletRequest req, @Context HttpServletResponse resp);
 
-    @POST 
+    @POST
+    @Path("transactionStatus")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response transactionStatus(String orderId);
+
+    @POST
     @Path("placeOrder")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response placeOrder(CustomerOrder customerOrder);

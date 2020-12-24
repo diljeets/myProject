@@ -5,10 +5,11 @@
  */
 package com.diljeet.myProject.ejb;
 
-import com.diljeet.myProject.utils.CardBinDetails;
+import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
+import com.diljeet.myProject.utils.RedirectForm;
 import com.paytm.pg.merchant.PaytmChecksum;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -16,13 +17,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Model;
 import javax.inject.Named;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -55,13 +63,14 @@ public class PaymentGatewayBean {
     private List<PaymentOptions> paymentOptions;
     private List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance;
     private List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking;
-    private List<CardBinDetails> cardBinDetails;
+    private List<CardDetails> cardDetails;
+    private RedirectForm redirectForm;
 
     public PaymentGatewayBean() {
         paymentOptions = new ArrayList<>();
         payChannelOptionsPaytmBalance = new ArrayList<>();
         payChannelOptionsNetBanking = new ArrayList<>();
-        cardBinDetails = new ArrayList<>();
+        cardDetails = new ArrayList<>();
     }
 
     public List<PaymentOptions> getPaymentOptions() {
@@ -88,12 +97,20 @@ public class PaymentGatewayBean {
         this.payChannelOptionsNetBanking = payChannelOptionsNetBanking;
     }
 
-    public List<CardBinDetails> getCardBinDetails() {
-        return cardBinDetails;
+    public List<CardDetails> getCardDetails() {
+        return cardDetails;
     }
 
-    public void setCardBinDetails(List<CardBinDetails> cardBinDetails) {
-        this.cardBinDetails = cardBinDetails;
+    public void setCardDetails(List<CardDetails> cardDetails) {
+        this.cardDetails = cardDetails;
+    }
+
+    public RedirectForm getRedirectForm() {
+        return redirectForm;
+    }
+
+    public void setRedirectForm(RedirectForm redirectForm) {
+        this.redirectForm = redirectForm;
     }
 
     public Response initiateTransaction(String orderId, String payableAmount, String username, String channelId, String callbackUrl) {
@@ -106,7 +123,7 @@ public class PaymentGatewayBean {
         paymentOptions.clear();
         payChannelOptionsPaytmBalance.clear();
         payChannelOptionsNetBanking.clear();
-        cardBinDetails.clear();
+        cardDetails.clear();
 
         JSONObject paytmParams = new JSONObject();
 
@@ -181,7 +198,8 @@ public class PaymentGatewayBean {
                 String resultCode = resultInfoObj.getString("resultCode");
                 if (!resultCode.equals("0000")) {
                     String resultMsg = resultInfoObj.getString("resultMsg");
-                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                    return Response
+                            .status(Response.Status.NOT_ACCEPTABLE)
                             .header("resultMsg", resultMsg)
                             .build();
                 } else {
@@ -242,7 +260,8 @@ public class PaymentGatewayBean {
                 String resultCode = resultInfoObj.getString("resultCode");
                 if (!resultCode.equals("0000")) {
                     String resultMsg = resultInfoObj.getString("resultMsg");
-                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                    return Response
+                            .status(Response.Status.NOT_ACCEPTABLE)
                             .header("resultMsg", resultMsg)
                             .build();
                 } else {
@@ -287,7 +306,9 @@ public class PaymentGatewayBean {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        return Response.ok().build();
+        return Response
+                .ok()
+                .build();
     }
 
     public Response sendOTP(String paytmMobile) {
@@ -334,7 +355,8 @@ public class PaymentGatewayBean {
                 String resultCode = resultInfoObj.getString("resultCode");
                 resultMsg = resultInfoObj.getString("resultMsg");
                 if (!resultCode.equals("01")) {
-                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                    return Response
+                            .status(Response.Status.NOT_ACCEPTABLE)
                             .header("resultMsg", resultMsg)
                             .build();
                 }
@@ -344,7 +366,8 @@ public class PaymentGatewayBean {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        return Response.status(Response.Status.OK)
+        return Response
+                .status(Response.Status.OK)
                 .header("resultMsg", resultMsg)
                 .build();
     }
@@ -368,7 +391,7 @@ public class PaymentGatewayBean {
         try {
             url = new URL("https://securegw-stage.paytm.in/login/validateOtp?mid=" + MID + "&orderId=" + orderId);
         } catch (MalformedURLException ex) {
-            Logger.getLogger(PaymentGatewayBean.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
 
         /* for Production */
@@ -396,7 +419,8 @@ public class PaymentGatewayBean {
                 resultStatus = resultInfoObj.getString("resultStatus");
                 if (!resultCode.equals("01")) {
                     resultMsg = resultInfoObj.getString("resultMsg");
-                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                    return Response
+                            .status(Response.Status.NOT_ACCEPTABLE)
                             .header("resultMsg", resultMsg)
                             .build();
                 } else {
@@ -407,7 +431,8 @@ public class PaymentGatewayBean {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        return Response.status(Response.Status.OK)
+        return Response
+                .status(Response.Status.OK)
                 .build();
     }
 
@@ -457,7 +482,8 @@ public class PaymentGatewayBean {
                 String resultCode = resultInfoObj.getString("resultCode");
                 if (!resultCode.equals("0000")) {
                     String resultMsg = resultInfoObj.getString("resultMsg");
-                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                    return Response
+                            .status(Response.Status.NOT_ACCEPTABLE)
                             .header("resultMsg", resultMsg)
                             .build();
                 } else {
@@ -492,7 +518,8 @@ public class PaymentGatewayBean {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        return Response.status(Response.Status.OK)
+        return Response
+                .status(Response.Status.OK)
                 .build();
     }
 
@@ -541,7 +568,8 @@ public class PaymentGatewayBean {
                 String resultCode = resultInfoObj.getString("resultCode");
                 if (!resultCode.equals("0000")) {
                     String resultMsg = resultInfoObj.getString("resultMsg");
-                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                    return Response
+                            .status(Response.Status.NOT_ACCEPTABLE)
                             .header("resultMsg", resultMsg)
                             .build();
                 } else {
@@ -564,7 +592,7 @@ public class PaymentGatewayBean {
                     //Get iconUrl Object
                     String cardIconUrl = bodyObj.getString("iconUrl");
 
-                    cardBinDetails.add(new CardBinDetails(
+                    cardDetails.add(new CardDetails(
                             issuingBank,
                             issuingBankCode,
                             paymentMode,
@@ -584,9 +612,115 @@ public class PaymentGatewayBean {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        return Response.status(Response.Status.OK)
+        return Response
+                .status(Response.Status.OK)
                 .build();
     }
+
+//    public void processTransaction(String paymentMode) {
+//
+//        JSONObject paytmParams = new JSONObject();
+//
+//        JSONObject body = new JSONObject();
+//        body.put("requestType", REQUEST_TYPE_PROCESS_TRANSACTION);
+//        body.put("mid", MID);
+//        body.put("orderId", orderId);
+//        body.put("paymentMode", paymentMode);
+////        body.put("authMode", "otp");
+////        body.put("walletType", "PAYTMPG");
+//        if (paymentMode.equals("CREDIT_CARD")) {
+////            body.put("cardInfo", "|4854980801319205|123|032022");
+//            body.put("cardInfo", "|4111111111111111|111|032032");
+//            body.put("authMode", "otp");
+//        }
+//
+//        JSONObject head = new JSONObject();
+//        head.put("txnToken", transactionToken);
+//
+//        paytmParams.put("body", body);
+//        paytmParams.put("head", head);
+//
+//        String post_data = paytmParams.toString();
+//
+//        /* for Staging */
+//        URL url = null;
+//        try {
+//            url = new URL("https://securegw-stage.paytm.in/theia/api/v1/processTransaction?mid=" + MID + "&orderId=" + orderId);
+//        } catch (MalformedURLException ex) {
+//            ex.printStackTrace();
+//        }
+//
+//        /* for Production */
+//// URL url = new URL("https://securegw.paytm.in/theia/api/v1/processTransaction?mid=YOUR_MID_HERE&orderId=ORDERID_98765");
+////        Response response = null;
+//        try {
+//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//            connection.setRequestMethod("POST");
+//            connection.setRequestProperty("Content-Type", "application/json");
+//            connection.setDoOutput(true);
+//
+//            DataOutputStream requestWriter = new DataOutputStream(connection.getOutputStream());
+//            requestWriter.writeBytes(post_data);
+//            requestWriter.close();
+//            String responseData = "";
+//            InputStream is = connection.getInputStream();
+//            BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
+//            if ((responseData = responseReader.readLine()) != null) {
+//                logger.log(Level.SEVERE, "PT ResponseData {0}", responseData);
+//                JSONObject resObj = new JSONObject(responseData);
+//                JSONObject bodyObj = resObj.getJSONObject("body");
+//                JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
+//
+//                String resultCode = resultInfoObj.getString("resultCode");
+//                if (!resultCode.equals("0000")) {
+//                    String resultMsg = resultInfoObj.getString("resultMsg");
+////                    return Response
+////                            .status(Response.Status.NOT_ACCEPTABLE)
+////                            .header("resultMsg", resultMsg)
+////                            .build();
+//                } else {
+//                    if (paymentMode.equals("CREDIT_CARD")) {
+//                        JSONObject bankFormObj = bodyObj.getJSONObject("bankForm");
+//                        JSONObject redirectFormObj = bankFormObj.getJSONObject("redirectForm");
+//                        String actionUrl = redirectFormObj.getString("actionUrl");
+//                        String method = redirectFormObj.getString("method");
+//                        String type = redirectFormObj.getString("type");
+//
+//                        JSONObject headersObj = redirectFormObj.getJSONObject("headers");
+//                        String content_type = headersObj.getString("Content-Type");
+//
+//                        JSONObject contentObj = redirectFormObj.getJSONObject("content");
+//                        String md = contentObj.getString("MD");
+//                        String paReq = contentObj.getString("PaReq");
+//                        String termUrl = contentObj.getString("TermUrl");
+//
+//                        redirectForm = new RedirectForm(
+//                                actionUrl,
+//                                method,
+//                                type,
+//                                content_type,
+//                                md,
+//                                paReq,
+//                                termUrl
+//                        );
+////                        return Response
+////                                .ok()
+////                                .entity(orderId)
+////                                .build();
+//                    } else {
+////                        return Response
+////                                .ok()
+////                                .entity(bodyObj.toString())
+////                                .build();
+//                    }
+//                }
+//            }
+//            responseReader.close();
+//        } catch (Exception exception) {
+//            exception.printStackTrace();
+//        }
+////        return null;
+//    }
 
     public Response processTransaction(String paymentMode) {
 
@@ -600,8 +734,8 @@ public class PaymentGatewayBean {
 //        body.put("authMode", "otp");
 //        body.put("walletType", "PAYTMPG");
         if (paymentMode.equals("CREDIT_CARD")) {
-//            body.put("cardInfo", "|4854980801319205|123|032022");
-            body.put("cardInfo", "|4111111111111111|111|032032");
+            body.put("cardInfo", "|4854980801319205|123|032022");
+//            body.put("cardInfo", "|4111111111111111|111|032032");
             body.put("authMode", "otp");
         }
 
@@ -623,6 +757,7 @@ public class PaymentGatewayBean {
 
         /* for Production */
 // URL url = new URL("https://securegw.paytm.in/theia/api/v1/processTransaction?mid=YOUR_MID_HERE&orderId=ORDERID_98765");
+//        Response response = null;
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
@@ -644,13 +779,46 @@ public class PaymentGatewayBean {
                 String resultCode = resultInfoObj.getString("resultCode");
                 if (!resultCode.equals("0000")) {
                     String resultMsg = resultInfoObj.getString("resultMsg");
-                    return Response.status(Response.Status.NOT_ACCEPTABLE)
+                    return Response
+                            .status(Response.Status.NOT_ACCEPTABLE)
                             .header("resultMsg", resultMsg)
                             .build();
                 } else {
-                    return Response.ok()
-                            .entity(bodyObj.toString())
-                            .build();
+                    if (paymentMode.equals("CREDIT_CARD")) {
+                        JSONObject bankFormObj = bodyObj.getJSONObject("bankForm");
+                        JSONObject redirectFormObj = bankFormObj.getJSONObject("redirectForm");
+                        String actionUrl = redirectFormObj.getString("actionUrl");
+                        String method = redirectFormObj.getString("method");
+                        String type = redirectFormObj.getString("type");
+
+                        JSONObject headersObj = redirectFormObj.getJSONObject("headers");
+                        String content_type = headersObj.getString("Content-Type");
+
+                        JSONObject contentObj = redirectFormObj.getJSONObject("content");
+                        String md = contentObj.getString("MD");
+                        String paReq = contentObj.getString("PaReq");
+                        String termUrl = contentObj.getString("TermUrl");
+
+                        redirectForm = new RedirectForm(
+                                actionUrl,
+                                method,
+                                type,
+                                content_type,
+                                md,
+                                paReq,
+                                termUrl
+                        );    
+                        
+                        return Response
+                                .temporaryRedirect(URI.create("http://localhost:8080/myProject/redirect-form.xhtml"))
+                                .build();
+
+                    } else {
+                        return Response
+                                .ok()
+                                .entity(bodyObj.toString())
+                                .build();
+                    }
                 }
             }
             responseReader.close();
@@ -659,8 +827,8 @@ public class PaymentGatewayBean {
         }
         return null;
     }
-
-    public void transactionStatus(String paytmChecksum) {
+    
+    public Response transactionStatus(String orderId) {
         /* initialize an object */
         JSONObject paytmParams = new JSONObject();
 
@@ -706,11 +874,10 @@ public class PaymentGatewayBean {
 
         /* for Production */
 // URL url = new URL("https://securegw.paytm.in/v3/order/status");
-        String signature = null;
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Content-Type", "application/json");            
             connection.setDoOutput(true);
 
             DataOutputStream requestWriter = new DataOutputStream(connection.getOutputStream());
@@ -722,17 +889,18 @@ public class PaymentGatewayBean {
             if ((responseData = responseReader.readLine()) != null) {
                 logger.log(Level.SEVERE, "Transaction Status Response is {0}", responseData);
                 JSONObject resObj = new JSONObject(responseData);
-//                JSONObject headObj = resObj.getJSONObject("head");
-//                signature = headObj.getString("signature");
-//                verifyChecksumHash2(resObj, paytmChecksum);
-
+                JSONObject bodyObj = resObj.getJSONObject("body");
+                return Response
+                        .ok()
+                        .entity(bodyObj.toString())
+                        .build();
             }
-            // System.out.append("Request: " + post_data);
+
             responseReader.close();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-//        return signature;
+        return null;
     }
 
 }

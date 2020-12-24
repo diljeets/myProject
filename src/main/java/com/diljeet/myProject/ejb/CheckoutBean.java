@@ -11,25 +11,33 @@ import com.diljeet.myProject.entities.CustomerOrder;
 import com.diljeet.myProject.entities.CustomerTransaction;
 import com.diljeet.myProject.interfaces.CartService;
 import com.diljeet.myProject.interfaces.CheckoutService;
+import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.InitiateTransaction;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Model;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -52,11 +60,14 @@ public class CheckoutBean {
     @Inject
     HttpServletRequest req;
 
+    @Context
+    HttpServletResponse res;
+
     @Inject
     CheckoutController checkoutController;
 
     @Inject
-    CartController cartController;    
+    CartController cartController;
 
     @PostConstruct
     public void init() {
@@ -74,7 +85,7 @@ public class CheckoutBean {
         }
         InitiateTransaction initiateTransaction = new InitiateTransaction(payableAmount,
                 "WEB",
-                "http://localhost:8080/myProject/process-transaction-status.xhtml");
+                "http://localhost:8080/myProject/webapi/Checkout/pgResponse");
         try {
             Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/initiateTransaction")
                     .request(MediaType.APPLICATION_JSON)
@@ -214,63 +225,103 @@ public class CheckoutBean {
         return true;
     }
 
+    public List<CardDetails> fetchCardDetails() {
+        List<CardDetails> cardDetails = null;
+        try {
+            cardDetails = client.target("http://localhost:8080/myProject/webapi/Checkout/fetchCardDetails")
+                    .request(MediaType.APPLICATION_JSON)
+                    .header("Cookie", req.getHeader("Cookie"))
+                    .get(new GenericType<List<CardDetails>>() {
+                    });
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
+            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Card Details. Please try again.");
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        }
+        return cardDetails;
+    }
+
     public void processTransaction(String paymentMode) {
+
         Response response = null;
         try {
             response = client.target("http://localhost:8080/myProject/webapi/Checkout/processTransaction")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(paymentMode, MediaType.APPLICATION_JSON), Response.class);
+            if (paymentMode.equals("BALANCE")) {
+                if (response.getStatus() == Response.Status.OK.getStatusCode()
+                        && response.hasEntity()) {
+                    String stringEntity = response.readEntity(String.class);
+                    JSONObject jsonObject = new JSONObject(stringEntity);
+                    String callBackUrl = jsonObject.getString("callBackUrl");
+                    JSONObject txnInfoObj = jsonObject.getJSONObject("txnInfo");
 
-            if (response.getStatus() == Response.Status.OK.getStatusCode()
-                    && response.hasEntity()) {
-                String stringEntity = response.readEntity(String.class);
-                JSONObject jsonObject = new JSONObject(stringEntity);
-                String callBackUrl = jsonObject.getString("callBackUrl");
-                JSONObject txnInfoObj = jsonObject.getJSONObject("txnInfo");
+                    String BANKNAME = txnInfoObj.getString("BANKNAME");
+                    String BANKTXNID = txnInfoObj.getString("BANKTXNID");
+                    String CURRENCY = txnInfoObj.getString("CURRENCY");
+                    String GATEWAYNAME = txnInfoObj.getString("GATEWAYNAME");
+//                String MID = txnInfoObj.getString("MID");
+                    String ORDERID = txnInfoObj.getString("ORDERID");
+                    String PAYMENTMODE = txnInfoObj.getString("PAYMENTMODE");
+                    String RESPCODE = txnInfoObj.getString("RESPCODE");
+                    String RESPMSG = txnInfoObj.getString("RESPMSG");
+//                String STATUS = txnInfoObj.getString("STATUS");
+                    String TXNAMOUNT = txnInfoObj.getString("TXNAMOUNT");
+                    String TXNDATE = txnInfoObj.getString("TXNDATE");
+                    String TXNID = txnInfoObj.getString("TXNID");
 
-                String BANKNAME = txnInfoObj.getString("BANKNAME");
-                String BANKTXNID = txnInfoObj.getString("BANKTXNID");
-                String CURRENCY = txnInfoObj.getString("CURRENCY");
-                String GATEWAYNAME = txnInfoObj.getString("GATEWAYNAME");
-//                    String _MID = txnInfoObj.getString("MID");
-                String ORDERID = txnInfoObj.getString("ORDERID");
-                String PAYMENTMODE = txnInfoObj.getString("PAYMENTMODE");
-                String RESPCODE = txnInfoObj.getString("RESPCODE");
-                String RESPMSG = txnInfoObj.getString("RESPMSG");
-//                    String STATUS = txnInfoObj.getString("STATUS");
-                String TXNAMOUNT = txnInfoObj.getString("TXNAMOUNT");
-                String TXNDATE = txnInfoObj.getString("TXNDATE");
-                String TXNID = txnInfoObj.getString("TXNID");
+                    if (RESPCODE.equals("01")) {
+                        Response transactionStatusResponse = transactionStatus(ORDERID);
+                        if (transactionStatusResponse.getStatus() == Response.Status.OK.getStatusCode()
+                                && transactionStatusResponse.hasEntity()) {
+                            String stringEntityInTransactionStatusResponse = transactionStatusResponse.readEntity(String.class);
+                            JSONObject bodyObj = new JSONObject(stringEntityInTransactionStatusResponse);
+                            JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
+                            String resultCode = resultInfoObj.getString("resultCode");
+                            if (resultCode.equals("01")) {
+                                CustomerTransaction customerTransaction = new CustomerTransaction(
+                                        BANKNAME,
+                                        BANKTXNID,
+                                        CURRENCY,
+                                        GATEWAYNAME,
+                                        ORDERID,
+                                        PAYMENTMODE,
+                                        RESPCODE,
+                                        RESPMSG,
+                                        TXNAMOUNT,
+                                        TXNDATE,
+                                        TXNID
+                                );
+                                //Place Customer Order and Transaction details in Database
+                                placeOrder(new CustomerOrder(checkoutController.getDeliveryTime(),
+                                        checkoutController.getDeliveryAddress(),
+                                        cartController.getCartItems(),
+                                        cartController.getPayableAmount(),
+                                        customerTransaction));
+                            }
+                        }
+                    }
 
-                CustomerTransaction customerTransaction = new CustomerTransaction(
-                        BANKNAME,
-                        BANKTXNID,
-                        CURRENCY,
-                        GATEWAYNAME,
-                        ORDERID,
-                        PAYMENTMODE,
-                        RESPCODE,
-                        RESPMSG,
-                        TXNAMOUNT,
-                        TXNDATE,
-                        TXNID
-                );
+                    //Redirect to intimate Customer whether or not Order/Transaction is successful
+                    FacesContext.getCurrentInstance().getExternalContext().redirect(callBackUrl);
 
-                //Place Customer Order and Transaction details in Database
-                placeOrder(new CustomerOrder(checkoutController.getDeliveryTime(),
-                        checkoutController.getDeliveryAddress(),
-                        cartController.getCartItems(),
-                        cartController.getPayableAmount(),
-                        customerTransaction));
+                } else {
+                    String resultMsg = response.getHeaderString("resultMsg");
+                    msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
+                    FacesContext.getCurrentInstance().addMessage(null, msg);
+                }
+            }
 
-                //Redirect to intimate Customer whether or not Order/Transaction is successful
-                FacesContext.getCurrentInstance().getExternalContext().redirect(callBackUrl);
-
-            } else {
-                String resultMsg = response.getHeaderString("resultMsg");
-                msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
-                FacesContext.getCurrentInstance().addMessage(null, msg);
+            if (paymentMode.equals("CREDIT_CARD")) {
+                if (response.getStatus() == Response.Status.TEMPORARY_REDIRECT.getStatusCode()) {
+                    String redirectUrl = response.getLocation().toString();
+                    FacesContext.getCurrentInstance().getExternalContext().redirect(redirectUrl);
+                } else {
+                    String resultMsg = response.getHeaderString("resultMsg");
+                    msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
+                    FacesContext.getCurrentInstance().addMessage(null, msg);
+                }
             }
 
         } catch (Exception e) {
@@ -278,6 +329,19 @@ public class CheckoutBean {
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Something went wrong. Please try again.");
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }
+    }
+
+    public Response transactionStatus(String orderId) {
+        Response response = null;
+        try {
+            response = client.target("http://localhost:8080/myProject/webapi/Checkout/transactionStatus")
+                    .request(MediaType.APPLICATION_JSON)
+                    .header("Cookie", req.getHeader("Cookie"))
+                    .post(Entity.entity(orderId, MediaType.APPLICATION_JSON), Response.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
     }
 
     public void placeOrder(CustomerOrder customerOrder) {
@@ -288,7 +352,7 @@ public class CheckoutBean {
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(customerOrder, MediaType.APPLICATION_JSON), Response.class);
-//                    .buildPost(Entity.entity(customerOrder, MediaType.APPLICATION_JSON))
+//                    .buildPost(Entity.entity(customerOrder, MediaType.APPLICATION_JSON))                  
 //                    .submit(Response.class);
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 logger.log(Level.SEVERE, "Order Placed Successfully");
