@@ -157,7 +157,7 @@
                                 <p:panel id="netbanking" 
                                          rendered="#{checkoutController.isModeNB}"
                                          style="border:none;">
-                                    <p:panel rendered="#{paymentOption.paymentMode eq 'NET_BANKING'}" style="border:none;">
+                                    <p:panel rendered="#{paymentOption.paymentMode eq 'NET_BANKING'}" style="border:none;"> 
                                         <p:dataTable id="datatable-channeloptions" 
                                                      class="table-channeloptions"
                                                      value="#{checkoutController.payChannelOptionsNetBanking}"        
@@ -165,16 +165,16 @@
                                                      selection="#{checkoutController.payChannelOptionNetBanking}"
                                                      rowKey="#{payChannelOptionNetBanking.channelCode}" 
                                                      summary="List of Payment Banks">  
-                                            <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPayChannelOptionNetBanking}"/>
+                                            <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPayChannelOptionNetBanking}" update="datatable-channeloptions"/>
                                             <p:column selectionMode="single" style="width:16px;text-align:center"/>
                                             <p:column>
                                                 <h:outputText value="#{payChannelOptionNetBanking.channelName}"/>                                
                                             </p:column>                                                                    
-                                        </p:dataTable>
+                                        </p:dataTable>                                         
                                         <div class="ui-g ui-fluid">
                                             <div class="ui-g-12 ui-md-2">
                                                 <div class="ui-inputgroup">  
-                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode,checkoutController.selectedNetBankingChannel)}" onclick="PF('progressPanel').show();PF('payByNBBtn').disable();" oncomplete="PF('progressPanel').close();PF('payByNBBtn').enable();" widgetVar="payByNBBtn"/>
+                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode,checkoutController.channelCode)}" onclick="PF('progressPanel').show();PF('payByNBBtn').disable();" oncomplete="PF('progressPanel').close();PF('payByNBBtn').enable();" widgetVar="payByNBBtn"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -182,7 +182,7 @@
                                 </p:panel>
                             </p:column>
                             <f:facet name="footer">
-                                <p:commandButton process="datatable-paymentoptions" actionListener="#{checkoutController.addDeliveryAddress(registeredUsersAddressController.address)}" value="Deliver at this Address"/>
+                                <p:commandButton actionListener="#{checkoutController.processTransaction(checkoutController.paymentMode)}" value="Review and Place Order" onclick="PF('progressPanel').show();PF('reviewAndPlaceOrderBtn').disable();" oncomplete="PF('progressPanel').close();PF('reviewAndPlaceOrderBtn').enable();" widgetVar="reviewAndPlaceOrderBtn"/>
                             </f:facet>                                           
                         </p:dataTable>
                     </p>                       

@@ -287,14 +287,19 @@ public class PaymentGatewayBean {
                                 onboarding,
                                 priority
                         ));
+
+                        boolean isChannelOptionHybridDisabled;
+                        String channelName;
+                        String iconUrl;
+                        String channelCode;
                         if ((obj.getString("paymentMode")).equals("NET_BANKING") && (obj.get("payChannelOptions") instanceof JSONArray)) {
                             JSONArray payChannelOptionsJsonArray = (JSONArray) obj.get("payChannelOptions");
                             for (int j = 0; j < payChannelOptionsJsonArray.length(); j++) {
                                 JSONObject obj1 = payChannelOptionsJsonArray.getJSONObject(j);
-                                boolean isChannelOptionHybridDisabled = obj1.getBoolean("isHybridDisabled");
-                                String channelName = obj1.getString("channelName");
-                                String iconUrl = obj1.getString("iconUrl");
-                                String channelCode = obj1.getString("channelCode");
+                                isChannelOptionHybridDisabled = obj1.getBoolean("isHybridDisabled");
+                                channelName = obj1.getString("channelName");
+                                iconUrl = obj1.getString("iconUrl");
+                                channelCode = obj1.getString("channelCode");
 
                                 payChannelOptionsNetBanking.add(new PayChannelOptionsNetBanking(
                                         isChannelOptionHybridDisabled,
@@ -303,6 +308,10 @@ public class PaymentGatewayBean {
                                         channelCode
                                 ));
                             }
+                            payChannelOptionsNetBanking.add(new PayChannelOptionsNetBanking(
+                                    "Other Banks",
+                                    "OTHERS"
+                            ));
                         }
                     }
                 }
@@ -620,6 +629,77 @@ public class PaymentGatewayBean {
         return Response
                 .status(Response.Status.OK)
                 .build();
+    }
+
+    public void fetchNetBankingPaymentChannels() {
+        //Clear payChannelOptionsNetBanking List
+        payChannelOptionsNetBanking.clear();
+        
+        JSONObject paytmParams = new JSONObject();
+
+        JSONObject body = new JSONObject();
+        body.put("type", "MERCHANT");
+
+        JSONObject head = new JSONObject();
+        head.put("tokenType", TOKEN_TYPE);
+        head.put("token", transactionToken);
+
+        paytmParams.put("body", body);
+        paytmParams.put("head", head);
+
+        String post_data = paytmParams.toString();
+
+        /* for Staging */
+        URL url = null;
+        try {
+            url = new URL("https://securegw-stage.paytm.in/theia/api/v1/fetchNBPaymentChannels?mid=" + MID + "&orderId=" + orderId);
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
+        }
+
+        /* for Production */
+// URL url = new URL("https://securegw.paytm.in/theia/api/v1/fetchNBPaymentChannels?mid=YOUR_MID_HERE&orderId=ORDERID_98765");
+        try {
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            DataOutputStream requestWriter = new DataOutputStream(connection.getOutputStream());
+            requestWriter.writeBytes(post_data);
+            requestWriter.close();
+            String responseData = "";
+            InputStream is = connection.getInputStream();
+            BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
+            if ((responseData = responseReader.readLine()) != null) {
+                logger.log(Level.SEVERE, "fetch NB Payment Channel Response: {0}", responseData);
+                JSONObject resObj = new JSONObject(responseData);
+                JSONObject bodyObj = resObj.getJSONObject("body");
+                JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
+
+                String resultCode = resultInfoObj.getString("resultCode");
+                if (resultCode.equals("0000")) {
+                    JSONObject nbPayOptionObj = bodyObj.getJSONObject("nbPayOption");
+                    JSONArray payChannelOptionsJsonArray = nbPayOptionObj.getJSONArray("payChannelOptions");
+                    for (int i = 0; i < payChannelOptionsJsonArray.length(); i++) {
+                        JSONObject bankObj = payChannelOptionsJsonArray.getJSONObject(i);
+                        boolean isChannelOptionHybridDisabled = bankObj.getBoolean("isHybridDisabled");
+                        String channelName = bankObj.getString("channelName");
+                        String iconUrl = bankObj.getString("iconUrl");
+                        String channelCode = bankObj.getString("channelCode");                        
+                        payChannelOptionsNetBanking.add(new PayChannelOptionsNetBanking(
+                                isChannelOptionHybridDisabled,
+                                channelName,
+                                iconUrl,
+                                channelCode
+                        ));
+                    }
+                }
+            }
+            responseReader.close();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     public Response processTransaction(PaymentRequestDetails paymentRequestDetails) {

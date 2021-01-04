@@ -18,6 +18,11 @@ public class PayChannelOptionsNetBanking {
 
     public PayChannelOptionsNetBanking(){        
     }
+
+    public PayChannelOptionsNetBanking(String channelName, String channelCode) {
+        this.channelName = channelName;
+        this.channelCode = channelCode;
+    }
     
     public PayChannelOptionsNetBanking(boolean isHybridDisabled, String channelName, String iconUrl, String channelCode) {
         this.isHybridDisabled = isHybridDisabled;
