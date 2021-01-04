@@ -57,7 +57,7 @@ public class CustomerOrder implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateOrderCreated;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)    
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)       
     private CustomerTransaction customerTransaction;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "customerOrder")

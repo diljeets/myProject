@@ -5,11 +5,11 @@
  */
 package com.diljeet.myProject.services;
 
-import com.diljeet.myProject.controllers.RedirectFormController;
 import com.diljeet.myProject.controllers.TemplateController;
 import com.diljeet.myProject.ejb.PaymentGatewayBean;
 import com.diljeet.myProject.entities.Cart;
 import com.diljeet.myProject.entities.CustomerOrder;
+import com.diljeet.myProject.entities.CustomerTransaction;
 import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import java.util.logging.Logger;
 import javax.ejb.Stateful;
@@ -20,10 +20,10 @@ import com.diljeet.myProject.utils.MyProjectUtils;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
-import com.diljeet.myProject.utils.RedirectForm;
+import com.diljeet.myProject.utils.PaymentRequestDetails;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -34,10 +34,10 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
+import org.json.JSONObject;
 
 /**
  *
@@ -98,16 +98,6 @@ public class CheckoutServiceBean implements CheckoutService {
         return deliveryAddress;
     }
 
-//    @Override
-//    public void initiateTransaction(String payableAmount, String channelId) {
-//        String orderId = MyProjectUtils.createOrderId();
-//        String username = req.getUserPrincipal().getName();        
-//        try {
-//            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username, channelId);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
     @Override
     public Response initiateTransaction(InitiateTransaction initiateTransaction) {
         String orderId = MyProjectUtils.createOrderId();
@@ -199,26 +189,71 @@ public class CheckoutServiceBean implements CheckoutService {
             e.printStackTrace();
         }
         return cardDetails;
-    }  
-
+    }
+    
     @Override
-    public Response processTransaction(String paymentMode) {
+    public Response processTransaction(PaymentRequestDetails paymentRequestDetails) {
         Response response = null;
         try {
-            response = paymentGatewayBean.processTransaction(paymentMode);
+            response = paymentGatewayBean.processTransaction(paymentRequestDetails);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return response;
-    }   
+    }
+
+//    @Override
+//    public Response processTransaction(String paymentMode) {
+//        Response response = null;
+//        try {
+//            response = paymentGatewayBean.processTransaction(paymentMode);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return response;
+//    }
 
     @Override
-    public String pgResponse(HttpServletRequest req, HttpServletResponse resp) {        
+    public void pgGetResponse(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            resp.sendRedirect(req.getContextPath() + "/order-status.xhtml");
+        } catch (Exception ex) {
+            Logger.getLogger(CheckoutServiceBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
+    public Response pgPostResponse(HttpServletRequest req, HttpServletResponse resp) {
         Map<String, String[]> mapData = req.getParameterMap();
-        TreeMap<String, String> parameters = new TreeMap<String, String>();
+        JSONObject parameters = new JSONObject();
         mapData.forEach((key, val) -> parameters.put(key, val[0]));
-        logger.log(Level.SEVERE, "Final CC response is {0}", parameters.toString());
-        return "process-transaction-status.xhtml";
+        logger.log(Level.SEVERE, "Final payment response is {0}", parameters.toString());
+
+        //Get Customer Transaction Status
+        paymentGatewayBean.getCustomerTransactionStatus(parameters.toString());
+
+        return Response
+                .seeOther(URI.create("/Checkout/pgResponse"))
+                .build();
+    }
+
+    @Override
+    public Response getCustomerTransactionStatus() {
+        try {
+            CustomerTransaction customerTransaction = paymentGatewayBean.getCustomerTransaction();
+            if (customerTransaction != null) {
+                return Response
+                        .status(Response.Status.FOUND)
+                        .entity(customerTransaction)
+                        .build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return Response
+                .status(Response.Status.NOT_FOUND)
+                .build();
     }
 
     @Override

@@ -78,26 +78,35 @@
                                     <p:panel rendered="#{paymentOption.paymentMode eq 'CREDIT_CARD'}" style="border:none;">   
                                         <div class="ui-g ui-fluid">
                                             <div class="ui-g-12 ui-md-2" rendered="#{checkoutController.isCardValid}">
-                                                <h:outputText id="issuingBank" value="#{checkoutController.issuingBank}"/>
+                                                <h:outputText id="ccIssuingBank" value="#{checkoutController.issuingBank}"/>
                                             </div>
                                         </div> 
                                         <div class="ui-g ui-fluid">
                                             <div class="ui-g-12 ui-md-2">
                                                 <div class="ui-inputgroup">
                                                     <span class="ui-inputgroup-addon">Credit Card Number</span>    
-                                                    <p:inputText id="ccNumber" value="#{checkoutController.creditcardNumber}" maxlength="16">
-                                                        <p:ajax event="keyup" listener="#{checkoutController.fetchBinDetails}" process="@this,cardIcon,issuingBank" update="cardIcon,issuingBank"/>
+                                                    <p:inputText id="ccNumber" value="#{checkoutController.ccNumber}" maxlength="16">
+                                                        <p:ajax event="keyup" listener="#{checkoutController.fetchBinDetails}" process="@this,ccIcon,ccIssuingBank" update="ccIcon,ccIssuingBank"/>
                                                     </p:inputText> 
                                                     <span class="ui-inputgroup-addon" rendered="#{checkoutController.isCardValid}">
-                                                        <p:graphicImage id="cardIcon" value="#{checkoutController.cardIconUrl}"/>
+                                                        <p:graphicImage id="ccIcon" value="#{checkoutController.cardIconUrl}"/>
                                                     </span>                                                 
+                                                </div>
+                                                <div class="ui-inputgroup">
+                                                    <p:inputText id="ccExpiryMonth" value="#{checkoutController.ccExpiryMonth}" maxlength="2"/>
+                                                    <span class="ui-inputgroup-addon"> / </span>    
+                                                    <p:inputText id="ccExpiryYear" value="#{checkoutController.ccExpiryYear}" maxlength="4"/>
+                                                </div>
+                                                <div class="ui-inputgroup">                                                     
+                                                    <span class="ui-inputgroup-addon">Cvv</span>    
+                                                    <h:inputSecret id="ccCvv" value="#{checkoutController.ccCvv}" maxlength="3"/>
                                                 </div>
                                             </div>
                                         </div>         
                                         <div class="ui-g ui-fluid">
                                             <div class="ui-g-12 ui-md-2">
                                                 <div class="ui-inputgroup">  
-                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode)}" onclick="PF('progressPanel').show();PF('payByCCBtn').disable();" oncomplete="PF('progressPanel').close();PF('payByCCBtn').enable();" widgetVar="payByCCBtn"/>
+                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode,checkoutController.ccNumber,checkoutController.ccExpiryMonth,checkoutController.ccExpiryYear,checkoutController.ccCvv)}" onclick="PF('progressPanel').show();PF('payByCCBtn').disable();" oncomplete="PF('progressPanel').close();PF('payByCCBtn').enable();" widgetVar="payByCCBtn"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -107,31 +116,69 @@
                                 <p:panel id="debitcard" 
                                          rendered="#{checkoutController.isModeDC}"
                                          style="border:none;">
-                                    <p:panelGrid rendered="#{paymentOption.paymentMode eq 'DEBIT_CARD'}">
-                                        <span class="ui-float-label">
-                                            <p:inputText id="mobiledc"/>
-                                            <p:outputLabel for="mobiledc" value="Paytm Mobile" />
-                                            <p:message for="mobiledc"/>
-                                        </span>
-                                    </p:panelGrid>                                   
+                                    <p:panel rendered="#{paymentOption.paymentMode eq 'DEBIT_CARD'}" style="border:none;">   
+                                        <div class="ui-g ui-fluid">
+                                            <div class="ui-g-12 ui-md-2" rendered="#{checkoutController.isCardValid}">
+                                                <h:outputText id="dcIssuingBank" value="#{checkoutController.issuingBank}"/>
+                                            </div>
+                                        </div> 
+                                        <div class="ui-g ui-fluid">
+                                            <div class="ui-g-12 ui-md-2">
+                                                <div class="ui-inputgroup">
+                                                    <span class="ui-inputgroup-addon">Debit Card Number</span>    
+                                                    <p:inputText id="dcNumber" value="#{checkoutController.dcNumber}" maxlength="16">
+                                                        <p:ajax event="keyup" listener="#{checkoutController.fetchBinDetails}" process="@this,dcIcon,dcIssuingBank" update="dcIcon,dcIssuingBank"/>
+                                                    </p:inputText> 
+                                                    <span class="ui-inputgroup-addon" rendered="#{checkoutController.isCardValid}">
+                                                        <p:graphicImage id="dcIcon" value="#{checkoutController.cardIconUrl}"/>
+                                                    </span>                                                 
+                                                </div>
+                                                <div class="ui-inputgroup">
+                                                    <p:inputText id="dcExpiryMonth" value="#{checkoutController.dcExpiryMonth}" maxlength="2"/>
+                                                    <span class="ui-inputgroup-addon"> / </span>    
+                                                    <p:inputText id="dcExpiryYear" value="#{checkoutController.dcExpiryYear}" maxlength="4"/>
+                                                </div>
+                                                <div class="ui-inputgroup">                                                     
+                                                    <span class="ui-inputgroup-addon">Cvv</span>    
+                                                    <h:inputSecret id="dcCvv" value="#{checkoutController.dcCvv}" maxlength="3"/>
+                                                </div>
+                                            </div>
+                                        </div>         
+                                        <div class="ui-g ui-fluid">
+                                            <div class="ui-g-12 ui-md-2">
+                                                <div class="ui-inputgroup">  
+                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode,checkoutController.dcNumber,checkoutController.dcExpiryMonth,checkoutController.dcExpiryYear,checkoutController.dcCvv)}" onclick="PF('progressPanel').show();PF('payByDCBtn').disable();" oncomplete="PF('progressPanel').close();PF('payByDCBtn').enable();" widgetVar="payByDCBtn"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </p:panel>                                     
                                 </p:panel>
 
                                 <p:panel id="netbanking" 
                                          rendered="#{checkoutController.isModeNB}"
                                          style="border:none;">
-                                    <p:dataTable id="datatable-channeloptions" 
-                                                 class="table-channeloptions"
-                                                 value="#{checkoutController.payChannelOptionsNetBanking}"        
-                                                 var="payChannelOptionNetBanking"
-                                                 selection="#{checkoutController.payChannelOptionNetBanking}"
-                                                 rowKey="#{payChannelOptionNetBanking.channelCode}" 
-                                                 rendered="#{paymentOption.paymentMode eq 'NET_BANKING'}" 
-                                                 summary="List of Payment Banks">                                     
-                                        <p:column selectionMode="single" style="width:16px;text-align:center"/>
-                                        <p:column>
-                                            <h:outputText value="#{payChannelOptionNetBanking.channelName}"/>                                
-                                        </p:column>                                                                    
-                                    </p:dataTable>
+                                    <p:panel rendered="#{paymentOption.paymentMode eq 'NET_BANKING'}" style="border:none;">
+                                        <p:dataTable id="datatable-channeloptions" 
+                                                     class="table-channeloptions"
+                                                     value="#{checkoutController.payChannelOptionsNetBanking}"        
+                                                     var="payChannelOptionNetBanking"
+                                                     selection="#{checkoutController.payChannelOptionNetBanking}"
+                                                     rowKey="#{payChannelOptionNetBanking.channelCode}" 
+                                                     summary="List of Payment Banks">  
+                                            <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPayChannelOptionNetBanking}"/>
+                                            <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                                            <p:column>
+                                                <h:outputText value="#{payChannelOptionNetBanking.channelName}"/>                                
+                                            </p:column>                                                                    
+                                        </p:dataTable>
+                                        <div class="ui-g ui-fluid">
+                                            <div class="ui-g-12 ui-md-2">
+                                                <div class="ui-inputgroup">  
+                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode,checkoutController.selectedNetBankingChannel)}" onclick="PF('progressPanel').show();PF('payByNBBtn').disable();" oncomplete="PF('progressPanel').close();PF('payByNBBtn').enable();" widgetVar="payByNBBtn"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </p:panel>
                                 </p:panel>
                             </p:column>
                             <f:facet name="footer">

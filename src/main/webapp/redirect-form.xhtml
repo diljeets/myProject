@@ -8,12 +8,30 @@
         <title>Facelet Title</title>
     </h:head>
     <h:body>
-        <h:form a:method="#{redirectFormController.redirectForm.method}" a:action="#{redirectFormController.redirectForm.actionUrl}">
-            <h:inputHidden a:name="MD" value="#{redirectFormController.redirectForm.md}"/>
-            <h:inputHidden a:name="PaReq" value="#{redirectFormController.redirectForm.paReq}"/>
-            <h:inputHidden a:name="TermUrl" value="#{redirectFormController.redirectForm.termUrl}"/>
-        </h:form>
+        <p:panel rendered="#{checkoutController.isModePaytm}">
+            <h:form a:method="get" a:action="http://localhost:8080/myProject/webapi/Checkout/pgResponse">               
+                <input type="submit" value="Place Order" name="Pay" />
+            </h:form>
+        </p:panel>
+        <p:panel rendered="#{checkoutController.isModeCC or checkoutController.isModeDC}">
+            <h:form a:method="#{redirectFormController.redirectForm.method}" a:type="#{redirectFormController.redirectForm.type}" a:action="#{redirectFormController.redirectForm.actionUrl}">
+                <h:inputHidden a:name="MD" value="#{redirectFormController.redirectForm.md}"/>
+                <h:inputHidden a:name="PaReq" value="#{redirectFormController.redirectForm.paReq}"/>
+                <h:inputHidden a:name="TermUrl" value="#{redirectFormController.redirectForm.termUrl}"/>
+                <input type="submit" value="Place Order" name="Pay" />
+            </h:form>
+        </p:panel>
+        <p:panel rendered="#{checkoutController.isModeNB}">
+            <h:form a:method="#{redirectFormController.redirectForm.method}" a:type="#{redirectFormController.redirectForm.type}" a:action="#{redirectFormController.redirectForm.actionUrl}">
+                <h:inputHidden a:name="MD" value="#{redirectFormController.redirectForm.md}"/>
+                <h:inputHidden a:name="SBMTTYPE" value="#{redirectFormController.redirectForm.sbmttype}"/>
+                <h:inputHidden a:name="PID" value="#{redirectFormController.redirectForm.pid}"/>
+                <h:inputHidden a:name="ES" value="#{redirectFormController.redirectForm.es}"/>
+                <input type="submit" value="Place Order" name="Pay" />
+            </h:form>
+        </p:panel>
+
     </h:body>
-    <script type="text/javascript">  document.forms[0].submit();</script>
+    <!--    <script type="text/javascript">  document.forms[0].submit();</script>-->
 </html>
 

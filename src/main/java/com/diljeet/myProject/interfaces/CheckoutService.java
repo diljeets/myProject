@@ -6,21 +6,21 @@
 package com.diljeet.myProject.interfaces;
 
 import com.diljeet.myProject.entities.CustomerOrder;
+import com.diljeet.myProject.entities.CustomerTransaction;
 import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.InitiateTransaction;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
+import com.diljeet.myProject.utils.PaymentRequestDetails;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -96,16 +96,29 @@ public interface CheckoutService {
     @Path("fetchCardDetails")
     @Produces({MediaType.APPLICATION_JSON})
     public List<CardDetails> fetchCardDetails();
-
+    
     @POST
     @Path("processTransaction")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response processTransaction(String paymentMode);    
+    public Response processTransaction(PaymentRequestDetails paymentRequestDetails); 
+
+//    @POST
+//    @Path("processTransaction")
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    public Response processTransaction(String paymentMode); 
+    
+    @GET
+    @Path("pgResponse")        
+    public void pgGetResponse(@Context HttpServletRequest req, @Context HttpServletResponse resp);
       
     @POST
     @Path("pgResponse")    
-    @Produces(MediaType.TEXT_PLAIN)
-    public String pgResponse(@Context HttpServletRequest req, @Context HttpServletResponse resp);
+    public Response pgPostResponse(@Context HttpServletRequest req, @Context HttpServletResponse resp);
+    
+    @GET
+    @Path("getCustomerTransactionStatus")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response getCustomerTransactionStatus();
 
     @POST
     @Path("transactionStatus")

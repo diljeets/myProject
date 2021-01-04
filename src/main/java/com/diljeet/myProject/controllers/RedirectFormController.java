@@ -5,6 +5,7 @@
  */
 package com.diljeet.myProject.controllers;
 
+import com.diljeet.myProject.ejb.CheckoutBean;
 import com.diljeet.myProject.ejb.PaymentGatewayBean;
 import com.diljeet.myProject.ejb.RegisteredUsersBean;
 import com.diljeet.myProject.entities.MealPlanCategory;
@@ -33,10 +34,10 @@ public class RedirectFormController implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private RedirectForm redirectForm;
+    private RedirectForm redirectForm;   
     
     @EJB
-    PaymentGatewayBean paymentGatewayBean;
+    CheckoutBean checkoutBean;
     
     @PostConstruct
     public void init() {
@@ -50,7 +51,7 @@ public class RedirectFormController implements Serializable {
     }   
 
     public RedirectForm getRedirectForm() {
-        return paymentGatewayBean.getRedirectForm();
+        return checkoutBean.getRedirectForm();
     }
 
     public void setRedirectForm(RedirectForm redirectForm) {

@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <h:form>
+            <p:panelGrid columns="2">
+                <p:outputLabel for="orderId" value="OrderId"/>
+                <h:outputText id="orderId" value="#{orderStatusController.customerTransaction.orderId}"/>
+                
+                <p:outputLabel for="paymentMode" value="PaymentMode"/>
+                <h:outputText id="paymentMode" value="#{orderStatusController.customerTransaction.paymentMode}"/>
+                
+                <p:outputLabel for="respCode" value="RespCode"/>
+                <h:outputText id="respCode" value="#{orderStatusController.customerTransaction.respCode}"/>
+                
+                <p:outputLabel for="respMsg" value="RespMsg"/>
+                <h:outputText id="respMsg" value="#{orderStatusController.customerTransaction.respMsg}"/>
+                
+                <p:outputLabel for="txnAmount" value="TxnAmount"/>
+                <h:outputText id="txnAmount" value="#{orderStatusController.customerTransaction.txnAmount}"/>
+                
+                <p:outputLabel for="txnDate" value="TxnDate"/>
+                <h:outputText id="txnDate" value="#{orderStatusController.customerTransaction.txnDate}"/>
+            </p:panelGrid>
+        </h:form>
+    </h:body>
+</html>
+

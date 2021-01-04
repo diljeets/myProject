@@ -135,7 +135,7 @@
                         </p:panelGrid> 
                         <p:commandButton value="Add Address" id="addAddressBtn" class="cmdBtn" action="#{registeredUsersAddressController.addAddress(registeredUsersAddressController.address)}" update="checkoutForm msgs myDatatable" onclick="PF('progressPanel').show();PF('addAddressBtn').disable();" oncomplete="PF('progressPanel').close();PF('addAddressBtn').enable();" widgetVar="addAddressBtn"/>
                         <p>
-                            <p:commandButton value="Continue" action="select-payment-option.xhtml" actionListener="#{checkoutController.initiateTransaction(checkoutController.cartController.payableAmount)}" onclick="PF('progressPanel').show();PF('continueBtn').disable();" oncomplete="PF('progressPanel').close();PF('continueBtn').enable();" widgetVar="continueBtn"/>
+                            <p:commandButton value="Continue" action="select-payment-option.xhtml" actionListener="#{checkoutController.initiateTransaction(cartController.payableAmount)}" onclick="PF('progressPanel').show();PF('continueBtn').disable();" oncomplete="PF('progressPanel').close();PF('continueBtn').enable();" widgetVar="continueBtn"/>
                         </p>                                           
                     </h:form>
                 </p>

@@ -17,6 +17,9 @@ public class RedirectForm {
     private String md;
     private String paReq;
     private String termUrl;
+    private String sbmttype;
+    private String pid;
+    private String es;
 
     public RedirectForm(){        
     }
@@ -29,6 +32,17 @@ public class RedirectForm {
         this.md = md;
         this.paReq = paReq;
         this.termUrl = termUrl;
+    }
+
+    public RedirectForm(String actionUrl, String method, String type, String contentType, String md, String sbmttype, String pid, String es) {
+        this.actionUrl = actionUrl;
+        this.method = method;
+        this.type = type;
+        this.contentType = contentType;
+        this.md = md;
+        this.sbmttype = sbmttype;
+        this.pid = pid;
+        this.es = es;
     }
 
     public String getActionUrl() {
@@ -85,6 +99,30 @@ public class RedirectForm {
 
     public void setTermUrl(String termUrl) {
         this.termUrl = termUrl;
+    }
+
+    public String getSbmttype() {
+        return sbmttype;
+    }
+
+    public void setSbmttype(String sbmttype) {
+        this.sbmttype = sbmttype;
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public void setPid(String pid) {
+        this.pid = pid;
+    }
+
+    public String getEs() {
+        return es;
+    }
+
+    public void setEs(String es) {
+        this.es = es;
     }
     
     
