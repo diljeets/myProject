@@ -6,7 +6,6 @@
 package com.diljeet.myProject.controllers;
 
 import com.diljeet.myProject.ejb.CheckoutBean;
-import com.diljeet.myProject.ejb.PaymentGatewayBean;
 import com.diljeet.myProject.entities.CustomerOrder;
 import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.interfaces.CheckoutService;
@@ -19,14 +18,12 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import java.util.List;
-import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.component.UIOutput;
 import javax.faces.event.AjaxBehaviorEvent;
-import javax.inject.Inject;
 import org.primefaces.event.SelectEvent;
 
 /**
@@ -74,16 +71,11 @@ public class CheckoutController implements Serializable {
     private boolean isModeNB;
     private String channelCode;
 
-//    @Inject
-//    CartController cartController;
     @EJB
     CheckoutBean checkoutBean;
 
     @EJB
     CheckoutService checkoutService;
-
-    @EJB
-    PaymentGatewayBean paymentGatewayBean;
 
     @PostConstruct
     public void init() {
@@ -352,13 +344,6 @@ public class CheckoutController implements Serializable {
         this.channelCode = channelCode;
     }
 
-//    public CartController getCartController() {
-//        return cartController;
-//    }
-//
-//    public void setCartController(CartController cartController) {
-//        this.cartController = cartController;
-//    }
     public void addDeliveryAddress(RegisteredUsersAddress selectedAddress) {
         checkoutService.addDeliveryAddress(selectedAddress);
     }
@@ -409,28 +394,6 @@ public class CheckoutController implements Serializable {
         }
     }
 
-//    public void processTransaction(String paymentMode) {
-//        checkoutBean.processTransaction(new PaymentRequestDetails(
-//                paymentMode
-//        ));
-//    }
-//    public void processTransaction(String paymentMode, String cardNumber, String cardExpiryMonth, String cardExpiryYear, String cardCvv) {
-//        String cardExpiryDate = cardExpiryMonth + cardExpiryYear;
-//        checkoutBean.processTransaction(new PaymentRequestDetails(
-//                paymentMode,
-//                cardNumber,
-//                cardExpiryDate,
-//                cardCvv
-//        ));
-//    }
-//
-//    public void processTransaction(String paymentMode, String channelCode) {
-//        checkoutBean.processTransaction(new PaymentRequestDetails(
-//                paymentMode,
-//                channelCode
-//        ));
-//    }
-
     public void onRowSelect(SelectEvent<PaymentOptions> event) {
         isModePaytm = false;
         isModeCC = false;
@@ -451,7 +414,7 @@ public class CheckoutController implements Serializable {
     public void onRowSelectPayChannelOptionNetBanking(SelectEvent<PayChannelOptionsNetBanking> event) {
         String selectedChannelCode = event.getObject().getChannelCode();
         if (selectedChannelCode.equals("OTHERS")) {
-            paymentGatewayBean.fetchNetBankingPaymentChannels();
+            checkoutBean.fetchOtherNetBankingPaymentChannels();
         } else {
             channelCode = selectedChannelCode;
         }

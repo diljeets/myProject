@@ -61,8 +61,7 @@
                                                         <p:repeat value="#{checkoutController.payChannelOptionsPaytmBalance}" var="payChannelOptionPaytmBalance">
                                                             <p:panel rendered="#{payChannelOptionPaytmBalance.displayName eq 'Paytm Wallet'}">
                                                                 <p:graphicImage url="#{payChannelOptionPaytmBalance.imageUrl}" width="50px" height="50px"/>
-                                                                <h:outputText value="#{payChannelOptionPaytmBalance.displayName} #{payChannelOptionPaytmBalance.balance}"/>  
-                                                                <p:commandButton value="Pay" action="#{checkoutController.processTransaction(paymentOption.paymentMode)}" onclick="PF('progressPanel').show();PF('payBtn').disable();" oncomplete="PF('progressPanel').close();PF('payBtn').enable();" widgetVar="payBtn"/>
+                                                                <h:outputText value="#{payChannelOptionPaytmBalance.displayName} #{payChannelOptionPaytmBalance.balance}"/>                                                    
                                                             </p:panel>
                                                         </p:repeat>
                                                     </p:panel>                                                    
@@ -102,14 +101,7 @@
                                                     <h:inputSecret id="ccCvv" value="#{checkoutController.ccCvv}" maxlength="3"/>
                                                 </div>
                                             </div>
-                                        </div>         
-                                        <div class="ui-g ui-fluid">
-                                            <div class="ui-g-12 ui-md-2">
-                                                <div class="ui-inputgroup">  
-                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode,checkoutController.ccNumber,checkoutController.ccExpiryMonth,checkoutController.ccExpiryYear,checkoutController.ccCvv)}" onclick="PF('progressPanel').show();PF('payByCCBtn').disable();" oncomplete="PF('progressPanel').close();PF('payByCCBtn').enable();" widgetVar="payByCCBtn"/>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </div>  
                                     </p:panel>                                                                    
                                 </p:panel>
 
@@ -143,14 +135,7 @@
                                                     <h:inputSecret id="dcCvv" value="#{checkoutController.dcCvv}" maxlength="3"/>
                                                 </div>
                                             </div>
-                                        </div>         
-                                        <div class="ui-g ui-fluid">
-                                            <div class="ui-g-12 ui-md-2">
-                                                <div class="ui-inputgroup">  
-                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode,checkoutController.dcNumber,checkoutController.dcExpiryMonth,checkoutController.dcExpiryYear,checkoutController.dcCvv)}" onclick="PF('progressPanel').show();PF('payByDCBtn').disable();" oncomplete="PF('progressPanel').close();PF('payByDCBtn').enable();" widgetVar="payByDCBtn"/>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </div>        
                                     </p:panel>                                     
                                 </p:panel>
 
@@ -170,14 +155,7 @@
                                             <p:column>
                                                 <h:outputText value="#{payChannelOptionNetBanking.channelName}"/>                                
                                             </p:column>                                                                    
-                                        </p:dataTable>                                         
-                                        <div class="ui-g ui-fluid">
-                                            <div class="ui-g-12 ui-md-2">
-                                                <div class="ui-inputgroup">  
-                                                    <p:commandButton value="Pay" actionListener="#{checkoutController.processTransaction(paymentOption.paymentMode,checkoutController.channelCode)}" onclick="PF('progressPanel').show();PF('payByNBBtn').disable();" oncomplete="PF('progressPanel').close();PF('payByNBBtn').enable();" widgetVar="payByNBBtn"/>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </p:dataTable> 
                                     </p:panel>
                                 </p:panel>
                             </p:column>

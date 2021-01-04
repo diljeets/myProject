@@ -6,7 +6,6 @@
 package com.diljeet.myProject.interfaces;
 
 import com.diljeet.myProject.entities.CustomerOrder;
-import com.diljeet.myProject.entities.CustomerTransaction;
 import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.InitiateTransaction;
@@ -53,10 +52,6 @@ public interface CheckoutService {
     @Produces({MediaType.TEXT_PLAIN})
     public String getDeliveryAddress();
 
-//    @POST
-//    @Path("{channelId}/initiate-transaction")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public void initiateTransaction(String payableAmount, @PathParam("channelId") String channelId);
     @POST
     @Path("initiateTransaction")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -97,15 +92,14 @@ public interface CheckoutService {
     @Produces({MediaType.APPLICATION_JSON})
     public List<CardDetails> fetchCardDetails();
     
+    @GET
+    @Path("fetchOtherNetBankingPaymentChannels")    
+    public void fetchOtherNetBankingPaymentChannels();
+    
     @POST
     @Path("processTransaction")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response processTransaction(PaymentRequestDetails paymentRequestDetails); 
-
-//    @POST
-//    @Path("processTransaction")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public Response processTransaction(String paymentMode); 
     
     @GET
     @Path("pgResponse")        

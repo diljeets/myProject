@@ -5,11 +5,7 @@
  */
 package com.diljeet.myProject.ejb;
 
-import com.diljeet.myProject.controllers.CartController;
-import com.diljeet.myProject.controllers.CheckoutController;
 import com.diljeet.myProject.controllers.RedirectFormController;
-import com.diljeet.myProject.entities.CustomerOrder;
-import com.diljeet.myProject.entities.CustomerTransaction;
 import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.InitiateTransaction;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
@@ -18,7 +14,6 @@ import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
 import com.diljeet.myProject.utils.RedirectForm;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -29,12 +24,9 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -59,13 +51,6 @@ public class CheckoutBean {
     @Inject
     HttpServletRequest req;
 
-    @Context
-    HttpServletResponse res;
-
-//    @Inject
-//    CheckoutController checkoutController;
-//    @Inject
-//    CartController cartController;
     @Inject
     RedirectFormController redirectFormController;
 
@@ -248,6 +233,17 @@ public class CheckoutBean {
         }
         return cardDetails;
     }
+    
+    public void fetchOtherNetBankingPaymentChannels() {        
+        try {
+            client.target("http://localhost:8080/myProject/webapi/Checkout/fetchOtherNetBankingPaymentChannels")
+                    .request(MediaType.APPLICATION_JSON)
+                    .header("Cookie", req.getHeader("Cookie"))
+                    .get();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());            
+        }        
+    }
 
     public void processTransaction(PaymentRequestDetails paymentRequestDetails) {
         if (paymentRequestDetails == null) {
@@ -323,77 +319,7 @@ public class CheckoutBean {
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }
     }
-
-//    public void processTransaction(String paymentMode) {
-//        
-//        Response response = null;
-//        try {
-//            response = client.target("http://localhost:8080/myProject/webapi/Checkout/processTransaction")
-//                    .request(MediaType.APPLICATION_JSON)
-//                    .header("Cookie", req.getHeader("Cookie"))
-//                    .post(Entity.entity(paymentMode, MediaType.APPLICATION_JSON), Response.class);
-//            if (response.getStatus() == Response.Status.OK.getStatusCode()
-//                    && response.hasEntity()) {
-//                JSONObject bodyObj = new JSONObject(response.readEntity(String.class));
-//                JSONObject bankFormObj = bodyObj.getJSONObject("bankForm");
-//                JSONObject redirectFormObj = bankFormObj.getJSONObject("redirectForm");
-//                String actionUrl = redirectFormObj.getString("actionUrl");
-//                String method = redirectFormObj.getString("method");
-//                String type = redirectFormObj.getString("type");
-//                
-//                JSONObject headersObj = redirectFormObj.getJSONObject("headers");
-//                String content_type = headersObj.getString("Content-Type");
-//                
-//                JSONObject contentObj = redirectFormObj.getJSONObject("content");
-//                String md = contentObj.getString("MD");
-//                String paReq = contentObj.getString("PaReq");
-//                String termUrl = contentObj.getString("TermUrl");
-//                
-//                redirectForm = new RedirectForm(
-//                        actionUrl,
-//                        method,
-//                        type,
-//                        content_type,
-//                        md,
-//                        paReq,
-//                        termUrl
-//                );
-//                //Redirect if paymode is CREDIT_CARD
-//                FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/redirect-form.xhtml");
-//                
-//            } else if (response.getStatus() == Response.Status.TEMPORARY_REDIRECT.getStatusCode()) {
-//                //Redirect if paymode is BALANCE
-////                String callbackUrl = response.getLocation().toString();
-//                FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/redirect-form.xhtml");
-//            } else {
-//                String resultMsg = response.getHeaderString("resultMsg");
-//                msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
-//                FacesContext.getCurrentInstance().addMessage(null, msg);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Something went wrong. Please try again.");
-//            FacesContext.getCurrentInstance().addMessage(null, msg);
-//        }
-//    }
-//    public void redirectForm() {        
-//        Form form = new Form();
-//        form.param("MD", redirectFormController.getRedirectForm().getMd())
-//                .param("PaReq", redirectFormController.getRedirectForm().getPaReq())
-//                .param("TermUrl", redirectFormController.getRedirectForm().getTermUrl());
-//        Future<Response> response;
-//        try {
-//            response = client.target(redirectFormController.getRedirectForm().getActionUrl())
-//                    .request(MediaType.APPLICATION_FORM_URLENCODED)
-//                    .header("Cookie", req.getHeader("Cookie"))
-//                    .buildPost(Entity.form(form))
-//                    .submit(Response.class);
-////                    .post(Entity.form(form), Response.class);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        
-//    }
+    
     public Response transactionStatus(String orderId) {
         Response response = null;
         try {
@@ -407,22 +333,4 @@ public class CheckoutBean {
         return response;
     }
 
-//    public void placeOrder(CustomerOrder customerOrder) {
-////        checkoutService.placeOrder(customerOrder);
-//        Response response = null;
-//        try {
-//            response = client.target("http://localhost:8080/myProject/webapi/Checkout/placeOrder")
-//                    .request(MediaType.APPLICATION_JSON)
-//                    .header("Cookie", req.getHeader("Cookie"))
-//                    .post(Entity.entity(customerOrder, MediaType.APPLICATION_JSON), Response.class);
-////                    .buildPost(Entity.entity(customerOrder, MediaType.APPLICATION_JSON))                  
-////                    .submit(Response.class);
-//            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-//                logger.log(Level.SEVERE, "Order Placed Successfully");
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        
-//    }
 }

@@ -11,7 +11,6 @@ import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
-import com.diljeet.myProject.utils.RedirectForm;
 import com.paytm.pg.merchant.PaytmChecksum;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -19,7 +18,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +58,6 @@ public class PaymentGatewayBean {
     private List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance;
     private List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking;
     private List<CardDetails> cardDetails;
-//    private RedirectForm redirectForm;
     private CustomerTransaction customerTransaction;
 
     public PaymentGatewayBean() {
@@ -102,13 +99,6 @@ public class PaymentGatewayBean {
         this.cardDetails = cardDetails;
     }
 
-//    public RedirectForm getRedirectForm() {
-//        return redirectForm;
-//    }
-//
-//    public void setRedirectForm(RedirectForm redirectForm) {
-//        this.redirectForm = redirectForm;
-//    }
     public CustomerTransaction getCustomerTransaction() {
         return customerTransaction;
     }
@@ -631,7 +621,7 @@ public class PaymentGatewayBean {
                 .build();
     }
 
-    public void fetchNetBankingPaymentChannels() {
+    public void fetchOtherNetBankingPaymentChannels() {
         //Clear payChannelOptionsNetBanking List
         payChannelOptionsNetBanking.clear();
         
@@ -794,90 +784,6 @@ public class PaymentGatewayBean {
         return null;
     }
 
-//    public Response processTransaction(String paymentMode) {
-//
-//        JSONObject paytmParams = new JSONObject();
-//
-//        JSONObject body = new JSONObject();
-//        body.put("requestType", REQUEST_TYPE_PROCESS_TRANSACTION);
-//        body.put("mid", MID);
-//        body.put("orderId", orderId);
-//        body.put("paymentMode", paymentMode);
-////        body.put("authMode", "otp");
-////        body.put("walletType", "PAYTMPG");
-//        if (paymentMode.equals("CREDIT_CARD")) {
-//            body.put("cardInfo", "|4854980801319205|123|032022");
-////            body.put("cardInfo", "|4111111111111111|111|032032");
-//            body.put("authMode", "otp");
-//        }
-//
-//        JSONObject head = new JSONObject();
-//        head.put("txnToken", transactionToken);
-//
-//        paytmParams.put("body", body);
-//        paytmParams.put("head", head);
-//
-//        String post_data = paytmParams.toString();
-//
-//        /* for Staging */
-//        URL url = null;
-//        try {
-//            url = new URL("https://securegw-stage.paytm.in/theia/api/v1/processTransaction?mid=" + MID + "&orderId=" + orderId);
-//        } catch (MalformedURLException ex) {
-//            ex.printStackTrace();
-//        }
-//
-//        /* for Production */
-//// URL url = new URL("https://securegw.paytm.in/theia/api/v1/processTransaction?mid=YOUR_MID_HERE&orderId=ORDERID_98765");
-////        Response response = null;
-//        try {
-//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//            connection.setRequestMethod("POST");
-//            connection.setRequestProperty("Content-Type", "application/json");
-//            connection.setDoOutput(true);
-//
-//            DataOutputStream requestWriter = new DataOutputStream(connection.getOutputStream());
-//            requestWriter.writeBytes(post_data);
-//            requestWriter.close();
-//            String responseData = "";
-//            InputStream is = connection.getInputStream();
-//            BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
-//            if ((responseData = responseReader.readLine()) != null) {
-//                logger.log(Level.SEVERE, "PT ResponseData {0}", responseData);
-//                JSONObject resObj = new JSONObject(responseData);
-//                JSONObject bodyObj = resObj.getJSONObject("body");
-//                JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
-//
-//                String resultCode = resultInfoObj.getString("resultCode");
-//                if (!resultCode.equals("0000")) {
-//                    String resultMsg = resultInfoObj.getString("resultMsg");
-//                    return Response
-//                            .status(Response.Status.NOT_ACCEPTABLE)
-//                            .header("resultMsg", resultMsg)
-//                            .build();
-//                } else {
-//                    if (paymentMode.equals("BALANCE")) {
-//                        String callBackUrl = bodyObj.getString("callBackUrl");
-//                        JSONObject txnInfoObj = bodyObj.getJSONObject("txnInfo");
-//                        getCustomerTransactionStatus(txnInfoObj.toString());                        
-//                        return Response
-//                                .temporaryRedirect(URI.create(callBackUrl))
-//                                .build();
-//                    }
-//                    if (paymentMode.equals("CREDIT_CARD")) {
-//                        return Response
-//                                .ok()
-//                                .entity(bodyObj.toString())
-//                                .build();
-//                    }                     
-//                }
-//            }
-//            responseReader.close();
-//        } catch (Exception exception) {
-//            exception.printStackTrace();
-//        }
-//        return null;
-//    }
     public void getCustomerTransactionStatus(String txnInfo) {
         JSONObject txnInfoObj = new JSONObject(txnInfo);
         String BANKNAME = txnInfoObj.getString("BANKNAME");

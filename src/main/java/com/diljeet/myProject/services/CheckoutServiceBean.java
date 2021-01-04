@@ -21,19 +21,16 @@ import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
-import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
@@ -190,6 +187,15 @@ public class CheckoutServiceBean implements CheckoutService {
         }
         return cardDetails;
     }
+
+    @Override
+    public void fetchOtherNetBankingPaymentChannels() {
+        try {
+            paymentGatewayBean.fetchOtherNetBankingPaymentChannels();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     
     @Override
     public Response processTransaction(PaymentRequestDetails paymentRequestDetails) {
@@ -201,17 +207,6 @@ public class CheckoutServiceBean implements CheckoutService {
         }
         return response;
     }
-
-//    @Override
-//    public Response processTransaction(String paymentMode) {
-//        Response response = null;
-//        try {
-//            response = paymentGatewayBean.processTransaction(paymentMode);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return response;
-//    }
 
     @Override
     public void pgGetResponse(HttpServletRequest req, HttpServletResponse resp) {
