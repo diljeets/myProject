@@ -94,7 +94,7 @@ public class MealPlanCategory implements Serializable {
 
     @Override
     public String toString() {
-        return "com.diljeet.test.entity.TestUsers[ id=" + id + " ]";
+        return "com.diljeet.test.entity.MealPlanCategory[ id=" + id + " ]";
     }
 
 }

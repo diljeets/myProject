@@ -100,5 +100,9 @@ public class CartController implements Serializable {
     public void removeFromCart(Cart cartItem) {
         cartService.removeFromCart(cartItem);
     }
+    
+     public void removeAllFromCart() {
+        cartService.removeAllFromCart();
+    }
 
 }

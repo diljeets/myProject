@@ -33,24 +33,15 @@ import javax.ws.rs.core.Response;
 @Path("/Checkout")
 public interface CheckoutService {
 
-    @POST
-    @Path("setDeliveryTime")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void addDeliveryTime(String selectedTime);
+//    @POST
+//    @Path("setDeliveryTime")
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    public void addDeliveryTime(String selectedTime);
 
 //    @GET
 //    @Path("getDeliveryTime")
 //    @Produces({MediaType.APPLICATION_JSON})
 //    public Response getDeliveryTime();
-    @POST
-    @Path("addDeliveryAddress")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public void addDeliveryAddress(RegisteredUsersAddress selectedAddress);
-
-    @GET
-    @Path("getDeliveryAddress")
-    @Produces({MediaType.TEXT_PLAIN})
-    public String getDeliveryAddress();
 
     @POST
     @Path("initiateTransaction")

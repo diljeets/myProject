@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
+import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.mail.Session;
@@ -27,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author diljeet
  */
 @Stateless
-//@RolesAllowed("Administrator")
+@RolesAllowed("Administrator")
 public class RegisteredUsersAddressServiceBean implements RegisteredUsersAddressService {
 
     private static final Logger logger = Logger.getLogger(RegisteredUsersAddressServiceBean.class.getCanonicalName());
@@ -73,6 +74,7 @@ public class RegisteredUsersAddressServiceBean implements RegisteredUsersAddress
     }
 
     @Override
+    @RolesAllowed({"Administrator","Customer"})
     public List<RegisteredUsersAddress> getAllRegisteredAddressByUsername() {
         List<RegisteredUsersAddress> addresses = null;
         String username = req.getUserPrincipal().getName();
@@ -93,6 +95,41 @@ public class RegisteredUsersAddressServiceBean implements RegisteredUsersAddress
         }
 
         return addresses;
+    }
+
+    @Override
+    public void updateAddressById(RegisteredUsersAddress updatedAddress) {
+        Long addressId = updatedAddress.getId();
+        try {
+            Query query = em.createNamedQuery("getRegisteredAddressById");
+            query.setParameter("addressId", addressId);
+            Object registeredUserAddress = query.getSingleResult();
+            if (registeredUserAddress != null) {
+                em.merge(updatedAddress);
+            } else {
+                logger.log(Level.SEVERE, "No Address Found");
+            }
+        } catch (Exception e) {
+            logger.log(Level.INFO, "Error updating address {0}", e.toString());
+        }
+    }
+
+    @Override
+    public void deleteRegisteredAddressById(int addressId) {
+        logger.log(Level.SEVERE, "Address ID to delete is {0}", Integer.toString(addressId));
+        try {
+            Query query = em.createNamedQuery("getRegisteredAddressById");
+            query.setParameter("addressId", addressId);
+            Object registeredUserAddress = query.getSingleResult();
+            if (registeredUserAddress != null) {
+                em.remove(registeredUserAddress);
+            } else {
+                logger.log(Level.SEVERE, "No Address Found");
+            }
+
+        } catch (Exception e) {
+            logger.log(Level.INFO, "Error deleting address {0}", e.toString());
+        }
     }
 
 }

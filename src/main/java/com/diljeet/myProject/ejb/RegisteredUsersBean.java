@@ -109,6 +109,7 @@ public class RegisteredUsersBean {
     }
 
     public String getUser(String username) {
+//        logger.log(Level.SEVERE, "Username is {0}", username);
         String customerName = null;
         RegisteredUsers currentCustomer = null;
         try {

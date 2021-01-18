@@ -47,7 +47,16 @@ public class TemplateController implements Serializable {
     }
 
     public String getCurrentCustomer() {
-        return registeredUsersBean.getUser(req.getUserPrincipal().getName());
+        String user = null;
+        try {
+            user = req.getUserPrincipal().getName();            
+        } catch (NullPointerException e) {
+            return "Guest";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }       
+
+        return registeredUsersBean.getUser(user);    
     }
 
     public void setCurrentCustomer(String currentCustomer) {

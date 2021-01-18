@@ -39,7 +39,7 @@ public class MealPlanCategoryController implements Serializable {
     @PostConstruct
     public void init() {
         mealPlan = new MealPlanCategory();
-        setMealPlans(mealPlanCategoryBean.getMealPlanCategories());
+//        setMealPlans(mealPlanCategoryBean.getMealPlanCategories());
         setMealPlanQuantity(1);
     }
 

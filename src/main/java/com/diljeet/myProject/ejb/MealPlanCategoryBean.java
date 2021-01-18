@@ -78,7 +78,7 @@ public class MealPlanCategoryBean {
         mealPlans = client.target("http://localhost:8080/myProject/webapi/MealPlanCategory")
                 .path("all")
                 .request(MediaType.APPLICATION_JSON)
-                .header("Cookie", req.getHeader("Cookie"))
+//                .header("Cookie", req.getHeader("Cookie"))
                 .get(new GenericType<List<MealPlanCategory>>() {
                 });
 

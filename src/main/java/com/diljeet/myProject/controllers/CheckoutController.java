@@ -7,7 +7,6 @@ package com.diljeet.myProject.controllers;
 
 import com.diljeet.myProject.ejb.CheckoutBean;
 import com.diljeet.myProject.entities.CustomerOrder;
-import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.interfaces.CheckoutService;
 import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
@@ -24,6 +23,7 @@ import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.component.UIOutput;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.inject.Inject;
 import org.primefaces.event.SelectEvent;
 
 /**
@@ -39,8 +39,7 @@ public class CheckoutController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private CustomerOrder customerOrder;
-    private String deliveryTime;
-    private String deliveryAddress;
+//    private String deliveryTime;
     private PaymentOptions paymentOption;
     private List<PaymentOptions> paymentOptions;
     private PayChannelOptionsPaytmBalance payChannelOptionPaytmBalance;
@@ -70,6 +69,9 @@ public class CheckoutController implements Serializable {
     private String isCardActive;
     private boolean isModeNB;
     private String channelCode;
+    
+    @Inject
+    DeliveryController deliveryController;
 
     @EJB
     CheckoutBean checkoutBean;
@@ -79,6 +81,7 @@ public class CheckoutController implements Serializable {
 
     @PostConstruct
     public void init() {
+//        setDeliveryTime("12:00");
     }
 
     /**
@@ -96,21 +99,13 @@ public class CheckoutController implements Serializable {
         this.customerOrder = customerOrder;
     }
 
-    public String getDeliveryTime() {
-        return deliveryTime;
-    }
-
-    public void setDeliveryTime(String deliveryTime) {
-        this.deliveryTime = deliveryTime;
-    }
-
-    public String getDeliveryAddress() {
-        return checkoutService.getDeliveryAddress();
-    }
-
-    public void setDeliveryAddress(String deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
-    }
+//    public String getDeliveryTime() {
+//        return deliveryTime;
+//    }
+//
+//    public void setDeliveryTime(String deliveryTime) {
+//        this.deliveryTime = deliveryTime;
+//    }
 
     public PaymentOptions getPaymentOption() {
         return paymentOption;
@@ -344,14 +339,18 @@ public class CheckoutController implements Serializable {
         this.channelCode = channelCode;
     }
 
-    public void addDeliveryAddress(RegisteredUsersAddress selectedAddress) {
-        checkoutService.addDeliveryAddress(selectedAddress);
+    public DeliveryController getDeliveryController() {
+        return deliveryController;
     }
 
-    public void addDeliveryTime(SelectEvent event) {
-        String selectedTime = event.getObject().toString();
-        checkoutService.addDeliveryTime(selectedTime);
+    public void setDeliveryController(DeliveryController deliveryController) {
+        this.deliveryController = deliveryController;
     }
+  
+//    public void addDeliveryTime(SelectEvent event) {
+//        String selectedTime = event.getObject().toString();
+//        checkoutService.addDeliveryTime(selectedTime);
+//    }
 
     public void initiateTransaction(String payableAmount) {
         checkoutBean.initiateTransaction(payableAmount);
@@ -442,7 +441,4 @@ public class CheckoutController implements Serializable {
         }
     }
 
-//    public void fetchNetBankingPaymentChannels() {
-//        paymentGatewayBean.fetchNetBankingPaymentChannels();
-//    }
 }

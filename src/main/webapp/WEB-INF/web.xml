@@ -7,25 +7,29 @@
         <param-name>javax.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>
-<!--    <context-param>
+    <!--    <context-param>
         <param-name>primefaces.THEME</param-name>
         <param-value>mytheme</param-value>
     </context-param>-->
-    <context-param>     
+    <!--    <context-param>     
         <param-name>primefaces.THEME</param-name>   
         <param-value>omega</param-value> 
+    </context-param>-->
+    <context-param>     
+        <param-name>primefaces.FONT_AWESOME</param-name>   
+        <param-value>true</param-value> 
     </context-param>
-<!--    <context-param>
+    <context-param>
         <param-name>primefaces.THEME</param-name>
         <param-value>nova-light</param-value>
-    </context-param>-->
+    </context-param>
     
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
         <load-on-startup>1</load-on-startup>        
     </servlet>
-<!--    <servlet>
+    <!--    <servlet>
         <servlet-name>Faces Servlet forward</servlet-name>
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
         <load-on-startup>1</load-on-startup>        
@@ -34,7 +38,7 @@
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.xhtml</url-pattern>        
     </servlet-mapping>
-<!--     <servlet-mapping>
+    <!--     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>/fwd/callback.xhtml</url-pattern>        
     </servlet-mapping>-->
@@ -67,11 +71,12 @@
         <display-name>Constraint1</display-name>
         <web-resource-collection>
             <web-resource-name>Administrator/Customer</web-resource-name>
-            <url-pattern>/index.xhtml</url-pattern>      
+            <!--            <url-pattern>/index.xhtml</url-pattern>      -->
             <url-pattern>/meal-plan-category.xhtml</url-pattern>       
-            <url-pattern>/cart.xhtml</url-pattern>     
-            <url-pattern>/checkout.xhtml</url-pattern>    
-            <url-pattern>/change-password.xhtml</url-pattern>    
+            <url-pattern>/delivery-hours.xhtml</url-pattern>
+            <!--            <url-pattern>/cart.xhtml</url-pattern>     -->
+            <url-pattern>/select-address-time.xhtml</url-pattern>    
+            <!--            <url-pattern>/change-password.xhtml</url-pattern>    -->
         </web-resource-collection>
         <auth-constraint>
             <role-name>Administrator</role-name>            
@@ -85,7 +90,8 @@
         <display-name>Constraint2</display-name>
         <web-resource-collection>
             <web-resource-name>webapi</web-resource-name>            
-            <url-pattern>/webapi/MealPlanCategory/*</url-pattern>              
+<!--            <url-pattern>/webapi/MealPlanCategory/*</url-pattern>              -->
+            <url-pattern>/webapi/RegisteredUsersAddress/*</url-pattern> 
         </web-resource-collection>
         <auth-constraint>
             <role-name>Administrator</role-name>

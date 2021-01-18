@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"      	
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Facelet Title</title>    
+    </h:head>
+    <h:body>
+        <ui:composition template="./template.xhtml">
+            <ui:define name="top"></ui:define>
+            <ui:define name="content">                
+                <h:outputText value="You are in the Delivery Time Content Section"/>                
+                <h:form id="deliveryHourForm">                    
+                    <h:panelGrid columns="2" cellspacing="5">
+                        <h:outputLabel for="deliveryHour" value="Delivery Hour:" style="font-weight: bold"/> 
+                        <h:panelGrid id="deliveryHour" columns="4" cellpadding="3">
+                            <p:selectOneMenu id="hours" value="#{deliveryHourController.deliveryHour.hours}" effect="fold" required="true">    
+                                <f:selectItem itemLabel="Hours"/>
+                                <f:selectItems value="#{deliveryHourController.hoursData}" var="hour" itemLabel="#{hour}" itemValue="#{hour}"/>  
+                            </p:selectOneMenu>
+                            <h:outputText value=":"/>   
+                            <p:selectOneMenu id="minutes" value="#{deliveryHourController.deliveryHour.minutes}" effect="fold" required="true">     
+                                <f:selectItem itemLabel="Minutes"/>
+                                <f:selectItems value="#{deliveryHourController.minutesData}" var="minute" itemLabel="#{minute}" itemValue="#{minute}"/>     
+                            </p:selectOneMenu> 
+                            <p:selectOneMenu id="meridiem" value="#{deliveryHourController.deliveryHour.meridiem}" effect="fold" required="true"> 
+                                <f:selectItems value="#{deliveryHourController.meridiemsData}" var="meridiem" itemLabel="#{meridiem}" itemValue="#{meridiem}"/>
+                            </p:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel for="panelIsActive" value="Is Active" style="font-weight: bold"/> 
+                        <h:panelGrid id="panelIsActive" columns="3" cellpadding="3">                             
+                            <h:outputText value="No"/> 
+                            <p:toggleSwitch id="isActive" value="#{deliveryHourController.deliveryHour.isActive}" required="true"/>
+                            <h:outputText value="Yes"/> 
+                        </h:panelGrid>                                              
+                    </h:panelGrid>
+                    <p:commandButton value="Submit" actionListener="#{deliveryHourController.addDeliveryHour(deliveryHourController.deliveryHour)}" update="deliveryHourForm deliveryHourDataTable"/>
+                </h:form>
+                <h:form id="deliveryHourDataTable">   
+                    <p>             
+                        <p:dataTable id="datatable"                              
+                                     value="#{deliveryHourController.deliveryHours}"        
+                                     var="deliveryHour"
+                                     rendered="#{deliveryHourController.deliveryHours.size() > 0}"
+                                     summary="List of Delivery hours"
+                                     editable="true">                                                      
+                            <f:facet name="header"></f:facet>
+                            <p:ajax event="rowEdit" listener="#{deliveryHourController.updateDeliveryHourById}" update="@this"/>
+                            <p:ajax event="rowEditCancel" listener="#{deliveryHourController.onRowCancel}"/>
+                            <p:column>                                
+                                <f:facet name="header">
+                                    <h:outputText value="Id"/>
+                                </f:facet>
+                                <h:outputText value="#{deliveryHour.id}"/>
+                            </p:column>
+                            <p:column headerText="Delivery Time">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{deliveryHour.hours}"/>
+                                        <h:outputText value=":" style="padding: 0 5px 0 5px"/>
+                                        <h:outputText value="#{deliveryHour.minutes}"/>
+                                        <h:outputText value="#{deliveryHour.meridiem}" style="padding: 0 5px 0 5px"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:panelGrid columns="4" style="width: auto;">
+                                            <p:selectOneMenu value="#{deliveryHour.hours}" effect="fold">    
+                                                <f:selectItem itemLabel="Hours"/>
+                                                <f:selectItems value="#{deliveryHourController.hoursData}" var="hour" itemLabel="#{hour}" itemValue="#{hour}"/>
+                                            </p:selectOneMenu>
+                                            <h:outputText value=":"/>   
+                                            <p:selectOneMenu value="#{deliveryHour.minutes}" effect="fold">     
+                                                <f:selectItem itemLabel="Minutes"/>
+                                                <f:selectItems value="#{deliveryHourController.minutesData}" var="minute" itemLabel="#{minute}" itemValue="#{minute}"/>     
+                                            </p:selectOneMenu> 
+                                            <p:selectOneMenu value="#{deliveryHour.meridiem}" effect="fold"> 
+                                                <f:selectItems value="#{deliveryHourController.meridiemsData}" var="meridiem" itemLabel="#{meridiem}" itemValue="#{meridiem}"/>                                  
+                                            </p:selectOneMenu>
+                                        </p:panelGrid>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="Is Active">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{deliveryHour.isActive}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:panelGrid columns="3" style="width: auto;">
+                                            <h:outputText value="No"/> 
+                                            <p:toggleSwitch value="#{deliveryHour.isActive}"/>
+                                            <h:outputText value="Yes"/> 
+                                        </p:panelGrid>                                        
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>  
+                            <p:column headerText="Actions" style="width:100px; background-color: #ffdb58">
+                                <p:rowEditor editTitle="Edit" cancelTitle="Cancel Edit" style="display: inline-block"/>
+                                <p:commandLink actionListener="#{deliveryHourController.deleteDeliveryHourById(deliveryHour.id)}" update=":deliveryHourDataTable:datatable" style="display: inline-block">
+                                    <i class="fa fa-fw fa-trash-o" style="font-size: 1.2em" title="Delete"></i>
+                                </p:commandLink>
+                            </p:column>                                                                 
+                        </p:dataTable>
+                    </p> 
+                </h:form>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

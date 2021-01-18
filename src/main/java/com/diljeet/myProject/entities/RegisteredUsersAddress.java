@@ -23,32 +23,36 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "registeredUsersAddress")
 @NamedQuery(name = "getAllRegisteredAddress",
-        query = "Select a From RegisteredUsersAddress a Order By a.id Desc")
- @NamedQuery(
+        query = "Select a From RegisteredUsersAddress a Order By a.id Desc"
+)
+@NamedQuery(
         name = "getAllRegisteredAddressByUsername",
         query = "SELECT DISTINCT a FROM RegisteredUsersAddress a, IN (a.registeredUser.addresses) u where u.registeredUser.username = :username"
-    )
+)
+@NamedQuery(name = "getRegisteredAddressById",
+        query = "Select a From RegisteredUsersAddress a where a.id = :addressId"
+)
 public class RegisteredUsersAddress implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;    
-    
-    @Column(name = "house_no")    
-    private String houseNo;    
-    
-    @Column(name = "building_no")    
-    private String buildingNo;    
-    
+    private Long id;
+
+    @Column(name = "house_no")
+    private String houseNo;
+
+    @Column(name = "building_no")
+    private String buildingNo;
+
     private String street;
-    
+
     private String city;
-    
-    private String state;    
-    
+
+    private String state;
+
     private String pincode;
-    
+
     @ManyToOne
     @JoinColumn(name = "REGISTEREDUSER_ID")
     private RegisteredUsers registeredUser;
@@ -115,8 +119,8 @@ public class RegisteredUsersAddress implements Serializable {
 
     public void setRegisteredUser(RegisteredUsers registeredUser) {
         this.registeredUser = registeredUser;
-    }    
-    
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -141,5 +145,5 @@ public class RegisteredUsersAddress implements Serializable {
     public String toString() {
         return "com.diljeet.myProject.entities.RegisteredUsersAddress[ id=" + id + " ]";
     }
-    
+
 }

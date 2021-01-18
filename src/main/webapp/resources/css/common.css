@@ -11,6 +11,12 @@ and open the template in the editor.
     background-color: #cfcfcf;
     padding: 1em;
 }*/
+/*body .ui-widget:not(.pi), body .ui-widget .ui-widget:not(.pi) {
+    font-size: 1em;
+}
+.top, #content{
+    font-size: 1.2em;
+}*/
 .ui-float-label{
     margin-top: 25px;
 }
@@ -36,8 +42,67 @@ body .ui-panel .ui-panel-content {
 .ui-widget-content {
     border: none;
 }
-    
-    
+body{
+    overflow-x: hidden;
+}
+.web-menu{
+    display: none;
+}
+.hammenu{
+    display: none;
+    position: absolute;
+    right: -315px;
+    background-color: #ff0000;
+    top: 35px;
+    width: auto;
+    max-width: 50%;
+    height: 100%;
+    z-index: 1000;
+    padding: 1.2em;    
+}
+.hammenu .user-icon{
+     font-size: 2em;
+}
+.hammenu .user{
+     font-size: 1.2em;
+}
+.hamicon{
+    display: block;
+    font-size: 1.3em;    
+}
+.donot-show{
+    display: none;
+}
+.overlay{
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    display: none;
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    opacity: 0.6;
+}
+@media screen and (min-width: 768px){
+    .web-menu{
+        display: block;
+    }
+    .hammenu{
+        display: none;       
+    }
+    .hamicon{
+        display: none;
+    }
+}
+
+@media screen and (min-width: 1024px){
+    .donot-show{
+        display: block;
+    }
+}
+
+
+
 /*body .table-channeloptions .ui-widget-content {
     border: 1px solid #fff !important;
 }*/

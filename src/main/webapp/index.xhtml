@@ -12,14 +12,13 @@
     <h:body>
         <ui:composition template="./template.xhtml">
             <ui:define name="top"></ui:define>
-            <ui:define name="content">                
-                <h:outputText value="You are in the Index Content Section"/>
+            <ui:define name="content"> 
                 <h:form> 
                     <div class="p-grid p-justify-center">
                         <div class="p-col-9">
-                            <div class="p-grid p-justify-around">
+                            <div class="p-grid p-justify-even">
                                 <p:repeat value="#{indexController.mealPlans}" var="mealPlan">
-                                    <div class="p-col-12 p-sm-12 p-md-6 p-lg-3" style="border: 1px #116fbf solid">
+                                    <div class="p-col-12 p-sm-12 p-md-6 p-lg-3 p-m-3" style="border: 1px #116fbf solid">
                                         <div class="p-col p-text-center">
                                             <div class="box">
                                                 <h:outputText value="#{mealPlan.mealPlanName}"/>

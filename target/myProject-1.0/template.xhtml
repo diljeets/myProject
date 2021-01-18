@@ -7,9 +7,25 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
     <h:head>
         <title>Facelets Template</title>  
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />        
         <h:outputStylesheet library="css" name="primeflex.css"/>
         <h:outputStylesheet library="css" name="common.css"/>
+        <script>
+            $(document).ready(function () {
+                $(".hamicon").click(function () {
+                    $("body").css("overflow", "hidden");
+                    $(".overlay").show();
+                    $(".hammenu").animate({"right": "0"}).show();
+                });
+                var hammenuWidth = $(".hammenu").outerWidth();
+//                console.log(hammenuWidth);
+                $(".fa-close").click(function () {
+                    $("body").removeAttr("style");
+                    $(".overlay").hide();
+                    $(".hammenu").animate({"right": "-" + hammenuWidth + "px"});
+                });
+            })
+        </script>
     </h:head>
     <h:body>        
         <div id="top" class="top">
@@ -22,16 +38,84 @@
                     <p:progressBar mode="indeterminate"/>
                 </p:panel>
                 <p:growl id="messages"/>
+                <div class="p-grid p-justify-center">
+                    <div class="p-col-12 p-sm-12 p-md-9 p-xl-9 p-pl-lg-0 p-pr-lg-0">
+                        <div class="p-grid p-align-end">
+                            <div class="p-col-6 p-sm-6 p-md-6 p-xl-6">
+                                <h:outputText value="My Logo goes here"/>
+                            </div>
+                            <div class="p-col-4 p-sm-5 p-md-2 p-xl-3">
+                                <div class="p-grid p-jc-end p-jc-sm-end p-jc-md-center p-jc-lg-center p-align-end">
+                                    <div class="p-col-3 p-sm-3 p-md-5 p-lg-6 p-xl-4 p-pb-0">
+                                        <p:commandLink action="/login.xhtml">
+                                            <div class="p-grid p-align-end">
+                                                <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-right">
+                                                    <i class="fa fa-fw fa-user"></i>
+                                                </div>
+                                                <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-left donot-show">
+                                                    <span>Login</span>
+                                                </div>
+                                            </div>
+                                        </p:commandLink>
+                                    </div>
+                                    <div class="p-col-3 p-sm-3 p-md-5 p-lg-6 p-xl-4 p-pb-0">
+                                        <p:commandLink action="/signup.xhtml">
+                                            <div class="p-grid p-align-end">
+                                                <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-right">
+                                                    <i class="fa fa-fw fa-user-plus"></i>
+                                                </div>
+                                                <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center donot-show">
+                                                    <span>Register</span>
+                                                </div>
+                                            </div>
+                                        </p:commandLink>
+                                    </div>
+                                </div>
+                            </div>  
+                            <div class="p-md-3 p-xl-2 p-text-right web-menu">
+                                <p:menuButton value="Welcome, #{templateController.currentCustomer}">
+                                    <p:menuitem value="Change Password" action="/change-password.xhtml"/>
+                                    <p:menuitem value="Log Out" action="#{templateController.logout()}"/>                            
+                                </p:menuButton>
+                            </div>
+                            <div class="hammenu">
+                                <div class="p-col p-text-right">
+                                    <i class="fa fa-fw fa-close"></i>                                    
+                                </div>
+                                <div class="p-col p-text-center user-icon">
+                                    <i class="fa fa-fw fa-user"></i>                                    
+                                </div>
+                                <div class="p-col p-text-center p-pt-0 user">                                    
+                                    <h:outputText value="#{templateController.currentCustomer}"/>
+                                </div>
+                                <p:separator/>
+                                <div class="p-col">
+                                    <i class="fa fa-fw fa-home"></i>
+                                    <p:commandLink value="Home" action="/index.xhtml"/>
+                                </div>
+                                <p:separator/>
+                                <div class="p-col">
+                                    <i class="fa fa-fw fa-refresh"></i>
+                                    <p:commandLink value="Change Password" action="/change-password.xhtml"/>
+                                </div>
+                                <p:separator/>
+                                <div class="p-col">
+                                    <i class="fa fa-fw fa-sign-out"></i>
+                                    <p:commandLink value="Log Out" action="#{templateController.logout()}"/>
+                                </div>                                
+                            </div>
+                            <div class="p-col p-sm p-md p-xl p-pl-sm-0 p-pl-md-0 p-text-right">
+                                <p:commandLink id="itemCount" action="/cart.xhtml" >Cart #{cartController.itemsInCart}</p:commandLink>         
+                            </div>
+                            <div class="p-col-12 p-sm-12 p-md-6 hamicon">
+                                <i class="fa fa-fw fa-navicon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p:separator/>
 
-                <p:menubar>   
-                    <f:facet name="options"> 
-                        <p:menuButton value="Hello, #{templateController.currentCustomer}">
-                            <p:menuitem value="Change Password" action="/change-password.xhtml"/>
-                            <p:menuitem value="Log Out" action="#{templateController.logout()}"/>                            
-                        </p:menuButton>
-                        <p:commandLink id="itemCount" style="margin:1px 10px 1px 20px;" action="/cart.xhtml">Cart #{cartController.itemsInCart}</p:commandLink>
-                    </f:facet>
-                </p:menubar>
+
             </h:form>
             <ui:insert name="top">Top Section</ui:insert>
         </div>
@@ -39,7 +123,8 @@
             <div id="content">                
                 <ui:insert name="content">Main Content</ui:insert>
             </div>
-        </div>  
+        </div> 
+        <div class="overlay"></div>
     </h:body>
 </html>
 

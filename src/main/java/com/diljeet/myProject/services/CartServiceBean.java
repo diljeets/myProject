@@ -90,4 +90,9 @@ public class CartServiceBean implements CartService {
         cartItems.remove(cartItem);
     }
 
+    @Override
+    public void removeAllFromCart() {
+        cartItems.clear();
+    }
+
 }

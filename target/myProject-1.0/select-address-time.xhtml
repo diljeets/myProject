@@ -17,13 +17,9 @@
                     <h:form>
                         <p:panelGrid>
                             <span class="ui-float-label">
-                                <p:selectOneMenu id="time" value="#{checkoutController.deliveryTime}" effect="fold">                                    
-                                    <f:selectItem itemLabel="12:00 PM" itemValue="12:00"/>
-                                    <f:selectItem itemLabel="12:30 PM" itemValue="12:30"/>
-                                    <f:selectItem itemLabel="01:00 PM" itemValue="01:00"/>                   
-                                    <f:selectItem itemLabel="01:30 PM" itemValue="01:30"/>    
-                                    <f:selectItem itemLabel="02:00 PM" itemValue="02:00"/>    
-                                    <p:ajax event="itemSelect" listener="#{checkoutController.addDeliveryTime}"/>
+                                <p:selectOneMenu id="time" value="#{deliveryController.deliveryTime}" effect="fold">                                    
+                                     <f:selectItems value="#{deliveryController.deliveryHours}" var="deliveryHour" itemLabel="#{deliveryHour.hours}:#{deliveryHour.minutes} #{deliveryHour.meridiem}" itemValue="#{deliveryHour.hours}:#{deliveryHour.minutes} #{deliveryHour.meridiem}"/>
+                                     <p:ajax event="itemSelect" listener="#{deliveryController.selectDeliveryTime}"/>
                                 </p:selectOneMenu>
                                 <p:outputLabel for="time" value="Delivery Time"/>
                                 <p:message for="time"/>
@@ -37,52 +33,83 @@
                         <p:dataTable id="datatable"                              
                                      value="#{registeredUsersAddressController.addresses}"        
                                      var="address"
-                                     selection="#{registeredUsersAddressController.address}"
+                                     selection="#{deliveryController.selectedAddress}"
                                      rowKey="#{address.id}"
-                                     rendered="#{registeredUsersAddressController.addresses.size() > 0}"
-                                     summary="List of Saved Addresses" 
-                                     draggableColumns="true" 
-                                     draggableRows="true"> 
-                            <p:column selectionMode="single" style="width:40px;text-align:center"/>
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="House No"/>
-                                </f:facet>
-                                <h:outputText value="#{address.houseNo}"/>
+                                     rendered="#{registeredUsersAddressController.addresses.size() > -1}"
+                                     summary="List of Saved Addresses"
+                                     editable="true" 
+                                     emptyMessage="Currently there are no saved Addresses."> 
+                            <p:column selectionMode="single" style="width:40px;text-align:center"/>                            
+                            <f:facet name="header"></f:facet>
+                            <p:ajax event="rowEdit" listener="#{registeredUsersAddressController.updateRegisteredAddressById}" update=":myDatatable:datatable"/>
+                            <p:ajax event="rowEditCancel" listener="#{registeredUsersAddressController.onRowCancel}" update=":myDatatable:datatable"/> 
+                            <p:ajax event="rowSelectRadio" listener="#{deliveryController.selectDeliveryAddress}" update=":continueForm:continueBtn"/>
+                            <p:column headerText="House No">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{address.houseNo}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{address.houseNo}" label="House No"/>
+                                    </f:facet>
+                                </p:cellEditor>
                             </p:column>
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="Building No"/>
-                                </f:facet>
-                                <h:outputText value="#{address.buildingNo}"/>
+                            <p:column headerText="Building No">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{address.buildingNo}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{address.buildingNo}" label="Building No"/>
+                                    </f:facet>
+                                </p:cellEditor>
                             </p:column>  
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="Street"/>
-                                </f:facet>
-                                <h:outputText value="#{address.street}"/>
+                            <p:column headerText="Street">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{address.street}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{address.street}" label="Street"/>
+                                    </f:facet>
+                                </p:cellEditor>
                             </p:column> 
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="City"/>
-                                </f:facet>
-                                <h:outputText value="#{address.city}"/>
+                            <p:column headerText="City">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{address.city}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{address.city}" label="City"/>
+                                    </f:facet>
+                                </p:cellEditor>
                             </p:column> 
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="State"/>
-                                </f:facet>
-                                <h:outputText value="#{address.state}"/>
+                            <p:column headerText="State">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{address.state}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{address.state}" label="State"/>
+                                    </f:facet>
+                                </p:cellEditor>
                             </p:column> 
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="PinCode"/>
-                                </f:facet>
-                                <h:outputText value="#{address.pincode}"/>
+                            <p:column headerText="PinCode">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{address.pincode}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{address.pincode}" label="PinCode"/>
+                                    </f:facet>
+                                </p:cellEditor>
                             </p:column>    
-                            <f:facet name="footer">
-                                <p:commandButton process="datatable" actionListener="#{checkoutController.addDeliveryAddress(registeredUsersAddressController.address)}" value="Deliver at this Address"/>
-                            </f:facet>                                           
+                            <p:column headerText="Actions" style="width:100px; background-color: #ffdb58">
+                                <p:rowEditor editTitle="Edit" cancelTitle="Cancel Edit" style="display: inline-block"/>
+                                <p:commandLink actionListener="#{registeredUsersAddressController.deleteRegisteredAddressById(address.id)}" update=":myDatatable:datatable" style="display: inline-block;">
+                                    <i class="fa fa-fw fa-trash-o" style="font-size: 1.2em" title="Delete"></i>
+                                </p:commandLink>
+                            </p:column>                                                                 
                         </p:dataTable>
                     </p>                    
                 </h:form>   
@@ -96,22 +123,19 @@
                         </p>
                         <p:panelGrid>
                             <span class="ui-float-label"> 
-                                <p:inputText id="houseNo" value="#{registeredUsersAddressController.address.houseNo}"/>
-                                <p:outputLabel for="houseNo" value="House No"/>
-                                <p:message for="houseNo"/>
+                                <p:inputText id="houseNo" value="#{registeredUsersAddressController.address.houseNo}" required="true"/>
+                                <p:outputLabel for="houseNo" value="House No"/>                                
                             </span>
                             <span class="ui-float-label">                         
-                                <p:inputText id="buildingNo" value="#{registeredUsersAddressController.address.buildingNo}"/>
-                                <p:outputLabel for="buildingNo" value="Building No"/>
-                                <p:message for="buildingNo"/>
+                                <p:inputText id="buildingNo" value="#{registeredUsersAddressController.address.buildingNo}" required="true" requiredMessage="House No is required"/>
+                                <p:outputLabel for="buildingNo" value="Building No"/>                                
                             </span>
                             <span class="ui-float-label">       
-                                <p:inputText id="street" value="#{registeredUsersAddressController.address.street}"/>
-                                <p:outputLabel for="street" value="Street"/>
-                                <p:message for="street"/>
+                                <p:inputText id="street" value="#{registeredUsersAddressController.address.street}" required="true"/>
+                                <p:outputLabel for="street" value="Street"/>                              
                             </span>                       
                             <span class="ui-float-label">
-                                <p:selectOneMenu id="city" value="#{registeredUsersAddressController.address.city}" effect="fold" editable="true" style="width: 125px">
+                                <p:selectOneMenu id="city" value="#{registeredUsersAddressController.address.city}" effect="fold" editable="true" style="width: 125px" required="true">
                                     <f:selectItem itemLabel="Select One" itemValue="" />
                                     <f:selectItem itemLabel="Mumbai" itemValue="Mumbai" />
                                     <f:selectItem itemLabel="Delhi" itemValue="Delhi" />
@@ -119,24 +143,23 @@
                                     <f:selectItem itemLabel="Pune" itemValue="Pune" />    
                                     <f:selectItem itemLabel="Gurgaon" itemValue="Gurgaon" />    
                                 </p:selectOneMenu>
-                                <p:outputLabel for="city" value="City"/>
-                                <p:message for="city"/>
+                                <p:outputLabel for="city" value="City"/>                              
                             </span>
                             <span class="ui-float-label">                             
-                                <p:inputText id="state" value="#{registeredUsersAddressController.address.state}"/>
-                                <p:outputLabel for="state" value="State"/>
-                                <p:message for="state"/>
+                                <p:inputText id="state" value="#{registeredUsersAddressController.address.state}" required="true"/>
+                                <p:outputLabel for="state" value="State"/>                                
                             </span>                      
                             <span class="ui-float-label">    
-                                <p:inputText id="pincode" value="#{registeredUsersAddressController.address.pincode}"/>
-                                <p:outputLabel for="pincode" value="Pincode"/>
-                                <p:message for="pincode"/> 
+                                <p:inputText id="pincode" value="#{registeredUsersAddressController.address.pincode}" required="true"/>
+                                <p:outputLabel for="pincode" value="Pincode"/>                                
                             </span>
                         </p:panelGrid> 
-                        <p:commandButton value="Add Address" id="addAddressBtn" class="cmdBtn" action="#{registeredUsersAddressController.addAddress(registeredUsersAddressController.address)}" update="checkoutForm msgs myDatatable" onclick="PF('progressPanel').show();PF('addAddressBtn').disable();" oncomplete="PF('progressPanel').close();PF('addAddressBtn').enable();" widgetVar="addAddressBtn"/>
+                        <p:commandButton value="Add Address" id="addAddressBtn" class="cmdBtn" action="#{registeredUsersAddressController.addAddress(registeredUsersAddressController.address)}" update="checkoutForm msgs myDatatable" onclick="PF('progressPanel').show();PF('addAddressBtn').disable();" oncomplete="PF('progressPanel').close();PF('addAddressBtn').enable();" widgetVar="addAddressBtn"/>                                                              
+                    </h:form>
+                    <h:form id="continueForm">
                         <p>
-                            <p:commandButton value="Continue" action="select-payment-option.xhtml" actionListener="#{checkoutController.initiateTransaction(cartController.payableAmount)}" onclick="PF('progressPanel').show();PF('continueBtn').disable();" oncomplete="PF('progressPanel').close();PF('continueBtn').enable();" widgetVar="continueBtn"/>
-                        </p>                                           
+                            <p:commandButton id="continueBtn" value="Continue" action="select-payment-option.xhtml?faces-redirect=true" actionListener="#{checkoutController.initiateTransaction(cartController.payableAmount)}" disabled="#{deliveryController.isDeliveryAddressSelected}" onclick="PF('progressPanel').show();PF('continueBtn').disable();" oncomplete="PF('progressPanel').close();PF('continueBtn').enable();" widgetVar="continueBtn"/>
+                        </p>    
                     </h:form>
                 </p>
 

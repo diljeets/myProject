@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -40,7 +41,7 @@ import org.json.JSONObject;
  *
  * @author diljeet
  */
-@Stateful
+@Stateless
 public class CheckoutServiceBean implements CheckoutService {
 
     private static final Logger logger = Logger.getLogger(CheckoutServiceBean.class.getCanonicalName());
@@ -57,43 +58,25 @@ public class CheckoutServiceBean implements CheckoutService {
     @Inject
     TemplateController templateController;
 
-    private String deliveryAddress;
-    private String deliveryTime;
-//    private List<Cart> cartItems;
+//    private String deliveryTime;
 
     public CheckoutServiceBean() {
-//        cartItems = new ArrayList<>();
     }
 
     @PostConstruct
     public void init() {
     }
 
-    @Override
-    public void addDeliveryTime(String selectedTime) {
-        this.deliveryTime = selectedTime;
-    }
+//    @Override
+//    public void addDeliveryTime(String selectedTime) {
+//        this.deliveryTime = selectedTime;
+//    }
 //
 //    @Override
 //    public Response getDeliveryTime() {
 //        logger.log(Level.SEVERE, "getDeliveryTime service bean {0}", deliveryTime);
 //        return Response.ok().entity(deliveryTime).build();
 //    }
-
-    @Override
-    public void addDeliveryAddress(RegisteredUsersAddress selectedAddress) {
-        deliveryAddress = selectedAddress.getHouseNo() + ", "
-                + selectedAddress.getBuildingNo() + ", "
-                + selectedAddress.getStreet() + ", "
-                + selectedAddress.getCity() + ", "
-                + selectedAddress.getState() + "-"
-                + selectedAddress.getPincode();
-    }
-
-    @Override
-    public String getDeliveryAddress() {
-        return deliveryAddress;
-    }
 
     @Override
     public Response initiateTransaction(InitiateTransaction initiateTransaction) {
@@ -212,8 +195,8 @@ public class CheckoutServiceBean implements CheckoutService {
     public void pgGetResponse(HttpServletRequest req, HttpServletResponse resp) {
         try {
             resp.sendRedirect(req.getContextPath() + "/order-status.xhtml");
-        } catch (Exception ex) {
-            Logger.getLogger(CheckoutServiceBean.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -281,7 +264,8 @@ public class CheckoutServiceBean implements CheckoutService {
             em.persist(customerOrder);
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        } 
+        
         return Response.ok().build();
     }
 

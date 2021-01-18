@@ -9,14 +9,12 @@ import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.interfaces.RegisteredUsersAddressService;
 import java.io.Serializable;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 
 /**
@@ -32,17 +30,17 @@ public class RegisteredUsersAddressController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private RegisteredUsersAddress address;
-
     private List<RegisteredUsersAddress> addresses;    
-    
+
     @EJB
-    RegisteredUsersAddressService registeredUsersAddressService;    
-    
+    RegisteredUsersAddressService registeredUsersAddressService;
+
     @PostConstruct
     public void init() {
         address = new RegisteredUsersAddress();
+        setAddresses(registeredUsersAddressService.getAllRegisteredAddressByUsername());
     }
-    
+
     public RegisteredUsersAddressController() {
     }
 
@@ -55,27 +53,34 @@ public class RegisteredUsersAddressController implements Serializable {
     }
 
     public List<RegisteredUsersAddress> getAddresses() {
-        return registeredUsersAddressService.getAllRegisteredAddressByUsername();
-//        return registeredUsersAddressService.getAllRegisteredAddress();
+        return addresses;
     }
 
     public void setAddresses(List<RegisteredUsersAddress> addresses) {
         this.addresses = addresses;
-    }
-    
-    public void addAddress(RegisteredUsersAddress address){
-//        logger.log(Level.SEVERE, address.getHouseNo());
-//        logger.log(Level.SEVERE, address.getCity());
+    }    
+
+    public void addAddress(RegisteredUsersAddress address) {
         registeredUsersAddressService.addAddress(address);
+        setAddresses(registeredUsersAddressService.getAllRegisteredAddressByUsername());
         clear();
     }
-    
-     public void onRowSelect(SelectEvent<RegisteredUsersAddress> event) {
-         setAddress(event.getObject());
-//        FacesMessage msg = new FacesMessage("Car Selected", event.getObject().getId());
+
+    public void deleteRegisteredAddressById(int addressId) {
+        registeredUsersAddressService.deleteRegisteredAddressById(addressId);
+        setAddresses(registeredUsersAddressService.getAllRegisteredAddressByUsername());
+    }
+
+    public void updateRegisteredAddressById(RowEditEvent<RegisteredUsersAddress> event) {
+        registeredUsersAddressService.updateAddressById(event.getObject());
+        setAddresses(registeredUsersAddressService.getAllRegisteredAddressByUsername());
+    }
+
+    public void onRowCancel(RowEditEvent<RegisteredUsersAddress> event) {
+//        FacesMessage msg = new FacesMessage("Edit Cancelled", Long.toString(event.getObject().getId()));
 //        FacesContext.getCurrentInstance().addMessage(null, msg);
     }
-    
+
     private void clear() {
         address.setHouseNo(null);
         address.setBuildingNo(null);
@@ -84,5 +89,5 @@ public class RegisteredUsersAddressController implements Serializable {
         address.setState(null);
         address.setPincode(null);
     }
-   
+
 }

@@ -46,4 +46,8 @@ public interface CartService {
     @DELETE
     @Consumes(MediaType.APPLICATION_JSON)
     public void removeFromCart(Cart cartItem);
+    
+    @DELETE
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void removeAllFromCart();
 }

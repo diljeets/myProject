@@ -10,7 +10,9 @@ import com.diljeet.myProject.entities.CustomerTransaction;
 import java.io.Serializable;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
@@ -20,7 +22,7 @@ import javax.faces.context.FacesContext;
  * @author diljeet
  */
 @Named(value = "orderStatusController")
-@SessionScoped
+@RequestScoped
 public class OrderStatusController implements Serializable {
 
     private static final Logger logger = Logger.getLogger(OrderStatusController.class.getCanonicalName());
@@ -33,9 +35,9 @@ public class OrderStatusController implements Serializable {
     OrderStatusBean orderStatusBean;
 
     @PostConstruct
-    public void init() {
+    public void init() {    
         setCustomerTransaction(orderStatusBean.getCustomerTransactionStatus());
-    }
+    }   
 
     /**
      * Creates a new instance of TestUsersController

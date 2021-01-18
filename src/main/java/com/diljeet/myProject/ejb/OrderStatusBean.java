@@ -30,17 +30,17 @@ import javax.ws.rs.core.Response;
 @Named
 @Stateless
 public class OrderStatusBean {
-    
+
     private static final Logger logger = Logger.getLogger(OrderStatusBean.class.getCanonicalName());
-    
+
     private Client client;
 
     @Inject
     HttpServletRequest req;
-    
+
     @Inject
     CheckoutController checkoutController;
-    
+
     @Inject
     CartController cartController;
 
@@ -48,38 +48,47 @@ public class OrderStatusBean {
     public void init() {
         client = ClientBuilder.newClient();
     }
-    
+
     @PreDestroy
     public void destroy() {
         client.close();
     }
-    
-    public CustomerTransaction getCustomerTransactionStatus(){
+
+    public CustomerTransaction getCustomerTransactionStatus() {
         CustomerTransaction customerTransaction = null;
         try {
-             Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/getCustomerTransactionStatus")                    
+            Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/getCustomerTransactionStatus")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .get();
             if (response.getStatus() == Response.Status.FOUND.getStatusCode()
                     && response.hasEntity()) {
                 customerTransaction = response.readEntity(CustomerTransaction.class);
+                logger.log(Level.SEVERE, "orderId for customer order is {0}", customerTransaction.getOrderId());
+//                logger.log(Level.SEVERE, "Delivery time is {0}", checkoutController.getDeliveryTime());
                 if ((customerTransaction.getRespCode()).equals("01")) {
-                    placeOrder(new CustomerOrder(checkoutController.getDeliveryTime(),
-                            checkoutController.getDeliveryAddress(),
+                    placeOrder(new CustomerOrder(checkoutController.getDeliveryController().getDeliveryTime(),
+                            checkoutController.getDeliveryController().getDeliveryAddress(),
                             cartController.getCartItems(),
                             cartController.getPayableAmount(),
                             customerTransaction
                     ));
                 }
+            } else {
+                logger.log(Level.SEVERE, "customerTransaction Object is not found");
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Could not place Order");
+        } finally {
+//            checkoutController.setDeliveryTime(null);
+//            checkoutController.getRegisteredUsersAddressController().setDeliveryAddress(null);
+            cartController.removeAllFromCart();
+            cartController.setPayableAmount(null);
         }
-        
+
         return customerTransaction;
     }
-    
+
     public void placeOrder(CustomerOrder customerOrder) {
 //        checkoutService.placeOrder(customerOrder);
         Response response = null;
@@ -96,8 +105,7 @@ public class OrderStatusBean {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
     }
 
-    
 }

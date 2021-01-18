@@ -823,6 +823,7 @@ public class PaymentGatewayBean {
                             TXNDATE,
                             TXNID
                     );
+                    logger.log(Level.SEVERE, "customerTransaction object created for Success {0}", customerTransaction.getOrderId());
                 }
             }
         } else {
@@ -840,6 +841,7 @@ public class PaymentGatewayBean {
                     TXNDATE,
                     TXNID
             );
+            logger.log(Level.SEVERE, "customerTransaction object created for Failure {0}", customerTransaction.getOrderId());
         }
     }
 

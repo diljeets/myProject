@@ -46,7 +46,8 @@ public class MealPlanCategoryServiceBean implements MealPlanCategoryService {
         return Response.status(Response.Status.CREATED).build();
     }
 
-    @Override        
+    @Override   
+//    @RolesAllowed("Administrator")
     public List<MealPlanCategory> getMealPlanCategories() {
         List<MealPlanCategory> mealPlans = null;
         try {
