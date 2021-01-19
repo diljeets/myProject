@@ -61,10 +61,10 @@ body{
     padding: 1.2em;    
 }
 .hammenu .user-icon{
-     font-size: 2em;
+    font-size: 2em;
 }
 .hammenu .user{
-     font-size: 1.2em;
+    font-size: 1.2em;
 }
 .hamicon{
     display: block;
@@ -83,23 +83,71 @@ body{
     top: 0;
     opacity: 0.6;
 }
+.cartColAction{
+    position: absolute;
+}
+.removeFromCartBtn{
+    position: absolute;
+    right: 3em;
+}
+body #cartForm .ui-datatable .ui-datatable-footer {
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    border: none;
+    padding: 1em;
+}
+.proceedBtn{    
+    right: 2em;
+}
+.separator{
+    border-bottom: 2px solid #cfcfcf;
+}
+@media screen and (min-width: 641px){
+    .cartColAction{
+        position: relative;
+    }
+    .removeFromCartBtn{
+        position: relative;       
+        left: 0;
+    }
+}
 @media screen and (min-width: 768px){
     .web-menu{
         display: block;
-    }
+    }    
     .hammenu{
         display: none;       
     }
     .hamicon{
         display: none;
-    }
+    }   
 }
-
-@media screen and (min-width: 1024px){
+@media screen and (min-width: 992px){
+    .web-menu .fa-user{
+        font-size: 1em;
+    }
+    body .ui-button.ui-button-text-icon-left .ui-button-text {
+        font-size: 11px;
+    } 
+}
+@media screen and (min-width: 1200px){
     .donot-show{
         display: block;
-    }
+    }         
 }
+@media screen and (min-width: 1280px){
+    .fix-jc{
+        justify-content: center;
+    }        
+}
+@media screen and (min-width: 1400px){
+    body .ui-button.ui-button-text-icon-left .ui-button-text {
+        font-size: 13px;
+    }       
+}
+
 
 
 

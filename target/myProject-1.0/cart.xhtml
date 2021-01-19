@@ -4,66 +4,69 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"      	
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
     <h:head>
         <title>Facelet Title</title>        
     </h:head>
     <h:body>
         <ui:composition template="./template.xhtml">
             <ui:define name="top"></ui:define>
-            <ui:define name="content">                
-                <h:outputText value="You are in the Cart Content Section"/>
-                <h:form id="myDatatable">
-                    <p>             
-                        <p:remoteCommand name="refreshFooter" update=":myDatatable:datatable:subTotal"/>
-                        <p:dataTable id="datatable"                              
-                                     value="#{cartController.cartItems}"        
-                                     var="cartItem"
-                                     rendered="#{cartController.cartItems.size() > -1}"
-                                     summary="List of Ordered Plans" 
-                                     draggableColumns="true" 
-                                     draggableRows="true">
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="Name"/>
-                                </f:facet> 
-                                <h:outputText value="#{cartItem.mealPlanName}"/>
-                            </p:column>  
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="Rate"/>
-                                </f:facet> 
-                                <h:outputText value="#{cartItem.mealPlanRate}"/>
-                            </p:column> 
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="Total Rate"/>
-                                </f:facet> 
-                                <h:outputText id="totalMealPlanRate" value="#{cartItem.totalMealPlanRate}"/>
-                            </p:column> 
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="Quantity"/>
-                                </f:facet>
-                                <p:spinner min="1" max="999" maxlength="3" size="5" value="#{cartItem.mealPlanQuantity}">
-                                    <p:ajax listener="#{cartController.addToCart(cartItem)}" update="totalMealPlanRate" oncomplete="refreshFooter()"/>
-                                </p:spinner>
-                            </p:column> 
-                            <p:column>
-                                <f:facet name="header">
-                                    <h:outputText value="ACTION"/>
-                                </f:facet>
-                                <p:commandButton value="Remove from Cart" action="#{cartController.removeFromCart(cartItem)}" update=":navForm:itemCount myDatatable"/>
-                            </p:column> 
-                            <f:facet name="footer">
-                                <h:outputText id="subTotal" value="#{cartController.payableAmount}"/>
-                            </f:facet>
-                        </p:dataTable>
-                    </p>
-                    <p>
-                        <p:commandButton value="Proceed to Order" action="select-address-time.xhtml?faces-redirect=true"/>
-                    </p>
-                </h:form>
+            <ui:define name="content">  
+                <div class="p-grid p-justify-center">
+                    <div class="p-col-12 p-md-10 p-lg-9 p-xl-9">
+                        <h:form id="cartForm">
+                            <p>             
+                                <p:remoteCommand name="refreshFooter" update=":cartForm:cartDatatable:subTotal"/>
+                                <p:dataTable id="cartDatatable"                              
+                                             value="#{cartController.cartItems}"        
+                                             var="cartItem"
+                                             rendered="#{cartController.cartItems.size() > -1}"
+                                             summary="List of Ordered Plans"
+                                             reflow="true">
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Name"/>
+                                        </f:facet> 
+                                        <h:outputText value="#{cartItem.mealPlanName}"/>
+                                    </p:column>                                      
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Quantity"/>
+                                        </f:facet>
+                                        <p:spinner min="1" max="999" maxlength="3" size="5" value="#{cartItem.mealPlanQuantity}">
+                                            <p:ajax listener="#{cartController.addToCart(cartItem)}" update="totalMealPlanRate" oncomplete="refreshFooter()"/>
+                                        </p:spinner>
+                                    </p:column> 
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Rate"/>
+                                        </f:facet> 
+                                        <h:outputText value="#{cartItem.mealPlanRate}"/>
+                                    </p:column> 
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Total Rate"/>
+                                        </f:facet> 
+                                        <h:outputText id="totalMealPlanRate" value="#{cartItem.totalMealPlanRate}"/>
+                                    </p:column> 
+                                    <p:column class="cartColAction">                                        
+                                        <p:commandLink class="removeFromCartBtn" actionListener="#{cartController.removeFromCart(cartItem)}" update=":navForm:itemCount cartForm">
+                                            <i class="fa fa-fw fa-trash-o" style="font-size: 1.2em" title="Delete"></i>
+                                        </p:commandLink>
+                                    </p:column> 
+                                    <f:facet name="footer">
+                                        <h:outputText id="subTotal" value="#{cartController.payableAmount}"/>
+                                        <p:commandButton class="proceedBtn" value="Proceed to Order" action="select-address-time.xhtml?faces-redirect=true"/>
+                                    </f:facet>
+                                </p:dataTable>
+                            </p>
+                            <!--                    <p>
+                                                    <p:commandButton class="proceedBtn" value="Proceed to Order" action="select-address-time.xhtml?faces-redirect=true"/>
+                                                </p>-->
+                        </h:form>
+                    </div>
+                </div>
             </ui:define>
         </ui:composition>
     </h:body>

@@ -39,14 +39,14 @@
                 </p:panel>
                 <p:growl id="messages"/>
                 <div class="p-grid p-justify-center">
-                    <div class="p-col-12 p-sm-12 p-md-9 p-xl-9 p-pl-lg-0 p-pr-lg-0">
+                    <div class="p-col-12 p-sm-12 p-md-12 p-xl-9 p-pl-lg-0 p-pr-lg-0 separator">
                         <div class="p-grid p-align-end">
                             <div class="p-col-6 p-sm-6 p-md-6 p-xl-6">
                                 <h:outputText value="My Logo goes here"/>
                             </div>
                             <div class="p-col-4 p-sm-5 p-md-2 p-xl-3">
-                                <div class="p-grid p-jc-end p-jc-sm-end p-jc-md-center p-jc-lg-center p-align-end">
-                                    <div class="p-col-3 p-sm-3 p-md-5 p-lg-6 p-xl-4 p-pb-0">
+                                <div class="p-grid p-jc-end p-jc-sm-end p-jc-md-end p-jc-lg-end p-jc-xl-evenly p-align-end fix-jc">
+                                    <div class="p-col-3 p-sm-3 p-md-4 p-lg-4 p-xl-4 p-pb-0">
                                         <p:commandLink action="/login.xhtml">
                                             <div class="p-grid p-align-end">
                                                 <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-right">
@@ -58,7 +58,7 @@
                                             </div>
                                         </p:commandLink>
                                     </div>
-                                    <div class="p-col-3 p-sm-3 p-md-5 p-lg-6 p-xl-4 p-pb-0">
+                                    <div class="p-col-3 p-sm-3 p-md-4 p-lg-4 p-xl-4 p-pb-0">
                                         <p:commandLink action="/signup.xhtml">
                                             <div class="p-grid p-align-end">
                                                 <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-right">
@@ -72,11 +72,11 @@
                                     </div>
                                 </div>
                             </div>  
-                            <div class="p-md-3 p-xl-2 p-text-right web-menu">
-                                <p:menuButton value="Welcome, #{templateController.currentCustomer}">
+                            <div class="p-md-3 p-lg-2 p-xl-2 web-menu">
+                                <p:splitButton value="Welcome, #{templateController.currentCustomer}" icon="fa fa-fw fa-user" style="width: 100%;">
                                     <p:menuitem value="Change Password" action="/change-password.xhtml"/>
-                                    <p:menuitem value="Log Out" action="#{templateController.logout()}"/>                            
-                                </p:menuButton>
+                                    <p:menuitem value="Log Out" action="#{templateController.logout()}"/> 
+                                </p:splitButton>        
                             </div>
                             <div class="hammenu">
                                 <div class="p-col p-text-right">
@@ -104,16 +104,16 @@
                                     <p:commandLink value="Log Out" action="#{templateController.logout()}"/>
                                 </div>                                
                             </div>
-                            <div class="p-col p-sm p-md p-xl p-pl-sm-0 p-pl-md-0 p-text-right">
+                            <div class="p-col p-sm p-md-1 p-xl-1 p-pl-sm-0 p-pl-md-0 p-text-right">
                                 <p:commandLink id="itemCount" action="/cart.xhtml" >Cart #{cartController.itemsInCart}</p:commandLink>         
                             </div>
                             <div class="p-col-12 p-sm-12 p-md-6 hamicon">
                                 <i class="fa fa-fw fa-navicon"></i>
                             </div>
                         </div>
-                    </div>
+                    </div>                    
                 </div>
-                <p:separator/>
+
 
 
             </h:form>
