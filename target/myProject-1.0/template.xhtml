@@ -19,7 +19,7 @@
                 });
                 var hammenuWidth = $(".hammenu").outerWidth();
 //                console.log(hammenuWidth);
-                $(".fa-close").click(function () {
+                $(".pi-times").click(function () {
                     $("body").removeAttr("style");
                     $(".overlay").hide();
                     $(".hammenu").animate({"right": "-" + hammenuWidth + "px"});
@@ -50,7 +50,8 @@
                                         <p:commandLink action="/login.xhtml">
                                             <div class="p-grid p-align-end">
                                                 <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-right">
-                                                    <i class="fa fa-fw fa-user"></i>
+                                                    <!--                                                    <i class="fa fa-fw fa-user"></i>-->
+                                                    <i class="pi pi-sign-in p-mr-1"></i>
                                                 </div>
                                                 <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-left donot-show">
                                                     <span>Login</span>
@@ -62,7 +63,8 @@
                                         <p:commandLink action="/signup.xhtml">
                                             <div class="p-grid p-align-end">
                                                 <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-right">
-                                                    <i class="fa fa-fw fa-user-plus"></i>
+                                                    <!--                                                    <i class="fa fa-fw fa-user-plus"></i>-->
+                                                    <i class="pi pi-user-plus p-mr-1"></i>
                                                 </div>
                                                 <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center donot-show">
                                                     <span>Register</span>
@@ -73,34 +75,39 @@
                                 </div>
                             </div>  
                             <div class="p-md-3 p-lg-2 p-xl-2 web-menu">
-                                <p:splitButton value="Welcome, #{templateController.currentCustomer}" icon="fa fa-fw fa-user" style="width: 100%;">
-                                    <p:menuitem value="Change Password" action="/change-password.xhtml"/>
-                                    <p:menuitem value="Log Out" action="#{templateController.logout()}"/> 
+                                <p:splitButton value="Welcome, #{templateController.currentCustomer}" icon="pi pi-user">
+                                    <p:menuitem value="Change Password" action="/change-password.xhtml" icon="pi pi-user-edit"/>
+                                    <p:menuitem value="Log Out" action="#{templateController.logout()}" icon="pi pi-sign-out"/> 
                                 </p:splitButton>        
                             </div>
                             <div class="hammenu">
                                 <div class="p-col p-text-right">
-                                    <i class="fa fa-fw fa-close"></i>                                    
+                                    <!--                                    <i class="fa fa-fw fa-close"></i>                                    -->
+                                    <i class="pi pi-times"></i>
                                 </div>
                                 <div class="p-col p-text-center user-icon">
-                                    <i class="fa fa-fw fa-user"></i>                                    
+                                    <!--                                    <i class="fa fa-fw fa-user"></i>                                    -->
+                                    <i class="pi pi-user"></i>
                                 </div>
                                 <div class="p-col p-text-center p-pt-0 user">                                    
                                     <h:outputText value="#{templateController.currentCustomer}"/>
                                 </div>
                                 <p:separator/>
                                 <div class="p-col">
-                                    <i class="fa fa-fw fa-home"></i>
+                                    <!--                                    <i class="fa fa-fw fa-home"></i>-->
+                                    <i class="pi pi-home p-mr-1"></i>
                                     <p:commandLink value="Home" action="/index.xhtml"/>
                                 </div>
                                 <p:separator/>
                                 <div class="p-col">
-                                    <i class="fa fa-fw fa-refresh"></i>
+                                    <!--                                    <i class="fa fa-fw fa-refresh"></i>-->
+                                    <i class="pi pi-user-edit p-mr-1"></i>
                                     <p:commandLink value="Change Password" action="/change-password.xhtml"/>
                                 </div>
                                 <p:separator/>
                                 <div class="p-col">
-                                    <i class="fa fa-fw fa-sign-out"></i>
+                                    <!--                                    <i class="fa fa-fw fa-sign-out"></i>-->
+                                    <i class="pi pi-sign-out p-mr-1"></i>
                                     <p:commandLink value="Log Out" action="#{templateController.logout()}"/>
                                 </div>                                
                             </div>
@@ -108,7 +115,8 @@
                                 <p:commandLink id="itemCount" action="/cart.xhtml" >Cart #{cartController.itemsInCart}</p:commandLink>         
                             </div>
                             <div class="p-col-12 p-sm-12 p-md-6 hamicon">
-                                <i class="fa fa-fw fa-navicon"></i>
+                                <!--                                <i class="fa fa-fw fa-navicon"></i>-->
+                                <i class="pi pi-bars"></i>
                             </div>
                         </div>
                     </div>                    

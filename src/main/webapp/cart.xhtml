@@ -18,7 +18,8 @@
                         <h:form id="cartForm">
                             <p>             
                                 <p:remoteCommand name="refreshFooter" update=":cartForm:cartDatatable:subTotal"/>
-                                <p:dataTable id="cartDatatable"                              
+                                <p:dataTable id="cartDatatable"  
+                                             class="cartDatatable"
                                              value="#{cartController.cartItems}"        
                                              var="cartItem"
                                              rendered="#{cartController.cartItems.size() > -1}"
@@ -52,12 +53,16 @@
                                     </p:column> 
                                     <p:column class="cartColAction">                                        
                                         <p:commandLink class="removeFromCartBtn" actionListener="#{cartController.removeFromCart(cartItem)}" update=":navForm:itemCount cartForm">
-                                            <i class="fa fa-fw fa-trash-o" style="font-size: 1.2em" title="Delete"></i>
+                                            <i class="pi pi-trash" title="Delete"></i>
                                         </p:commandLink>
                                     </p:column> 
                                     <f:facet name="footer">
-                                        <h:outputText id="subTotal" value="#{cartController.payableAmount}"/>
-                                        <p:commandButton class="proceedBtn" value="Proceed to Order" action="select-address-time.xhtml?faces-redirect=true"/>
+                                        <div class="subtotalAmount">
+                                            <h:outputText id="subTotal" value="Sub Total - #{cartController.payableAmount}"/>
+                                        </div>
+                                        <div class="proceedBtn">
+                                            <p:commandButton value="Proceed to Order" action="select-address-time.xhtml?faces-redirect=true"/>
+                                        </div>
                                     </f:facet>
                                 </p:dataTable>
                             </p>

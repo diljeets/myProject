@@ -73,15 +73,21 @@
                     </form>-->
             <h:form id="login" onsubmit="document.getElementById('login').action = 'j_security_check';" prependId="false">
                 <p:panelGrid>
-                    <span class="ui-float-label">                    
-                        <p:inputText id="j_username"/>  
-                        <p:outputLabel for="j_username" value="Username" />
-                    </span>
-                    <span class="ui-float-label">                    
-                        <p:password id="j_password"/>
-                        <p:outputLabel for="j_password" value="Password" />
-                    </span>
-                    <p:commandButton class="cmdBtn" type="submit" value="Submit" ajax="false" onclick="PF('progressPanel').show();"/>
+                    <p:row>
+                        <span class="ui-float-label">                    
+                            <p:inputText id="j_username"/>  
+                            <p:outputLabel for="j_username" value="Username" />
+                        </span>
+                    </p:row>
+                    <p:row>
+                        <span class="ui-float-label">                    
+                            <p:password id="j_password"/>
+                            <p:outputLabel for="j_password" value="Password" />
+                        </span>
+                    </p:row>
+                    <p:row>
+                        <p:commandButton class="cmdBtn" type="submit" value="Submit" ajax="false" onclick="PF('progressPanel').show();"/>
+                    </p:row>
                 </p:panelGrid>
             </h:form>
 
@@ -91,7 +97,7 @@
             <p>
                 New User? <a href="signup.xhtml">Sign Up</a>?
             </p>
-            
+
 
         </div>
         <h:outputStylesheet library="css" name="common.css"/>

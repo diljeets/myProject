@@ -1,0 +1,64 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Jan 21, 2021, 7:10:50 PM
+    Author     : diljeet
+*/
+
+/*Payments Data tables*/
+.ui-datatable table {  
+    table-layout: auto !important;
+}
+body .ui-datatable .ui-datatable-data>tr {
+    border: none;
+}
+body .ui-datatable .ui-datatable-data>tr>td {
+    padding: 2em 1em;
+    border-top: 1px solid #f4f4f4;
+    border-bottom: 1px solid #f4f4f4;
+}
+body .ui-datatable .ui-datatable-footer {
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    border: none;    
+    z-index: 100;
+    display: flex;
+    align-items: center;
+}
+.reviewAndPlaceOrderBtn{
+    flex: 1;
+    text-align: center;
+}
+body .ui-datatable .ui-datatable-data>tr.ui-state-highlight {
+    border: none;  
+    /*    border-top: 1px solid green;  
+        border-right: 1px solid green;
+        border-bottom: 1px solid green;*/
+    /*    background-color: #f9f9f9; */
+    color: #000;
+    cursor: default;
+}
+body .ui-datatable .ui-datatable-data>tr.ui-state-highlight .ui-selection-column {
+    /*    border-left: 1px solid green;  */
+    border-right: 0;
+}
+.ui-datatable.table-channeloptions tbody.ui-datatable-data {
+    display: flex;
+    flex-wrap: wrap;
+}
+.ui-datatable.table-channeloptions tbody.ui-datatable-data > tr{
+    flex: 1 180px;
+    margin: 15px;
+    display: flex;    
+}
+.ui-datatable.table-channeloptions tbody.ui-datatable-data > tr > td {
+    flex: 1;
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}

@@ -288,7 +288,7 @@ public class PaymentGatewayBean {
                                 JSONObject obj1 = payChannelOptionsJsonArray.getJSONObject(j);
                                 isChannelOptionHybridDisabled = obj1.getBoolean("isHybridDisabled");
                                 channelName = obj1.getString("channelName");
-                                iconUrl = obj1.getString("iconUrl");
+                                iconUrl = iconBaseUrl + obj1.getString("iconUrl");
                                 channelCode = obj1.getString("channelCode");
 
                                 payChannelOptionsNetBanking.add(new PayChannelOptionsNetBanking(
@@ -675,7 +675,7 @@ public class PaymentGatewayBean {
                         JSONObject bankObj = payChannelOptionsJsonArray.getJSONObject(i);
                         boolean isChannelOptionHybridDisabled = bankObj.getBoolean("isHybridDisabled");
                         String channelName = bankObj.getString("channelName");
-                        String iconUrl = bankObj.getString("iconUrl");
+                        String iconUrl = iconBaseUrl + bankObj.getString("iconUrl");
                         String channelCode = bankObj.getString("channelCode");                        
                         payChannelOptionsNetBanking.add(new PayChannelOptionsNetBanking(
                                 isChannelOptionHybridDisabled,

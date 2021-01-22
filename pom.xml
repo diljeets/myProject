@@ -15,7 +15,11 @@
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <jakartaee>8.0</jakartaee>
     </properties>
-    <repositories>
+    <repositories>       
+        <repository>
+            <id>my-repo2</id>
+            <url>https://repo1.maven.org/maven2/</url>
+        </repository> 
         <repository>
             <id>my-repo1</id>
             <url> http://artifactorypg.paytm.in/artifactory/libs-release </url>
@@ -31,8 +35,18 @@
         <dependency>
             <groupId>org.primefaces</groupId>
             <artifactId>primefaces</artifactId>
-            <version>8.0</version>
+            <version>10.0.0-RC1</version>
         </dependency>
+        <!--        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>8.0</version>
+        </dependency>-->
+        <!--        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>10.0.0</version>
+        </dependency>-->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>

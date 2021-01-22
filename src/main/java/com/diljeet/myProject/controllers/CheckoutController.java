@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import java.util.List;
+import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
@@ -365,6 +366,7 @@ public class CheckoutController implements Serializable {
     }
 
     public void processTransaction(String paymentMode) {
+        logger.log(Level.SEVERE, "checkout controller Payment mode is {0}", paymentMode);
         if (paymentMode.equals("BALANCE")) {
             checkoutBean.processTransaction(new PaymentRequestDetails(
                     paymentMode

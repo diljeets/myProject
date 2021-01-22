@@ -58,7 +58,7 @@ body{
     max-width: 50%;
     height: 100%;
     z-index: 1000;
-    padding: 1.2em;    
+    padding: 0.8em;    
 }
 .hammenu .user-icon{
     font-size: 2em;
@@ -79,7 +79,7 @@ body{
     background-color: #000000;
     display: none;
     position: absolute;
-    z-index: 0;
+    z-index: 101;
     top: 0;
     opacity: 0.6;
 }
@@ -88,21 +88,99 @@ body{
 }
 .removeFromCartBtn{
     position: absolute;
-    right: 3em;
+    right: 1.5em;
+}
+.cartDatatable {
+    padding-bottom: 30px;
 }
 body #cartForm .ui-datatable .ui-datatable-footer {
     position: fixed !important;
     bottom: 0;
     left: 0;
     width: 100%;
-    border: none;
-    padding: 1em;
+    border: none;    
+    z-index: 100;
+    display: flex;
+    align-items: center;
 }
-.proceedBtn{    
-    right: 2em;
+body #cartForm .ui-datatable .ui-datatable-footer .subtotalAmount{  
+    flex: 1;    
+    text-align: right;
+    padding-right: 15px;
 }
+body #cartForm .ui-datatable .ui-datatable-footer .proceedBtn{  
+    flex: 1;
+    text-align: left;
+    padding-left: 15px;
+}
+
 .separator{
     border-bottom: 2px solid #cfcfcf;
+}
+.set-bg{
+    background-color: whitesmoke;
+/*    border: 1px solid #e8d1d1;*/
+    /*    box-shadow: #e8d1d1 2px 2px 2px;*/
+}
+.continueBtn{
+    position: fixed;
+    bottom: 0;
+    background-color: #f4f4f4;
+    width: 100%;
+    left: 0;
+    text-align: center;
+}
+@media screen and (max-width: 640px){
+    /*    body .ui-datatable .ui-datatable-data>tr>td {
+            padding: 0;
+        }*/
+    /*    body .ui-datatable .ui-datatable-data>tr>td.ui-selection-column {        
+            padding-top: 0.5em 0 !important;
+        }*/
+    .ui-datatable-reflow .ui-datatable-data td[role="gridcell"]:not(.ui-helper-hidden) div.ui-cell-editor {
+        width: auto;
+        display: inline-block;    
+    }
+    body .ui-datatable .ui-datatable-data>tr>td.ui-selection-column .ui-column-title{
+        margin-top: 1.2em;
+    }
+    .ui-datatable-reflow .ui-datatable-data td[role="gridcell"] .ui-column-title {
+        min-width: 20% !important;        
+    }
+    .ui-datatable-reflow .ui-datatable-data td[role="gridcell"]:not(.ui-helper-hidden).ui-editable-column {
+        width: 90%;
+        float: right;
+        clear: none;
+    }
+    .ui-datatable-reflow .ui-datatable-data td[role="gridcell"]:not(.ui-helper-hidden):last-child{
+        position: absolute;
+        right: 15px;
+        width: 170px;   
+        text-align: right;
+    }
+    .ui-datatable .ui-datatable-data tr.ui-row-editing td.ui-editable-column{
+        padding-top: 5px !important;
+    }   
+}
+@media screen and (max-width: 450px){
+    /*     body .ui-datatable .ui-datatable-data>tr>td.ui-selection-column {
+            padding: 0 !important;
+        }*/
+    .ui-datatable-reflow .ui-datatable-data td[role="gridcell"] .ui-column-title {
+        min-width: 30% !important;        
+    }
+    .ui-datatable-reflow .ui-datatable-data td[role="gridcell"]:not(.ui-helper-hidden).ui-editable-column {
+        width: 85%;
+    }
+    /*    .ui-datatable-reflow .ui-datatable-data td[role="gridcell"]:not(.ui-helper-hidden):last-child{  
+            position: relative;
+            text-align: center;
+            width: 100%;   
+            
+        }
+        .ui-datatable-reflow .ui-datatable-data td[role="gridcell"]:not(.ui-helper-hidden):last-child .ui-column-title{
+            display: none;
+        }*/
 }
 @media screen and (min-width: 641px){
     .cartColAction{
@@ -128,9 +206,9 @@ body #cartForm .ui-datatable .ui-datatable-footer {
     .web-menu .fa-user{
         font-size: 1em;
     }
-    body .ui-button.ui-button-text-icon-left .ui-button-text {
+/*    body .ui-button.ui-button-text-icon-left .ui-button-text {
         font-size: 11px;
-    } 
+    } */
 }
 @media screen and (min-width: 1200px){
     .donot-show{
@@ -143,9 +221,9 @@ body #cartForm .ui-datatable .ui-datatable-footer {
     }        
 }
 @media screen and (min-width: 1400px){
-    body .ui-button.ui-button-text-icon-left .ui-button-text {
+/*    body .ui-button.ui-button-text-icon-left .ui-button-text {
         font-size: 13px;
-    }       
+    }       */
 }
 
 
