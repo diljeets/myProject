@@ -14,15 +14,22 @@ import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIComponent;
+import javax.faces.component.UIInput;
 import javax.faces.component.UIOutput;
+import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
 import org.primefaces.event.SelectEvent;
@@ -70,7 +77,7 @@ public class CheckoutController implements Serializable {
     private String isCardActive;
     private boolean isModeNB;
     private String channelCode;
-    
+
     @Inject
     DeliveryController deliveryController;
 
@@ -107,7 +114,6 @@ public class CheckoutController implements Serializable {
 //    public void setDeliveryTime(String deliveryTime) {
 //        this.deliveryTime = deliveryTime;
 //    }
-
     public PaymentOptions getPaymentOption() {
         return paymentOption;
     }
@@ -347,12 +353,11 @@ public class CheckoutController implements Serializable {
     public void setDeliveryController(DeliveryController deliveryController) {
         this.deliveryController = deliveryController;
     }
-  
+
 //    public void addDeliveryTime(SelectEvent event) {
 //        String selectedTime = event.getObject().toString();
 //        checkoutService.addDeliveryTime(selectedTime);
 //    }
-
     public void initiateTransaction(String payableAmount) {
         checkoutBean.initiateTransaction(payableAmount);
     }
@@ -395,7 +400,7 @@ public class CheckoutController implements Serializable {
         }
     }
 
-    public void onRowSelect(SelectEvent<PaymentOptions> event) {
+    public void onRowSelectPaymentOption(SelectEvent<PaymentOptions> event) {
         isModePaytm = false;
         isModeCC = false;
         isModeDC = false;
@@ -423,8 +428,10 @@ public class CheckoutController implements Serializable {
 
     public void fetchBinDetails(AjaxBehaviorEvent event) {
         String cardDigits = (String) ((UIOutput) event.getSource()).getValue();
-        if (cardDigits.length() == 6) {
-            isCardValid = checkoutBean.fetchBinDetails(cardDigits);
+        logger.log(Level.SEVERE, "CC number is {0}", cardDigits);
+        String firstSixCardDigits = cardDigits.substring(0, 6);
+        if (firstSixCardDigits.length() == 6) {
+            isCardValid = checkoutBean.fetchBinDetails(firstSixCardDigits);
             if (isCardValid) {
                 List<CardDetails> cardDetails = checkoutBean.fetchCardDetails();
                 Iterator<CardDetails> itr = cardDetails.iterator();
@@ -440,6 +447,121 @@ public class CheckoutController implements Serializable {
             }
         } else {
             isCardValid = false;
+        }        
+    }
+    
+//    public void fetchBinDetails(AjaxBehaviorEvent event) {
+//        String cardDigits = (String) ((UIOutput) event.getSource()).getValue();
+//        if (cardDigits.length() == 6) {
+//            isCardValid = checkoutBean.fetchBinDetails(cardDigits);
+//            if (isCardValid) {
+//                List<CardDetails> cardDetails = checkoutBean.fetchCardDetails();
+//                Iterator<CardDetails> itr = cardDetails.iterator();
+//                while (itr.hasNext()) {
+//                    CardDetails cardDetail = itr.next();
+//                    issuingBank = cardDetail.getIssuingBank();
+//                    channelName = cardDetail.getChannelName();
+//                    isCvvRequired = cardDetail.getIsCvvRequired();
+//                    isExpRequired = cardDetail.getIsExpRequired();
+//                    cardIconUrl = cardDetail.getCardIconUrl();
+//                    isCardActive = cardDetail.getIsActive();
+//                }
+//            }
+//        } else {
+//            isCardValid = false;
+//        }
+//    }
+
+    public void validatePaytmMobileNumber(FacesContext context, UIComponent comp, String mobileNumber) {
+        Pattern pattern = Pattern.compile("[0-9]+");
+        Matcher matcher = pattern.matcher(mobileNumber);
+        boolean isMatched = matcher.matches();
+        if (isMatched) {
+            if (mobileNumber.length() < 10) {
+                ((UIInput) comp).setValid(false);
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid 10-digit Mobile Number");
+                context.addMessage(comp.getClientId(context), message);
+            }
+        } else {
+            ((UIInput) comp).setValid(false);
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid Mobile Number");
+            context.addMessage(comp.getClientId(context), message);
+        }
+    }
+    
+    public void validateCardNumber(FacesContext context, UIComponent comp, String cardNumber) {
+        Pattern pattern = Pattern.compile("[0-9]+");
+        Matcher matcher = pattern.matcher(cardNumber);
+        boolean isMatched = matcher.matches();
+        if (isMatched) {
+            if (cardNumber.length() < 16) {
+                ((UIInput) comp).setValid(false);
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid 16-digit Card Number");
+                context.addMessage(comp.getClientId(context), message);
+            }
+        } else {
+            ((UIInput) comp).setValid(false);
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid Card Number");
+            context.addMessage(comp.getClientId(context), message);
+        }
+    }
+
+    public void validateExpiryMonth(FacesContext context, UIComponent comp, String expiryMonth) {
+        Pattern pattern = Pattern.compile("[0-9]+");
+        Matcher matcher = pattern.matcher(expiryMonth);
+        boolean isMatched = matcher.matches();
+        if (isMatched) {
+            if (expiryMonth.length() < 2) {
+                ((UIInput) comp).setValid(false);
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid Month between 01 and 12 e.g 01");
+                context.addMessage(comp.getClientId(context), message);
+            } else {
+                if (!((Integer.parseInt(expiryMonth) > 0) && (Integer.parseInt(expiryMonth) <= 12))) {
+                    ((UIInput) comp).setValid(false);
+                    FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid Month between 01 and 12");
+                    context.addMessage(comp.getClientId(context), message);
+                }
+            }
+        } else {
+            ((UIInput) comp).setValid(false);
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid Month e.g 01");
+            context.addMessage(comp.getClientId(context), message);
+        }
+    }
+
+    public void validateExpiryYear(FacesContext context, UIComponent comp, String expiryYear) {
+        Pattern pattern = Pattern.compile("[0-9]+");
+        Matcher matcher = pattern.matcher(expiryYear);
+        boolean isMatched = matcher.matches();
+        if (isMatched) {
+            LocalDate currentDate = LocalDate.now();
+            int currentYear = currentDate.getYear();
+            if (Integer.parseInt(expiryYear) < currentYear) {
+                ((UIInput) comp).setValid(false);
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Expiry Year cannot have a past value");
+                context.addMessage(comp.getClientId(context), message);
+            }
+        } else {
+            ((UIInput) comp).setValid(false);
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid Year e.g 2050");
+            context.addMessage(comp.getClientId(context), message);
+        }
+    }
+
+    public void validateCvv(FacesContext context, UIComponent comp, String cvv) {
+        Pattern pattern = Pattern.compile("[0-9]+");
+        Matcher matcher = pattern.matcher(cvv);
+        boolean isMatched = matcher.matches();
+        if (isMatched) {
+            if (cvv.length() < 3) {
+                ((UIInput) comp).setValid(false);
+                FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid 3-digit CVV number e.g 123");
+                context.addMessage(comp.getClientId(context), message);
+            }
+        } else {
+            ((UIInput) comp).setValid(false);
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid CVV number e.g 123");
+            context.addMessage(comp.getClientId(context), message);
         }
     }
 

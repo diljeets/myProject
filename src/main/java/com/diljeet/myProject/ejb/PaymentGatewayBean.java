@@ -353,6 +353,7 @@ public class PaymentGatewayBean {
             InputStream is = connection.getInputStream();
             BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
             if ((responseData = responseReader.readLine()) != null) {
+                logger.log(Level.SEVERE, "Send OTP response is {0}", responseData);
                 JSONObject resObj = new JSONObject(responseData);
                 JSONObject bodyObj = resObj.getJSONObject("body");
                 JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");

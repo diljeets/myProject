@@ -204,8 +204,9 @@ public class CheckoutBean {
                     .post(Entity.entity(firstSixCardDigits, MediaType.APPLICATION_JSON), Response.class);
             String resultMsg = response.getHeaderString("resultMsg");
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", resultMsg);
-                FacesContext.getCurrentInstance().addMessage(null, msg);
+                logger.log(Level.INFO, resultMsg);
+//                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", resultMsg);
+//                FacesContext.getCurrentInstance().addMessage(null, msg);
             } else {
                 msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
                 FacesContext.getCurrentInstance().addMessage(null, msg);

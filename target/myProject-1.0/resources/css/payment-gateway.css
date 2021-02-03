@@ -47,18 +47,83 @@ body .ui-datatable .ui-datatable-data>tr.ui-state-highlight .ui-selection-column
     /*    border-left: 1px solid green;  */
     border-right: 0;
 }
+/*body .ui-datatable.table-paymentoptions .ui-datatable-data{    
+    display: flex;
+    flex-direction: column;
+}
+body .ui-datatable.table-paymentoptions .ui-datatable-data > tr{ 
+    flex: 1;
+    display: flex;    
+}*/
+body .ui-datatable.table-paymentoptions .ui-datatable-data > tr > td.ui-selection-column{ 
+    position: relative;
+    width: 16px
+}
+body .ui-datatable.table-paymentoptions .ui-datatable-data > tr > td.ui-selection-column > div.ui-radiobutton{ 
+    position: absolute;
+    top: 30px;
+    right: 0;
+}
+body .ui-inputfield.otpInputText{
+    font-size: x-large;
+/*    letter-spacing: 1em;*/
+    text-align: center;
+    text-shadow: 0 0 black;
+}
+.ui-inputwrapper-filled{
+    position: relative;
+}
+.cardIcon{
+    width: 30px;
+    position: absolute;
+    right: 12px;
+    top: 2px;
+}
+body .ui-panel .ui-panel-content div span img{
+    width: 50px;
+}
 .ui-datatable.table-channeloptions tbody.ui-datatable-data {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap;   
 }
 .ui-datatable.table-channeloptions tbody.ui-datatable-data > tr{
     flex: 1 180px;
-    margin: 15px;
+    margin: 15px 15px 15px 0;
     display: flex;    
+    flex-direction: column;
+    border: 1px solid #ff0000;
+    position: relative;
 }
 .ui-datatable.table-channeloptions tbody.ui-datatable-data > tr > td {
     flex: 1;
     display: flex; 
     justify-content: center;
     align-items: center;
+    text-align: center;
+}
+.ui-datatable.table-channeloptions tbody.ui-datatable-data > tr > td {    
+    border: 0;
+}
+.ui-datatable.table-channeloptions tbody.ui-datatable-data > tr > td:first-child{
+    padding: 0;    
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+.ui-datatable.table-channeloptions tbody.ui-datatable-data > tr > td:first-child .pi-check{ 
+    display: none;
+}
+.ui-datatable.table-channeloptions tbody.ui-datatable-data > tr.ui-state-highlight > td:first-child .pi-check{ 
+    display: block;
+}
+.ui-datatable.table-channeloptions tbody.ui-datatable-data > tr > td:nth-child(2){    
+    min-height: 122px;
+    padding-bottom: 0px
+}
+.ui-datatable.table-channeloptions tbody.ui-datatable-data > tr > td:nth-child(2) img{
+    width: 50px;    
+    padding-bottom: 0.5em;
+}
+.ui-datatable.table-channeloptions tbody.ui-datatable-data > tr > td:last-child {
+    padding-top: 0;    
 }
