@@ -32,6 +32,7 @@ import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
+import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 
 /**
@@ -58,6 +59,7 @@ public class CheckoutController implements Serializable {
     private boolean isModePaytm;
     private String paytmMobile;
     private String otp;
+    private boolean isValidPaytmMobile;
     private boolean isModeCC;
     private String ccNumber;
     private String ccExpiryMonth;
@@ -192,6 +194,14 @@ public class CheckoutController implements Serializable {
 
     public void setOtp(String otp) {
         this.otp = otp;
+    }
+
+    public boolean isIsValidPaytmMobile() {
+        return isValidPaytmMobile;
+    }
+
+    public void setIsValidPaytmMobile(boolean isValidPaytmMobile) {
+        this.isValidPaytmMobile = isValidPaytmMobile;
     }
 
     public boolean isIsModeCC() {
@@ -408,6 +418,8 @@ public class CheckoutController implements Serializable {
         paymentMode = event.getObject().getPaymentMode();
         if (paymentMode.equals("BALANCE")) {
             isModePaytm = true;
+            PrimeFaces current = PrimeFaces.current();
+            current.executeScript("PF('paytmSidebar').show()");
         } else if (paymentMode.equals("CREDIT_CARD")) {
             isModeCC = true;
         } else if (paymentMode.equals("DEBIT_CARD")) {
@@ -447,9 +459,9 @@ public class CheckoutController implements Serializable {
             }
         } else {
             isCardValid = false;
-        }        
+        }
     }
-    
+
 //    public void fetchBinDetails(AjaxBehaviorEvent event) {
 //        String cardDigits = (String) ((UIOutput) event.getSource()).getValue();
 //        if (cardDigits.length() == 6) {
@@ -471,8 +483,8 @@ public class CheckoutController implements Serializable {
 //            isCardValid = false;
 //        }
 //    }
-
     public void validatePaytmMobileNumber(FacesContext context, UIComponent comp, String mobileNumber) {
+        isValidPaytmMobile = true;        
         Pattern pattern = Pattern.compile("[0-9]+");
         Matcher matcher = pattern.matcher(mobileNumber);
         boolean isMatched = matcher.matches();
@@ -481,14 +493,17 @@ public class CheckoutController implements Serializable {
                 ((UIInput) comp).setValid(false);
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid 10-digit Mobile Number");
                 context.addMessage(comp.getClientId(context), message);
-            }
+                isValidPaytmMobile = false;
+            } 
         } else {
             ((UIInput) comp).setValid(false);
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid Mobile Number");
-            context.addMessage(comp.getClientId(context), message);
-        }
+            context.addMessage(comp.getClientId(context), message); 
+            isValidPaytmMobile = false;
+        }        
+        logger.log(Level.SEVERE, "isValidationFailed is {0}", Boolean.toString(isValidPaytmMobile));
     }
-    
+
     public void validateCardNumber(FacesContext context, UIComponent comp, String cardNumber) {
         Pattern pattern = Pattern.compile("[0-9]+");
         Matcher matcher = pattern.matcher(cardNumber);

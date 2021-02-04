@@ -66,7 +66,7 @@ body .ui-datatable.table-paymentoptions .ui-datatable-data > tr > td.ui-selectio
 }
 body .ui-inputfield.otpInputText{
     font-size: x-large;
-/*    letter-spacing: 1em;*/
+    /*    letter-spacing: 1em;*/
     text-align: center;
     text-shadow: 0 0 black;
 }
@@ -126,4 +126,9 @@ body .ui-panel .ui-panel-content div span img{
 }
 .ui-datatable.table-channeloptions tbody.ui-datatable-data > tr > td:last-child {
     padding-top: 0;    
+}
+@media screen and (min-width: 1200px){
+    .ui-sidebar-right {
+        width: 30em;
+    }
 }

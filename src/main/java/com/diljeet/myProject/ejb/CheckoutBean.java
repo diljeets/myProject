@@ -185,7 +185,9 @@ public class CheckoutBean {
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(otp, MediaType.APPLICATION_JSON), Response.class);
             String resultMsg = response.getHeaderString("resultMsg");
-            if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/select-payment-option.xhtml");
+            } else if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
                 msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }

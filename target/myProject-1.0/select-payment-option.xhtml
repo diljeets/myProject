@@ -17,9 +17,9 @@
                     <div class="p-col-12 p-md-10 p-lg-9 p-xl-9">
                         <h3>Select Payment Method</h3>
                         <h:form id="form-payment-options">    
-                            <p:messages id="messages" showDetail="true" closable="true" showSummary="false">
-                                <p:autoUpdate/>
-                            </p:messages> 
+                            <p:messages id="form-payment-options-msgs" showDetail="true" showSummary="false" closable="true">
+                                <p:autoUpdate disabled="true"/>
+                            </p:messages>                             
                             <p>             
                                 <p:dataTable id="datatable-paymentoptions"
                                              class="table-paymentoptions"                                    
@@ -29,77 +29,11 @@
                                              rowKey="#{paymentOption.paymentMode}"
                                              rendered="#{checkoutController.paymentOptions.size() > 0}"
                                              summary="List of Payment Methods">  
-                                    <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,paytm,creditcard,debitcard,netbanking" update="@this,paytm,creditcard,debitcard,netbanking"/>
-                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,paytm,creditcard,debitcard,netbanking" update="@this,paytm,creditcard,debitcard,netbanking"/>                          
+                                    <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking"/>
+                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking"/>                          
                                     <p:column selectionMode="single"/>                              
                                     <p:column>
                                         <h:outputText value="#{paymentOption.displayName}"/>      
-
-                                        <p:panel id="paytm" 
-                                                 rendered="#{checkoutController.isModePaytm}"
-                                                 style="border:none;"> 
-                                            <p:panel rendered="#{paymentOption.paymentMode eq 'BALANCE'}" style="border:none;">
-
-                                                <p:panel id="panelSendOtp" widgetVar="panelSendOtp">
-                                                    <h:form id="paytmForm">
-                                                        <div class="ui-fluid p-formgrid p-grid p-mt-4">
-                                                            <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-3">
-                                                                <p:outputLabel for="paytm-mobile" value="Paytm Mobile"/>
-                                                                <span class="ui-fluid p-formgrid p-grid p-mt-2">
-                                                                    <span class="p-field p-col-12">
-                                                                        <div class="ui-inputgroup">
-                                                                            <span class="ui-inputgroup-addon">+91</span>
-                                                                            <p:inputText id="paytm-mobile" value="#{checkoutController.paytmMobile}" maxlength="10" placeholder="Enter Mobile No." validator="#{checkoutController.validatePaytmMobileNumber}">
-                                                                                <p:ajax/>
-                                                                            </p:inputText>
-
-                                                                        </div>
-                                                                    </span>
-                                                                    <span class="p-field p-col-12">
-                                                                        <p:commandButton value="Send OTP" actionListener="#{checkoutController.sendOTP(checkoutController.paytmMobile)}" onclick="PF('progressPanel').show();PF('sendOtpBtn').disable();" oncomplete="PF('progressPanel').close();PF('sendOtpBtn').enable();PF('panelEnterOtp').show();PF('panelSendOtp').close();" process="paytmForm" update="paytmForm" widgetVar="sendOtpBtn"/>
-                                                                    </span>
-                                                                </span>
-                                                            </span>                                                        
-                                                        </div>    
-                                                    </h:form>
-                                                </p:panel> 
-
-                                                <p:panel id="panelEnterOtp" visible="false" widgetVar="panelEnterOtp">
-                                                    <div class="ui-fluid p-formgrid p-grid p-mt-4">
-                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-3">
-                                                            <p:outputLabel for="enter-otp" value="Enter OTP"/>
-                                                            <span class="ui-fluid p-formgrid p-grid p-mt-2">
-                                                                <span class="p-field p-col-12">
-                                                                    <p:inputText class="otpInputText" id="enter-otp" value="#{checkoutController.otp}" maxlength="6"/>    
-
-                                                                </span>
-                                                                <span class="p-field p-col-12">
-                                                                    <p:commandButton value="Submit" actionListener="#{checkoutController.validateOtpAndFetchPaytmBalance(checkoutController.otp)}" onclick="PF('progressPanel').show();PF('enterOtpBtn').disable();" oncomplete="PF('progressPanel').close();PF('enterOtpBtn').enable();" onsuccess="PF('panelEnterOtp').close();PF('panelPaytmBalance').show();" widgetVar="enterOtpBtn" update="panelPayChannelOptionPaytmBalance"/>
-                                                                </span>
-                                                            </span>
-                                                        </span>
-                                                    </div>                                                                
-                                                </p:panel>
-                                                <p:panel visible="false" widgetVar="panelPaytmBalance">
-                                                    <div class="ui-fluid p-formgrid p-grid p-mt-4">
-                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-12">
-                                                            <p:panel id="panelPayChannelOptionPaytmBalance">
-                                                                <p:repeat value="#{checkoutController.payChannelOptionsPaytmBalance}" var="payChannelOptionPaytmBalance">
-                                                                    <p:panel rendered="#{payChannelOptionPaytmBalance.displayName eq 'Paytm Wallet'}">
-                                                                        <span class="p-grid p-align-center">
-                                                                            <p:graphicImage url="#{payChannelOptionPaytmBalance.imageUrl}" width="50px" height="50px"/>
-                                                                            <h:outputText styleClass="p-ml-2" value="#{payChannelOptionPaytmBalance.displayName} #{payChannelOptionPaytmBalance.balance}"/>                                      
-                                                                        </span>
-                                                                    </p:panel>
-                                                                </p:repeat>
-                                                            </p:panel>     
-                                                        </span>
-                                                    </div>                                                      
-                                                </p:panel> 
-                                                <!--                                                </h:form>-->
-                                            </p:panel>                                 
-                                        </p:panel>
-
                                         <p:panel id="creditcard" 
                                                  rendered="#{checkoutController.isModeCC}"
                                                  style="border:none;">
@@ -121,7 +55,7 @@
                                                                     <p:inputText id="ccNumber" value="#{checkoutController.ccNumber}" maxlength="16" required="true" requiredMessage="Please enter Credit Card Number" validator="#{checkoutController.validateCardNumber}" placeholder="16-digit Card Number">
 
                                                                         <!--                                                                        <f:validateRegex pattern="[0-9]+"/>      -->                                                                        
-                                                                        <p:ajax event="blur" listener="#{checkoutController.fetchBinDetails}" oncomplete="PF('panelCCDetails').show();" process="@this,ccIcon,ccIssuingBank" update="ccIcon,ccIssuingBank"/>
+                                                                        <p:ajax event="blur" listener="#{checkoutController.fetchBinDetails}" oncomplete="PF('panelCCDetails').show();" process="@this,ccIcon,ccIssuingBank" update="ccIcon,ccIssuingBank,:form-payment-options:form-payment-options-msgs"/>
                                                                     </p:inputText>
                                                                     <p:graphicImage class="cardIcon" id="ccIcon" value="#{checkoutController.cardIconUrl}"/>
                                                                 </span>
@@ -134,7 +68,7 @@
                                                                 <span class="p-field p-col-5 p-sm-5 p-md-4 p-lg-5 p-xl-5">
                                                                     <p:inputText id="ccExpiryMonth" value="#{checkoutController.ccExpiryMonth}" maxlength="2" required="true" requiredMessage="Please enter Card Expiry Month" validator="#{checkoutController.validateExpiryMonth}" placeholder="e.g 01">
                                                                         <!--                                                                        <f:validateRegex pattern="[0-9]+"/>-->
-                                                                        <p:ajax/> 
+                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/> 
                                                                     </p:inputText>
                                                                 </span>
                                                                 <span class="p-field p-col-2 p-sm-1 p-md-1 p-lg-1 p-xl-1 p-text-center">
@@ -143,7 +77,7 @@
                                                                 <span class="p-field p-col-5 p-sm-5 p-md-4 p-lg-6 p-xl-6">
                                                                     <p:inputText id="ccExpiryYear" value="#{checkoutController.ccExpiryYear}" maxlength="4" required="true" requiredMessage="Please enter Card Expiry Year" validator="#{checkoutController.validateExpiryYear}" placeholder="e.g 2050">
                                                                         <!--                                                                        <f:validateRegex pattern="[0-9]+"/> -->
-                                                                        <p:ajax/> 
+                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/> 
                                                                     </p:inputText>
                                                                 </span>
                                                             </span>                                                        
@@ -155,7 +89,7 @@
                                                                 <span class="p-field p-col-12 p-sm-5 p-md-4 p-lg-5 p-xl-4">
                                                                     <p:password id="ccCvv" value="#{checkoutController.ccCvv}" maxlength="3" required="true" requiredMessage="Please enter Card CVV number" validator="#{checkoutController.validateCvv}" placeholder="e.g 123">
                                                                         <!--                                                                        <f:validateRegex pattern="[0-9]+"/>-->
-                                                                        <p:ajax/>                                                                  
+                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/>                                                                  
                                                                     </p:password>
                                                                 </span>
                                                             </span>
@@ -194,7 +128,7 @@
                                                                     <p:inputText id="dcNumber" value="#{checkoutController.dcNumber}" maxlength="16" required="true" requiredMessage="Please enter Debit Card Number" validator="#{checkoutController.validateCardNumber}" placeholder="16-digit Card Number">
 
                                                                         <!--                                                                        <f:validateRegex pattern="[0-9]+"/>      -->                                                                        
-                                                                        <p:ajax event="blur" listener="#{checkoutController.fetchBinDetails}" oncomplete="PF('panelDCDetails').show();"  process="@this,dcIcon,dcIssuingBank" update="dcIcon,dcIssuingBank"/>
+                                                                        <p:ajax event="blur" listener="#{checkoutController.fetchBinDetails}" oncomplete="PF('panelDCDetails').show();"  process="@this,dcIcon,dcIssuingBank" update="dcIcon,dcIssuingBank,:form-payment-options:form-payment-options-msgs"/>
                                                                     </p:inputText>
                                                                     <p:graphicImage class="cardIcon" id="dcIcon" value="#{checkoutController.cardIconUrl}"/>
                                                                 </span>
@@ -207,7 +141,7 @@
                                                                 <span class="p-field p-col-5 p-sm-5 p-md-4 p-lg-5 p-xl-5">
                                                                     <p:inputText id="dcExpiryMonth" value="#{checkoutController.dcExpiryMonth}" maxlength="2" required="true" requiredMessage="Please enter Card Expiry Month" validator="#{checkoutController.validateExpiryMonth}" placeholder="e.g 01">
                                                                         <!--                                                                        <f:validateRegex pattern="[0-9]+"/>-->
-                                                                        <p:ajax/> 
+                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/> 
                                                                     </p:inputText>
                                                                 </span>
                                                                 <span class="p-field p-col-2 p-sm-1 p-md-1 p-lg-1 p-xl-1 p-text-center">
@@ -216,7 +150,7 @@
                                                                 <span class="p-field p-col-5 p-sm-5 p-md-4 p-lg-6 p-xl-6">
                                                                     <p:inputText id="dcExpiryYear" value="#{checkoutController.dcExpiryYear}" maxlength="4" required="true" requiredMessage="Please enter Card Expiry Year" validator="#{checkoutController.validateExpiryYear}" placeholder="e.g 2050">
                                                                         <!--                                                                        <f:validateRegex pattern="[0-9]+"/> -->
-                                                                        <p:ajax/> 
+                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/> 
                                                                     </p:inputText>
                                                                 </span>
                                                             </span>                                                        
@@ -228,7 +162,7 @@
                                                                 <span class="p-field p-col-12 p-sm-5 p-md-4 p-lg-5 p-xl-4">
                                                                     <p:password id="dcCvv" value="#{checkoutController.dcCvv}" maxlength="3" required="true" requiredMessage="Please enter Card CVV number" validator="#{checkoutController.validateCvv}" placeholder="e.g 123">
                                                                         <!--                                                                        <f:validateRegex pattern="[0-9]+"/>-->
-                                                                        <p:ajax/>                                                                  
+                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/>                                                                  
                                                                     </p:password>
                                                                 </span>
                                                             </span>
@@ -279,12 +213,64 @@
                                     </p:column>
                                     <f:facet name="footer"> 
                                         <div class="reviewAndPlaceOrderBtn">
-                                            <p:commandButton actionListener="#{checkoutController.processTransaction(checkoutController.paymentMode)}" value="Review and Place Order" onclick="PF('progressPanel').show();PF('reviewAndPlaceOrderBtn').disable();" oncomplete="PF('progressPanel').close();PF('reviewAndPlaceOrderBtn').enable();" widgetVar="reviewAndPlaceOrderBtn"/>
+                                            <p:commandButton actionListener="#{checkoutController.processTransaction(checkoutController.paymentMode)}" value="Review and Place Order" onclick="PF('progressPanel').show();PF('reviewAndPlaceOrderBtn').disable();" oncomplete="PF('progressPanel').close();PF('reviewAndPlaceOrderBtn').enable();" widgetVar="reviewAndPlaceOrderBtn" update=":form-payment-options:form-payment-options-msgs"/>
                                         </div>
                                     </f:facet>                                           
                                 </p:dataTable>
-                            </p>                       
-                        </h:form>   
+                            </p> 
+                        </h:form>  
+                        <h:form id="paytmSidebarForm">                            
+                            <p:sidebar visible="false" widgetVar="paytmSidebar" position="right" baseZIndex="10000">   
+                                <p:panel widgetVar="progressPanelPaytmSidebarForm"
+                                         visible="false"
+                                         style="border:none;"
+                                         closable="true"
+                                         toggleable="true">
+                                    <p:progressBar mode="indeterminate"/>
+                                </p:panel>
+                                <p:messages id="paytmSidebarMsgs" showDetail="true" showSummary="false" closable="true" styleClass="p-mt-6">
+                                    <p:autoUpdate disabled="true"/>
+                                </p:messages>
+                                <!--                                <p:message id="msg-mobile" for="paytm-mobile"/>-->
+                                <p:panel widgetVar="panelSendOtp" styleClass="p-mt-4">
+                                    <div class="ui-fluid p-formgrid p-grid">
+                                        <span class="p-col">                                        
+                                            <p:outputLabel for="paytm-mobile" value="Paytm Mobile"/>
+                                            <span class="ui-fluid p-formgrid p-grid p-mt-2">
+                                                <span class="p-field p-col-12">
+                                                    <div class="ui-inputgroup">
+                                                        <span class="ui-inputgroup-addon">+91</span>
+                                                        <p:inputText id="paytm-mobile" value="#{checkoutController.paytmMobile}" maxlength="10" placeholder="Enter Mobile No." validator="#{checkoutController.validatePaytmMobileNumber}">
+                                                            <p:ajax update="sendOtpBtn,:paytmSidebarForm:paytmSidebarMsgs"/>
+                                                        </p:inputText>
+
+                                                    </div>
+                                                </span>
+                                                <span class="p-field p-col-12">
+                                                    <p:commandButton id="sendOtpBtn" value="Send OTP" actionListener="#{checkoutController.sendOTP(checkoutController.paytmMobile)}" onclick="PF('progressPanelPaytmSidebarForm').show();PF('sendOtpBtn').disable();" oncomplete="PF('progressPanelPaytmSidebarForm').close();PF('sendOtpBtn').enable();" onsuccess="if (#{checkoutController.isValidPaytmMobile}){PF('panelSendOtp').close();PF('panelEnterOtp').show();}" widgetVar="sendOtpBtn" update=":paytmSidebarForm:paytmSidebarMsgs"/>
+                                                </span>
+                                            </span>
+                                        </span>                                                        
+                                    </div>
+                                </p:panel>
+                                <p:panel visible="false" widgetVar="panelEnterOtp" styleClass="p-mt-4">
+                                    <div class="ui-fluid p-formgrid p-grid">
+                                        <span class="p-col">
+                                            <p:outputLabel for="enter-otp" value="Enter OTP"/>
+                                            <span class="ui-fluid p-formgrid p-grid p-mt-2">
+                                                <span class="p-field p-col-12">
+                                                    <p:inputText class="otpInputText" id="enter-otp" value="#{checkoutController.otp}" maxlength="6"/>    
+
+                                                </span>
+                                                <span class="p-field p-col-12">
+                                                    <p:commandButton value="Submit" actionListener="#{checkoutController.validateOtpAndFetchPaytmBalance(checkoutController.otp)}" onclick="PF('progressPanelPaytmSidebarForm').show();PF('enterOtpBtn').disable();" oncomplete="PF('progressPanelPaytmSidebarForm').close();PF('enterOtpBtn').enable();"  widgetVar="enterOtpBtn" update=":paytmSidebarForm:paytmSidebarMsgs"/>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </div> 
+                                </p:panel>
+                            </p:sidebar>
+                        </h:form>
                     </div>
                 </div>
                 <h:outputStylesheet library="css" name="payment-gateway.css"/>
