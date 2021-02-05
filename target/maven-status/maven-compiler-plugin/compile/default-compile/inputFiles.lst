@@ -20,6 +20,7 @@
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/entities/Cart.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/DeliveryController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/interfaces/RegisteredUsersService.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/SavedInstruments.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/entities/RegisteredUsersAddress.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/CardDetails.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/MealPlanCategoryController.java

@@ -55,11 +55,13 @@ body .ui-datatable.table-paymentoptions .ui-datatable-data > tr{
     flex: 1;
     display: flex;    
 }*/
-body .ui-datatable.table-paymentoptions .ui-datatable-data > tr > td.ui-selection-column{ 
+body .ui-datatable.table-paymentoptions .ui-datatable-data > tr > td.ui-selection-column,
+body .ui-datatable.table-paytm-wallet .ui-datatable-data > tr > td.ui-selection-column{ 
     position: relative;
     width: 16px
 }
-body .ui-datatable.table-paymentoptions .ui-datatable-data > tr > td.ui-selection-column > div.ui-radiobutton{ 
+body .ui-datatable.table-paymentoptions .ui-datatable-data > tr > td.ui-selection-column > div.ui-radiobutton,
+body .ui-datatable.table-paytm-wallet .ui-datatable-data > tr > td.ui-selection-column > div.ui-radiobutton{ 
     position: absolute;
     top: 30px;
     right: 0;
@@ -70,6 +72,9 @@ body .ui-inputfield.otpInputText{
     text-align: center;
     text-shadow: 0 0 black;
 }
+body .ui-datatable.table-paymentoptions .ui-datatable-data > tr.donotRender:first-child{
+    display: none;
+}
 .ui-inputwrapper-filled{
     position: relative;
 }
@@ -77,7 +82,7 @@ body .ui-inputfield.otpInputText{
     width: 30px;
     position: absolute;
     right: 12px;
-    top: 2px;
+    bottom: 3px;
 }
 body .ui-panel .ui-panel-content div span img{
     width: 50px;

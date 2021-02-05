@@ -13,6 +13,7 @@ import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
+import com.diljeet.myProject.utils.SavedInstruments;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,6 +58,11 @@ public interface CheckoutService {
     @Path("fetchPayChannelOptionsPaytmBalance")
     @Produces({MediaType.APPLICATION_JSON})
     public List<PayChannelOptionsPaytmBalance> fetchPayChannelOptionsPaytmBalance();
+    
+    @GET
+    @Path("fetchSavedInstruments")
+    @Produces({MediaType.APPLICATION_JSON})
+    public List<SavedInstruments> fetchSavedInstruments();
 
     @GET
     @Path("fetchPayChannelOptionsNetBanking")

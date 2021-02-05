@@ -9,19 +9,29 @@ package com.diljeet.myProject.utils;
  *
  * @author diljeet
  */
-public class PayChannelOptionsPaytmBalance {    
-    
+public class PayChannelOptionsPaytmBalance {
+
+    private String paymentMode;
     private String balance;
-    private String displayName;        
+    private String displayName;
     private String imageUrl;
 
-    public PayChannelOptionsPaytmBalance(){        
+    public PayChannelOptionsPaytmBalance() {
     }
 
-    public PayChannelOptionsPaytmBalance(String balance, String displayName, String imageUrl) {
+    public PayChannelOptionsPaytmBalance(String paymentMode, String balance, String displayName, String imageUrl) {
+        this.paymentMode = paymentMode;
         this.balance = balance;
         this.displayName = displayName;
         this.imageUrl = imageUrl;
+    }
+
+    public String getPaymentMode() {
+        return paymentMode;
+    }
+
+    public void setPaymentMode(String paymentMode) {
+        this.paymentMode = paymentMode;
     }
 
     public String getBalance() {
@@ -48,6 +58,4 @@ public class PayChannelOptionsPaytmBalance {
         this.imageUrl = imageUrl;
     }
 
-    
-    
 }

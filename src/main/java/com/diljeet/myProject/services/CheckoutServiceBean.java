@@ -21,6 +21,7 @@ import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
+import com.diljeet.myProject.utils.SavedInstruments;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -114,6 +115,17 @@ public class CheckoutServiceBean implements CheckoutService {
             e.printStackTrace();
         }
         return payChannelOptionsPaytmBalance;
+    }
+
+    @Override
+    public List<SavedInstruments> fetchSavedInstruments() {
+        List<SavedInstruments> savedInstruments = null;
+        try {
+            savedInstruments = paymentGatewayBean.getSavedInstruments();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return savedInstruments;
     }
 
     @Override

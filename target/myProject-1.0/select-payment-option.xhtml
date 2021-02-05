@@ -20,7 +20,25 @@
                             <p:messages id="form-payment-options-msgs" showDetail="true" showSummary="false" closable="true">
                                 <p:autoUpdate disabled="true"/>
                             </p:messages>                             
-                            <p>             
+                            <p> 
+                                <p:dataTable id="datatable-paytm-wallet"
+                                             class="table-paytm-wallet"                                    
+                                             value="#{checkoutController.payChannelOptionsPaytmBalance}"        
+                                             var="payChannelOptionPaytmBalance"
+                                             selection="#{checkoutController.payChannelOptionPaytmBalance}"
+                                             rowKey="#{payChannelOptionPaytmBalance.paymentMode}"
+                                             rendered="#{checkoutController.payChannelOptionsPaytmBalance.size() > 0}"
+                                             rowStyleClass="#{payChannelOptionPaytmBalance.displayName eq 'Gift Voucher' ? 'ui-helper-hidden' : ''}"> 
+                                    <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPayChannelOptionsPaytmBalance}"/>
+                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPayChannelOptionsPaytmBalance}"/>  
+                                    <p:column selectionMode="single"/>                              
+                                    <p:column>
+                                        <span class="p-grid p-align-center">                                                                                  
+                                            <p:graphicImage url="#{payChannelOptionPaytmBalance.imageUrl}" width="40px"/>
+                                            <h:outputText styleClass="p-ml-2" value="#{payChannelOptionPaytmBalance.displayName} #{payChannelOptionPaytmBalance.balance}"/>                                         
+                                        </span>
+                                    </p:column>
+                                </p:dataTable>
                                 <p:dataTable id="datatable-paymentoptions"
                                              class="table-paymentoptions"                                    
                                              value="#{checkoutController.paymentOptions}"        
@@ -28,7 +46,8 @@
                                              selection="#{checkoutController.paymentOption}"
                                              rowKey="#{paymentOption.paymentMode}"
                                              rendered="#{checkoutController.paymentOptions.size() > 0}"
-                                             summary="List of Payment Methods">  
+                                             summary="List of Payment Methods"
+                                             rowStyleClass="#{checkoutController.payChannelOptionsPaytmBalance.size() > 0 ? 'donotRender' : ''}">  
                                     <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking"/>
                                     <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking"/>                          
                                     <p:column selectionMode="single"/>                              
@@ -43,58 +62,33 @@
                                                         <div class="p-grid">
                                                             <div class="p-col-12 p-mt-3 p-pb-0">
                                                                 <h:outputText class="p-mr-2" id="ccIssuingBank" value="#{checkoutController.issuingBank}"/>
-
                                                             </div>
                                                         </div>
                                                     </p:panel>
-                                                    <div class="ui-fluid p-formgrid p-grid p-mt-3">
-                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-3">
+                                                    <div class="ui-fluid p-formgrid p-grid">
+                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-6 p-xl-4 p-mt-3">
                                                             <p:outputLabel for="ccNumber" value="Credit Card Number"/>
-                                                            <span class="ui-fluid p-formgrid p-grid p-mt-1">
-                                                                <span class="p-field p-col-12 p-sm-12 p-md-12 p-lg-12 p-xl-12"> 
-                                                                    <p:inputText id="ccNumber" value="#{checkoutController.ccNumber}" maxlength="16" required="true" requiredMessage="Please enter Credit Card Number" validator="#{checkoutController.validateCardNumber}" placeholder="16-digit Card Number">
-
-                                                                        <!--                                                                        <f:validateRegex pattern="[0-9]+"/>      -->                                                                        
-                                                                        <p:ajax event="blur" listener="#{checkoutController.fetchBinDetails}" oncomplete="PF('panelCCDetails').show();" process="@this,ccIcon,ccIssuingBank" update="ccIcon,ccIssuingBank,:form-payment-options:form-payment-options-msgs"/>
-                                                                    </p:inputText>
-                                                                    <p:graphicImage class="cardIcon" id="ccIcon" value="#{checkoutController.cardIconUrl}"/>
-                                                                </span>
-                                                            </span>
+                                                            <p:inputMask id="ccNumber" value="#{checkoutController.maskedCCNumber}" required="true" requiredMessage="Please enter Credit Card Number" placeholder="16-digit Card Number" mask="9999-9999-9999-9999" validateMask="true" styleClass="p-mt-1">
+                                                                <p:ajax event="blur" listener="#{checkoutController.fetchBinDetails}" oncomplete="PF('panelCCDetails').show();" process="@this,ccIcon,ccIssuingBank" update="ccIcon,ccIssuingBank,:form-payment-options:form-payment-options-msgs"/>
+                                                            </p:inputMask>
+                                                            <p:graphicImage class="cardIcon" id="ccIcon" value="#{checkoutController.cardIconUrl}"/>
                                                         </span>
 
-                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-3">
-                                                            <p:outputLabel for="ccExpiryMonth" value="Expiry Date"/> 
-                                                            <span class="ui-fluid p-formgrid p-grid p-align-center p-mt-1">  
-                                                                <span class="p-field p-col-5 p-sm-5 p-md-4 p-lg-5 p-xl-5">
-                                                                    <p:inputText id="ccExpiryMonth" value="#{checkoutController.ccExpiryMonth}" maxlength="2" required="true" requiredMessage="Please enter Card Expiry Month" validator="#{checkoutController.validateExpiryMonth}" placeholder="e.g 01">
-                                                                        <!--                                                                        <f:validateRegex pattern="[0-9]+"/>-->
-                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/> 
-                                                                    </p:inputText>
-                                                                </span>
-                                                                <span class="p-field p-col-2 p-sm-1 p-md-1 p-lg-1 p-xl-1 p-text-center">
-                                                                    <ui:fragment>/</ui:fragment>
-                                                                </span>
-                                                                <span class="p-field p-col-5 p-sm-5 p-md-4 p-lg-6 p-xl-6">
-                                                                    <p:inputText id="ccExpiryYear" value="#{checkoutController.ccExpiryYear}" maxlength="4" required="true" requiredMessage="Please enter Card Expiry Year" validator="#{checkoutController.validateExpiryYear}" placeholder="e.g 2050">
-                                                                        <!--                                                                        <f:validateRegex pattern="[0-9]+"/> -->
-                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/> 
-                                                                    </p:inputText>
-                                                                </span>
-                                                            </span>                                                        
+                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-2 p-mt-3">
+                                                            <p:outputLabel for="ccExpiryDate" value="Expiry Date"/> 
+                                                            <p:inputMask id="ccExpiryDate" value="#{checkoutController.maskedCCExpiryDate}" required="true" requiredMessage="Please enter Credit Card Expiry Month" placeholder="e.g 01/2050" mask="99/9999" validateMask="true" styleClass="p-mt-1">
+                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/> 
+                                                            </p:inputMask>                                                     
                                                         </span>
 
-                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-4">
+                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-2 p-xl-2 p-mt-3">
                                                             <p:outputLabel for="ccCvv" value="Cvv"/>  
-                                                            <span class="ui-fluid p-formgrid p-grid p-mt-1">  
-                                                                <span class="p-field p-col-12 p-sm-5 p-md-4 p-lg-5 p-xl-4">
-                                                                    <p:password id="ccCvv" value="#{checkoutController.ccCvv}" maxlength="3" required="true" requiredMessage="Please enter Card CVV number" validator="#{checkoutController.validateCvv}" placeholder="e.g 123">
-                                                                        <!--                                                                        <f:validateRegex pattern="[0-9]+"/>-->
-                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/>                                                                  
-                                                                    </p:password>
-                                                                </span>
-                                                            </span>
+                                                            <p:password id="ccCvv" value="#{checkoutController.ccCvv}" maxlength="3" required="true" requiredMessage="Please enter Card CVV number" validator="#{checkoutController.validateCvv}" placeholder="e.g 123" styleClass="p-mt-1">
+                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/> 
+                                                            </p:password>
                                                         </span> 
-                                                        <span class="p-col-12 p-md-12 p-lg-12">
+
+                                                        <span class="p-col-12 p-md-12 p-lg-12 p-mt-3">
                                                             <span class="p-grid p-m-0 p-align-center">
                                                                 <p:graphicImage name="visa.png" library="images"/>
                                                                 <p:graphicImage name="mastercard.png" library="images"/>
@@ -106,7 +100,6 @@
                                                 </h:form>
                                             </p:panel>                                                                    
                                         </p:panel>
-
 
                                         <p:panel id="debitcard" 
                                                  rendered="#{checkoutController.isModeDC}"
@@ -120,55 +113,30 @@
                                                             </div>
                                                         </div>
                                                     </p:panel>
-                                                    <div class="ui-fluid p-formgrid p-grid p-mt-3">
-                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-3">
+                                                    <div class="ui-fluid p-formgrid p-grid">
+                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-6 p-xl-4 p-mt-3">
                                                             <p:outputLabel for="dcNumber" value="Debit Card Number"/>
-                                                            <span class="ui-fluid p-formgrid p-grid p-mt-1">
-                                                                <span class="p-field p-col-12 p-sm-12 p-md-12 p-lg-12 p-xl-12">
-                                                                    <p:inputText id="dcNumber" value="#{checkoutController.dcNumber}" maxlength="16" required="true" requiredMessage="Please enter Debit Card Number" validator="#{checkoutController.validateCardNumber}" placeholder="16-digit Card Number">
-
-                                                                        <!--                                                                        <f:validateRegex pattern="[0-9]+"/>      -->                                                                        
-                                                                        <p:ajax event="blur" listener="#{checkoutController.fetchBinDetails}" oncomplete="PF('panelDCDetails').show();"  process="@this,dcIcon,dcIssuingBank" update="dcIcon,dcIssuingBank,:form-payment-options:form-payment-options-msgs"/>
-                                                                    </p:inputText>
-                                                                    <p:graphicImage class="cardIcon" id="dcIcon" value="#{checkoutController.cardIconUrl}"/>
-                                                                </span>
-                                                            </span>
+                                                            <p:inputMask id="dcNumber" value="#{checkoutController.maskedDCNumber}" required="true" requiredMessage="Please enter Debit Card Number" placeholder="16-digit Card Number" mask="9999-9999-9999-9999" validateMask="true" styleClass="p-mt-1">  
+                                                                <p:ajax event="blur" listener="#{checkoutController.fetchBinDetails}" oncomplete="PF('panelDCDetails').show();"  process="@this,dcIcon,dcIssuingBank" update="dcIcon,dcIssuingBank,:form-payment-options:form-payment-options-msgs"/>
+                                                            </p:inputMask>
+                                                            <p:graphicImage class="cardIcon" id="dcIcon" value="#{checkoutController.cardIconUrl}"/>
                                                         </span>
 
-                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-3">
-                                                            <p:outputLabel for="dcExpiryMonth" value="Expiry Date"/> 
-                                                            <span class="ui-fluid p-formgrid p-grid p-align-center p-mt-1">  
-                                                                <span class="p-field p-col-5 p-sm-5 p-md-4 p-lg-5 p-xl-5">
-                                                                    <p:inputText id="dcExpiryMonth" value="#{checkoutController.dcExpiryMonth}" maxlength="2" required="true" requiredMessage="Please enter Card Expiry Month" validator="#{checkoutController.validateExpiryMonth}" placeholder="e.g 01">
-                                                                        <!--                                                                        <f:validateRegex pattern="[0-9]+"/>-->
-                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/> 
-                                                                    </p:inputText>
-                                                                </span>
-                                                                <span class="p-field p-col-2 p-sm-1 p-md-1 p-lg-1 p-xl-1 p-text-center">
-                                                                    <ui:fragment>/</ui:fragment>
-                                                                </span>
-                                                                <span class="p-field p-col-5 p-sm-5 p-md-4 p-lg-6 p-xl-6">
-                                                                    <p:inputText id="dcExpiryYear" value="#{checkoutController.dcExpiryYear}" maxlength="4" required="true" requiredMessage="Please enter Card Expiry Year" validator="#{checkoutController.validateExpiryYear}" placeholder="e.g 2050">
-                                                                        <!--                                                                        <f:validateRegex pattern="[0-9]+"/> -->
-                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/> 
-                                                                    </p:inputText>
-                                                                </span>
-                                                            </span>                                                        
+                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-2 p-mt-3">
+                                                            <p:outputLabel for="dcExpiryDate" value="Expiry Date"/> 
+                                                            <p:inputMask id="dcExpiryDate" value="#{checkoutController.maskedDCExpiryDate}" required="true" requiredMessage="Please enter Debit Card Expiry Date" placeholder="e.g 01/2050" mask="99/9999" validateMask="true" styleClass="p-mt-1">
+                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/> 
+                                                            </p:inputMask>                                                        
                                                         </span>
 
-                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-4">
+                                                        <span class="p-col-12 p-sm-6 p-md-6 p-lg-2 p-xl-2 p-mt-3">
                                                             <p:outputLabel for="dcCvv" value="Cvv"/>  
-                                                            <span class="ui-fluid p-formgrid p-grid p-mt-1">  
-                                                                <span class="p-field p-col-12 p-sm-5 p-md-4 p-lg-5 p-xl-4">
-                                                                    <p:password id="dcCvv" value="#{checkoutController.dcCvv}" maxlength="3" required="true" requiredMessage="Please enter Card CVV number" validator="#{checkoutController.validateCvv}" placeholder="e.g 123">
-                                                                        <!--                                                                        <f:validateRegex pattern="[0-9]+"/>-->
-                                                                        <p:ajax update=":form-payment-options:form-payment-options-msgs"/>                                                                  
-                                                                    </p:password>
-                                                                </span>
-                                                            </span>
+                                                            <p:password id="dcCvv" value="#{checkoutController.dcCvv}" maxlength="3" required="true" requiredMessage="Please enter Card CVV number" validator="#{checkoutController.validateCvv}" placeholder="e.g 123" styleClass="p-mt-1">
+                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/>    
+                                                            </p:password>
                                                         </span> 
 
-                                                        <span class="p-col-12 p-md-12 p-lg-12">
+                                                        <span class="p-col-12 p-md-12 p-lg-12 p-mt-3">
                                                             <span class="p-grid p-m-0 p-align-center">
                                                                 <p:graphicImage name="visa.png" library="images"/>
                                                                 <p:graphicImage name="mastercard.png" library="images"/>
@@ -258,9 +226,8 @@
                                         <span class="p-col">
                                             <p:outputLabel for="enter-otp" value="Enter OTP"/>
                                             <span class="ui-fluid p-formgrid p-grid p-mt-2">
-                                                <span class="p-field p-col-12">
-                                                    <p:inputText class="otpInputText" id="enter-otp" value="#{checkoutController.otp}" maxlength="6"/>    
-
+                                                <span class="p-field p-col-12">                                                    
+                                                    <p:inputMask class="otpInputText" id="enter-otp" value="#{checkoutController.otp}" mask="9  9  9  9  9  9" validateMask="true"/>
                                                 </span>
                                                 <span class="p-field p-col-12">
                                                     <p:commandButton value="Submit" actionListener="#{checkoutController.validateOtpAndFetchPaytmBalance(checkoutController.otp)}" onclick="PF('progressPanelPaytmSidebarForm').show();PF('enterOtpBtn').disable();" oncomplete="PF('progressPanelPaytmSidebarForm').close();PF('enterOtpBtn').enable();"  widgetVar="enterOtpBtn" update=":paytmSidebarForm:paytmSidebarMsgs"/>

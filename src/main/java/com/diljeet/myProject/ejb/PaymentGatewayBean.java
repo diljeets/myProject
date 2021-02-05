@@ -11,6 +11,7 @@ import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
+import com.diljeet.myProject.utils.SavedInstruments;
 import com.paytm.pg.merchant.PaytmChecksum;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -56,6 +57,7 @@ public class PaymentGatewayBean {
     private String iconBaseUrl;
     private List<PaymentOptions> paymentOptions;
     private List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance;
+    private List<SavedInstruments> savedInstruments;
     private List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking;
     private List<CardDetails> cardDetails;
     private CustomerTransaction customerTransaction;
@@ -63,6 +65,7 @@ public class PaymentGatewayBean {
     public PaymentGatewayBean() {
         paymentOptions = new ArrayList<>();
         payChannelOptionsPaytmBalance = new ArrayList<>();
+        savedInstruments = new ArrayList<>();
         payChannelOptionsNetBanking = new ArrayList<>();
         cardDetails = new ArrayList<>();
     }
@@ -81,6 +84,14 @@ public class PaymentGatewayBean {
 
     public void setPayChannelOptionsPaytmBalance(List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance) {
         this.payChannelOptionsPaytmBalance = payChannelOptionsPaytmBalance;
+    }
+
+    public List<SavedInstruments> getSavedInstruments() {
+        return savedInstruments;
+    }
+
+    public void setSavedInstruments(List<SavedInstruments> savedInstruments) {
+        this.savedInstruments = savedInstruments;
     }
 
     public List<PayChannelOptionsNetBanking> getPayChannelOptionsNetBanking() {
@@ -116,6 +127,7 @@ public class PaymentGatewayBean {
 
         paymentOptions.clear();
         payChannelOptionsPaytmBalance.clear();
+        savedInstruments.clear();
         payChannelOptionsNetBanking.clear();
         cardDetails.clear();
         customerTransaction = null;
@@ -493,10 +505,12 @@ public class PaymentGatewayBean {
                             .build();
                 } else {
                     JSONObject merchantPayOptionObj = bodyObj.getJSONObject("merchantPayOption");
+                    //fetch balance in Paytm Wallet
                     JSONArray paymentModesJsonArray = merchantPayOptionObj.getJSONArray("paymentModes");
                     for (int i = 0; i < paymentModesJsonArray.length(); i++) {
                         JSONObject obj = paymentModesJsonArray.getJSONObject(i);
                         if ((obj.getString("paymentMode")).equals("BALANCE") && (obj.get("payChannelOptions") instanceof JSONArray)) {
+                            String paymentMode = obj.getString("paymentMode");
                             JSONArray payChannelOptionsJsonArray = (JSONArray) obj.get("payChannelOptions");
                             for (int j = 0; j < payChannelOptionsJsonArray.length(); j++) {
                                 JSONObject jsonObject = payChannelOptionsJsonArray.getJSONObject(j);
@@ -509,6 +523,7 @@ public class PaymentGatewayBean {
                                     String imageUrl = objsInSubWalletDetailsJsonArray.getString("imageUrl");
 
                                     payChannelOptionsPaytmBalance.add(new PayChannelOptionsPaytmBalance(
+                                            paymentMode,
                                             balance,
                                             displayName,
                                             imageUrl
@@ -516,6 +531,63 @@ public class PaymentGatewayBean {
                                 }
                             }
                         }
+                    }
+                    // fetch Saved Cards by user if any
+                    JSONArray instruments = merchantPayOptionObj.getJSONArray("savedInstruments");
+                    for (Object instrument : instruments){
+                        JSONObject savedCard = (JSONObject) instrument;
+                        //Misc Card Info
+                        String iconUrl = savedCard.getString("iconUrl");                        
+                        String issuingBank = savedCard.getString("issuingBank");                        
+                        String displayName = savedCard.getString("displayName");
+                        String priority = savedCard.getString("priority");
+//                        String paymentOfferDetails = (String) savedCard.get("paymentOfferDetails");
+//                        String savedCardEmisubventionDetail = (String) savedCard.get("savedCardEmisubventionDetail");
+                        String channelCode = savedCard.getString("channelCode");
+                        String channelName = savedCard.getString("channelName");
+                        boolean oneClickSupported = savedCard.getBoolean("oneClickSupported");
+                        boolean isEmiAvailable = savedCard.getBoolean("isEmiAvailable");
+                        boolean isHybridDisabled = savedCard.getBoolean("isHybridDisabled");
+                        boolean isEmiHybridDisabled = savedCard.getBoolean("isEmiHybridDisabled");
+                        //Auth Mode
+                        JSONArray authModes = savedCard.getJSONArray("authModes");
+                        String authMode = authModes.getString(0);
+                        //Card Details
+                        JSONObject savedCardDetails = savedCard.getJSONObject("cardDetails");
+                        String cardId = savedCardDetails.getString("cardId");
+                        String cardType = savedCardDetails.getString("cardType");
+                        String expiryDate = savedCardDetails.getString("expiryDate");
+                        String firstSixDigit = savedCardDetails.getString("firstSixDigit");
+                        String lastFourDigit = savedCardDetails.getString("lastFourDigit");
+                        String status = savedCardDetails.getString("status");
+                        String cvvLength = savedCardDetails.getString("cvvLength");
+                        boolean cvvRequired = savedCardDetails.getBoolean("cvvRequired");
+                        boolean indian = savedCardDetails.getBoolean("indian");
+                        
+                        savedInstruments.add(new SavedInstruments(
+                                iconUrl,
+                                issuingBank,
+                                displayName,
+                                priority,
+//                                paymentOfferDetails,
+//                                savedCardEmisubventionDetail,
+                                channelCode,
+                                channelName,
+                                oneClickSupported,
+                                isEmiAvailable,
+                                isHybridDisabled,
+                                isEmiHybridDisabled,
+                                authMode,
+                                cardId,
+                                cardType,
+                                expiryDate,
+                                firstSixDigit,
+                                lastFourDigit,
+                                status,
+                                cvvLength,
+                                cvvRequired,
+                                indian
+                        ));                        
                     }
                 }
             }

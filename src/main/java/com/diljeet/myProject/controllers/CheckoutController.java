@@ -61,14 +61,12 @@ public class CheckoutController implements Serializable {
     private String otp;
     private boolean isValidPaytmMobile;
     private boolean isModeCC;
-    private String ccNumber;
-    private String ccExpiryMonth;
-    private String ccExpiryYear;
+    private String maskedCCNumber;
+    private String maskedCCExpiryDate;
     private String ccCvv;
     private boolean isModeDC;
-    private String dcNumber;
-    private String dcExpiryMonth;
-    private String dcExpiryYear;
+    private String maskedDCNumber;
+    private String maskedDCExpiryDate;
     private String dcCvv;
     private boolean isCardValid;
     private String issuingBank;
@@ -212,28 +210,20 @@ public class CheckoutController implements Serializable {
         this.isModeCC = isModeCC;
     }
 
-    public String getCcNumber() {
-        return ccNumber;
+    public String getMaskedCCNumber() {
+        return maskedCCNumber;
     }
 
-    public void setCcNumber(String ccNumber) {
-        this.ccNumber = ccNumber;
+    public void setMaskedCCNumber(String maskedCCNumber) {
+        this.maskedCCNumber = maskedCCNumber;
     }
 
-    public String getCcExpiryMonth() {
-        return ccExpiryMonth;
+    public String getMaskedCCExpiryDate() {
+        return maskedCCExpiryDate;
     }
 
-    public void setCcExpiryMonth(String ccExpiryMonth) {
-        this.ccExpiryMonth = ccExpiryMonth;
-    }
-
-    public String getCcExpiryYear() {
-        return ccExpiryYear;
-    }
-
-    public void setCcExpiryYear(String ccExpiryYear) {
-        this.ccExpiryYear = ccExpiryYear;
+    public void setMaskedCCExpiryDate(String maskedCCExpiryDate) {
+        this.maskedCCExpiryDate = maskedCCExpiryDate;
     }
 
     public String getCcCvv() {
@@ -244,30 +234,22 @@ public class CheckoutController implements Serializable {
         this.ccCvv = ccCvv;
     }
 
-    public String getDcNumber() {
-        return dcNumber;
+    public String getMaskedDCNumber() {
+        return maskedDCNumber;
     }
 
-    public void setDcNumber(String dcNumber) {
-        this.dcNumber = dcNumber;
+    public void setMaskedDCNumber(String maskedDCNumber) {
+        this.maskedDCNumber = maskedDCNumber;
     }
 
-    public String getDcExpiryMonth() {
-        return dcExpiryMonth;
+    public String getMaskedDCExpiryDate() {
+        return maskedDCExpiryDate;
     }
 
-    public void setDcExpiryMonth(String dcExpiryMonth) {
-        this.dcExpiryMonth = dcExpiryMonth;
+    public void setMaskedDCExpiryDate(String maskedDCExpiryDate) {
+        this.maskedDCExpiryDate = maskedDCExpiryDate;
     }
-
-    public String getDcExpiryYear() {
-        return dcExpiryYear;
-    }
-
-    public void setDcExpiryYear(String dcExpiryYear) {
-        this.dcExpiryYear = dcExpiryYear;
-    }
-
+   
     public String getDcCvv() {
         return dcCvv;
     }
@@ -376,26 +358,35 @@ public class CheckoutController implements Serializable {
         checkoutBean.sendOTP(paytmMobile);
     }
 
-    public void validateOtpAndFetchPaytmBalance(String otp) {
-        checkoutBean.validateOtpAndFetchPaytmBalance(otp);
+    public void validateOtpAndFetchPaytmBalance(String maskedOtp) {
+        //Remove masking from maskedOtp and retrieve actual otp        
+        String[] otpArray = maskedOtp.split("  ");
+        StringBuilder otpBuilder = new StringBuilder();
+        for (String otpChar : otpArray) {
+            otpBuilder.append(otpChar);
+        }
+        String otpString = otpBuilder.toString();
+        checkoutBean.validateOtpAndFetchPaytmBalance(otpString);
     }
 
     public void processTransaction(String paymentMode) {
-        logger.log(Level.SEVERE, "checkout controller Payment mode is {0}", paymentMode);
+//        logger.log(Level.SEVERE, "checkout controller Payment mode is {0}", paymentMode);
         if (paymentMode.equals("BALANCE")) {
             checkoutBean.processTransaction(new PaymentRequestDetails(
                     paymentMode
             ));
-        } else if (paymentMode.equals("CREDIT_CARD")) {
-            String ccExpiryDate = ccExpiryMonth + ccExpiryYear;
+        } else if (paymentMode.equals("CREDIT_CARD")) {                       
+            String ccNumber = removeMaskingFromCardNumber(maskedCCNumber);            
+            String ccExpiryDate = removeMaskingFromCardExpiryDate(maskedCCExpiryDate);
             checkoutBean.processTransaction(new PaymentRequestDetails(
                     paymentMode,
                     ccNumber,
                     ccExpiryDate,
                     ccCvv
             ));
-        } else if (paymentMode.equals("DEBIT_CARD")) {
-            String dcExpiryDate = dcExpiryMonth + dcExpiryYear;
+        } else if (paymentMode.equals("DEBIT_CARD")) {                        
+            String dcNumber = removeMaskingFromCardNumber(maskedDCNumber);            
+            String dcExpiryDate = removeMaskingFromCardExpiryDate(maskedDCExpiryDate);
             checkoutBean.processTransaction(new PaymentRequestDetails(
                     paymentMode,
                     dcNumber,
@@ -438,9 +429,13 @@ public class CheckoutController implements Serializable {
         }
     }
 
+    public void onRowSelectPayChannelOptionsPaytmBalance(SelectEvent<PayChannelOptionsPaytmBalance> event) {        
+        paymentMode = event.getObject().getPaymentMode();
+    }
+    
     public void fetchBinDetails(AjaxBehaviorEvent event) {
-        String cardDigits = (String) ((UIOutput) event.getSource()).getValue();
-        logger.log(Level.SEVERE, "CC number is {0}", cardDigits);
+        String maskedCardNumber = (String) ((UIOutput) event.getSource()).getValue();              
+        String cardDigits = removeMaskingFromCardNumber(maskedCardNumber);         
         String firstSixCardDigits = cardDigits.substring(0, 6);
         if (firstSixCardDigits.length() == 6) {
             isCardValid = checkoutBean.fetchBinDetails(firstSixCardDigits);
@@ -462,6 +457,23 @@ public class CheckoutController implements Serializable {
         }
     }
 
+    public String removeMaskingFromCardNumber(String maskedNumber){             
+        String[] cardNumberArray = maskedNumber.split("-");
+        StringBuilder cardNumberBuilder = new StringBuilder();
+        for (String cardNumberStr : cardNumberArray) {
+            cardNumberBuilder.append(cardNumberStr);
+        }
+        return cardNumberBuilder.toString();
+    }
+    
+     public String removeMaskingFromCardExpiryDate(String maskedDate){         
+        String[] cardExpiryDateArray = maskedDate.split("/");
+        StringBuilder cardExpiryDateBuilder = new StringBuilder();
+        for (String cardExpiryDateStr : cardExpiryDateArray) {
+            cardExpiryDateBuilder.append(cardExpiryDateStr);
+        }
+        return cardExpiryDateBuilder.toString();
+    }
 //    public void fetchBinDetails(AjaxBehaviorEvent event) {
 //        String cardDigits = (String) ((UIOutput) event.getSource()).getValue();
 //        if (cardDigits.length() == 6) {
@@ -484,7 +496,7 @@ public class CheckoutController implements Serializable {
 //        }
 //    }
     public void validatePaytmMobileNumber(FacesContext context, UIComponent comp, String mobileNumber) {
-        isValidPaytmMobile = true;        
+        isValidPaytmMobile = true;
         Pattern pattern = Pattern.compile("[0-9]+");
         Matcher matcher = pattern.matcher(mobileNumber);
         boolean isMatched = matcher.matches();
@@ -494,16 +506,22 @@ public class CheckoutController implements Serializable {
                 FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid 10-digit Mobile Number");
                 context.addMessage(comp.getClientId(context), message);
                 isValidPaytmMobile = false;
-            } 
+            }
         } else {
             ((UIInput) comp).setValid(false);
             FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid Mobile Number");
-            context.addMessage(comp.getClientId(context), message); 
+            context.addMessage(comp.getClientId(context), message);
             isValidPaytmMobile = false;
-        }        
-        logger.log(Level.SEVERE, "isValidationFailed is {0}", Boolean.toString(isValidPaytmMobile));
+        }
     }
 
+//    public void validateEnterOtp(FacesContext context, UIComponent comp, String maskedOtp) {
+//        if (maskedOtp.length() < 6) {
+//            ((UIInput) comp).setValid(false);
+//            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid 6-digit OTP");
+//            context.addMessage(comp.getClientId(context), message);            
+//        }
+//    }
     public void validateCardNumber(FacesContext context, UIComponent comp, String cardNumber) {
         Pattern pattern = Pattern.compile("[0-9]+");
         Matcher matcher = pattern.matcher(cardNumber);

@@ -13,6 +13,7 @@ import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
 import com.diljeet.myProject.utils.RedirectForm;
+import com.diljeet.myProject.utils.SavedInstruments;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -135,6 +136,22 @@ public class CheckoutBean {
         return payChannelOptionsPaytmBalance;
     }
 
+    public List<SavedInstruments> fetchSavedInstruments() {
+        List<SavedInstruments> savedInstruments = null;
+        try {
+            savedInstruments = client.target("http://localhost:8080/myProject/webapi/Checkout/fetchSavedInstruments")
+                    .request(MediaType.APPLICATION_JSON)
+                    .header("Cookie", req.getHeader("Cookie"))
+                    .get(new GenericType<List<SavedInstruments>>() {
+                    });
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
+            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Saved Cards. Please try again.");
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        }
+        return savedInstruments;
+    }
+    
     public List<PayChannelOptionsNetBanking> fetchPayChannelOptionsNetBanking() {
         List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = null;
         try {
@@ -178,7 +195,7 @@ public class CheckoutBean {
     public void validateOtpAndFetchPaytmBalance(String otp) {
         if (otp == null) {
             return;
-        }
+        }                
         try {
             Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/validateOTP/fetchBalance")
                     .request(MediaType.APPLICATION_JSON)
@@ -236,16 +253,16 @@ public class CheckoutBean {
         }
         return cardDetails;
     }
-    
-    public void fetchOtherNetBankingPaymentChannels() {        
+
+    public void fetchOtherNetBankingPaymentChannels() {
         try {
             client.target("http://localhost:8080/myProject/webapi/Checkout/fetchOtherNetBankingPaymentChannels")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .get();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());            
-        }        
+            logger.log(Level.SEVERE, e.getMessage());
+        }
     }
 
     public void processTransaction(PaymentRequestDetails paymentRequestDetails) {
@@ -322,7 +339,7 @@ public class CheckoutBean {
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }
     }
-    
+
     public Response transactionStatus(String orderId) {
         Response response = null;
         try {
