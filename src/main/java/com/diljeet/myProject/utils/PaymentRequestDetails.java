@@ -11,9 +11,11 @@ package com.diljeet.myProject.utils;
  */
 public class PaymentRequestDetails {
     private String paymentMode;
+    private String cardId;
     private String cardNumber;
     private String expiryDate;
-    private String cvv;            
+    private String cvv;         
+    private String saveCard;  
     private String channelCode;  
 
     public PaymentRequestDetails(){        
@@ -28,11 +30,18 @@ public class PaymentRequestDetails {
         this.channelCode = channelCode;
     }
     
-    public PaymentRequestDetails(String paymentMode, String cardNumber, String expiryDate, String cvv) {
+     public PaymentRequestDetails(String paymentMode, String cardId, String cvv) {
+        this.paymentMode = paymentMode;
+        this.cardId = cardId;
+        this.cvv = cvv;
+    }
+     
+    public PaymentRequestDetails(String paymentMode, String cardNumber, String expiryDate, String cvv, String saveCard) {
         this.paymentMode = paymentMode;
         this.cardNumber = cardNumber;
         this.expiryDate = expiryDate;
         this.cvv = cvv;
+        this.saveCard = saveCard;
     }
 
     public String getPaymentMode() {
@@ -41,6 +50,14 @@ public class PaymentRequestDetails {
 
     public void setPaymentMode(String paymentMode) {
         this.paymentMode = paymentMode;
+    }
+
+    public String getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
     }
 
     public String getCardNumber() {
@@ -65,6 +82,14 @@ public class PaymentRequestDetails {
 
     public void setCvv(String cvv) {
         this.cvv = cvv;
+    }
+
+    public String getSaveCard() {
+        return saveCard;
+    }
+
+    public void setSaveCard(String saveCard) {
+        this.saveCard = saveCard;
     }
 
     public String getChannelCode() {

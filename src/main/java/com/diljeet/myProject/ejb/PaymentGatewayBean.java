@@ -124,7 +124,7 @@ public class PaymentGatewayBean {
         this.username = username;
         this.channelId = channelId;
         this.callbackUrl = callbackUrl;
-
+        logger.log(Level.SEVERE, "orderId in IT is {0}", orderId);
         paymentOptions.clear();
         payChannelOptionsPaytmBalance.clear();
         savedInstruments.clear();
@@ -534,11 +534,11 @@ public class PaymentGatewayBean {
                     }
                     // fetch Saved Cards by user if any
                     JSONArray instruments = merchantPayOptionObj.getJSONArray("savedInstruments");
-                    for (Object instrument : instruments){
+                    for (Object instrument : instruments) {
                         JSONObject savedCard = (JSONObject) instrument;
                         //Misc Card Info
-                        String iconUrl = savedCard.getString("iconUrl");                        
-                        String issuingBank = savedCard.getString("issuingBank");                        
+                        String iconUrl = savedCard.getString("iconUrl");
+                        String issuingBank = savedCard.getString("issuingBank");
                         String displayName = savedCard.getString("displayName");
                         String priority = savedCard.getString("priority");
 //                        String paymentOfferDetails = (String) savedCard.get("paymentOfferDetails");
@@ -563,14 +563,14 @@ public class PaymentGatewayBean {
                         String cvvLength = savedCardDetails.getString("cvvLength");
                         boolean cvvRequired = savedCardDetails.getBoolean("cvvRequired");
                         boolean indian = savedCardDetails.getBoolean("indian");
-                        
+
                         savedInstruments.add(new SavedInstruments(
                                 iconUrl,
                                 issuingBank,
                                 displayName,
                                 priority,
-//                                paymentOfferDetails,
-//                                savedCardEmisubventionDetail,
+                                //                                paymentOfferDetails,
+                                //                                savedCardEmisubventionDetail,
                                 channelCode,
                                 channelName,
                                 oneClickSupported,
@@ -587,7 +587,7 @@ public class PaymentGatewayBean {
                                 cvvLength,
                                 cvvRequired,
                                 indian
-                        ));                        
+                        ));
                     }
                 }
             }
@@ -697,7 +697,7 @@ public class PaymentGatewayBean {
     public void fetchOtherNetBankingPaymentChannels() {
         //Clear payChannelOptionsNetBanking List
         payChannelOptionsNetBanking.clear();
-        
+
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -749,7 +749,7 @@ public class PaymentGatewayBean {
                         boolean isChannelOptionHybridDisabled = bankObj.getBoolean("isHybridDisabled");
                         String channelName = bankObj.getString("channelName");
                         String iconUrl = iconBaseUrl + bankObj.getString("iconUrl");
-                        String channelCode = bankObj.getString("channelCode");                        
+                        String channelCode = bankObj.getString("channelCode");
                         payChannelOptionsNetBanking.add(new PayChannelOptionsNetBanking(
                                 isChannelOptionHybridDisabled,
                                 channelName,
@@ -767,7 +767,7 @@ public class PaymentGatewayBean {
 
     public Response processTransaction(PaymentRequestDetails paymentRequestDetails) {
         String paymentMode = paymentRequestDetails.getPaymentMode();
-
+//        logger.log(Level.SEVERE, "paymentMode in PT is {0}", paymentMode);
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -778,10 +778,16 @@ public class PaymentGatewayBean {
 //        body.put("authMode", "otp");
 //        body.put("walletType", "PAYTMPG");
         if (paymentMode.equals("CREDIT_CARD") || paymentMode.equals("DEBIT_CARD")) {
-            String cardInfo = "|" + paymentRequestDetails.getCardNumber() + "|" + paymentRequestDetails.getCvv() + "|" + paymentRequestDetails.getExpiryDate();
-//            logger.log(Level.SEVERE, "cardInfo is {0}", cardInfo);
+            String cardInfo;
+            if (paymentRequestDetails.getCardId() != null) {                
+                cardInfo = paymentRequestDetails.getCardId() + "||" + paymentRequestDetails.getCvv() + "|";
+            } else {
+                cardInfo = "|" + paymentRequestDetails.getCardNumber() + "|" + paymentRequestDetails.getCvv() + "|" + paymentRequestDetails.getExpiryDate();
+                body.put("storeInstrument", paymentRequestDetails.getSaveCard());
+                logger.log(Level.SEVERE, "storeInstrument {0}", paymentRequestDetails.getSaveCard());
+            }
+            logger.log(Level.SEVERE, "cardInfo is {0}", cardInfo);            
             body.put("cardInfo", cardInfo);
-//            body.put("storeInstrument", "1");
 //            body.put("cardInfo", "|4854980801319205|123|032022");
 //            body.put("cardInfo", "|4111111111111111|111|032032");
             body.put("authMode", "otp");
@@ -791,7 +797,7 @@ public class PaymentGatewayBean {
         }
         JSONObject head = new JSONObject();
         head.put("txnToken", transactionToken);
-
+        logger.log(Level.SEVERE, "paymentMode in body Object is {0}", body.getString("paymentMode"));
         paytmParams.put("body", body);
         paytmParams.put("head", head);
 
@@ -866,6 +872,7 @@ public class PaymentGatewayBean {
 //                String MID = txnInfoObj.getString("MID");
         String ORDERID = txnInfoObj.getString("ORDERID");
         String PAYMENTMODE = txnInfoObj.getString("PAYMENTMODE");
+        logger.log(Level.SEVERE, "PAYMENTMODE in getCustomerTransactionStatus is {0}", PAYMENTMODE);
         String RESPCODE = txnInfoObj.getString("RESPCODE");
         String RESPMSG = txnInfoObj.getString("RESPMSG");
 //                String STATUS = txnInfoObj.getString("STATUS");

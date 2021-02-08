@@ -36,7 +36,7 @@
                                             <h:outputText value="Quantity"/>
                                         </f:facet>
                                         <p:spinner min="1" max="999" maxlength="3" size="5" value="#{cartItem.mealPlanQuantity}">
-                                            <p:ajax listener="#{cartController.addToCart(cartItem)}" update="totalMealPlanRate" oncomplete="refreshFooter()"/>
+                                            <p:ajax listener="#{cartController.addToCart(cartItem)}" update="totalMealPlanRate,:navForm:itemCount" oncomplete="refreshFooter()"/>
                                         </p:spinner>
                                     </p:column> 
                                     <p:column>

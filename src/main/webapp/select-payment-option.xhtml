@@ -29,14 +29,45 @@
                                              rowKey="#{payChannelOptionPaytmBalance.paymentMode}"
                                              rendered="#{checkoutController.payChannelOptionsPaytmBalance.size() > 0}"
                                              rowStyleClass="#{payChannelOptionPaytmBalance.displayName eq 'Gift Voucher' ? 'ui-helper-hidden' : ''}"> 
-                                    <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPayChannelOptionsPaytmBalance}"/>
-                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPayChannelOptionsPaytmBalance}"/>  
+                                    <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPayChannelOptionsPaytmBalance}" update=":form-payment-options:datatable-paymentoptions:reviewAndPlaceOrderBtn"/>
+                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPayChannelOptionsPaytmBalance}" update=":form-payment-options:datatable-paymentoptions:reviewAndPlaceOrderBtn"/>  
                                     <p:column selectionMode="single"/>                              
                                     <p:column>
                                         <span class="p-grid p-align-center">                                                                                  
                                             <p:graphicImage url="#{payChannelOptionPaytmBalance.imageUrl}" width="40px"/>
                                             <h:outputText styleClass="p-ml-2" value="#{payChannelOptionPaytmBalance.displayName} #{payChannelOptionPaytmBalance.balance}"/>                                         
                                         </span>
+                                    </p:column>
+                                </p:dataTable>
+                                <p:dataTable id="datatable-saved-instruments"
+                                             class="table-saved-instruments"                                    
+                                             value="#{checkoutController.savedInstruments}"        
+                                             var="savedInstrument"
+                                             selection="#{checkoutController.savedInstrument}"
+                                             rowKey="#{savedInstrument.cardId}"
+                                             rendered="#{checkoutController.savedInstruments.size() > 0}" size="small"> 
+                                    <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectSavedInstruments}" update=":form-payment-options:datatable-paymentoptions:reviewAndPlaceOrderBtn"/>
+                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectSavedInstruments}" update=":form-payment-options:datatable-paymentoptions:reviewAndPlaceOrderBtn"/>
+                                    <p:column selectionMode="single"/>                              
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Card"/>
+                                        </f:facet> 
+                                        <h:outputText value="#{savedInstrument.displayName} starting with #{savedInstrument.firstSixDigit} ending in #{savedInstrument.lastFourDigit}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Expires on"/>
+                                        </f:facet> 
+                                        <h:outputText value="#{savedInstrument.expiryDate}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputText value="Cvv"/>
+                                        </f:facet> 
+                                        <p:password id="savedCardCvv" value="#{checkoutController.cardCvv}" maxlength="3" placeholder="e.g 123">
+                                            <p:ajax update="@this"/>
+                                        </p:password>
                                     </p:column>
                                 </p:dataTable>
                                 <p:dataTable id="datatable-paymentoptions"
@@ -48,8 +79,8 @@
                                              rendered="#{checkoutController.paymentOptions.size() > 0}"
                                              summary="List of Payment Methods"
                                              rowStyleClass="#{checkoutController.payChannelOptionsPaytmBalance.size() > 0 ? 'donotRender' : ''}">  
-                                    <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking"/>
-                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking"/>                          
+                                    <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking,reviewAndPlaceOrderBtn"/>
+                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking,reviewAndPlaceOrderBtn"/>                          
                                     <p:column selectionMode="single"/>                              
                                     <p:column>
                                         <h:outputText value="#{paymentOption.displayName}"/>      
@@ -88,6 +119,12 @@
                                                             </p:password>
                                                         </span> 
 
+                                                         <span class="p-col-12 p-mt-3">         
+                                                             <p:selectBooleanCheckbox value="#{checkoutController.saveCC}" itemLabel="Save Card for Future Payments">
+                                                                <p:ajax update="@this"/>
+                                                            </p:selectBooleanCheckbox>
+                                                        </span> 
+                                                        
                                                         <span class="p-col-12 p-md-12 p-lg-12 p-mt-3">
                                                             <span class="p-grid p-m-0 p-align-center">
                                                                 <p:graphicImage name="visa.png" library="images"/>
@@ -136,6 +173,12 @@
                                                             </p:password>
                                                         </span> 
 
+                                                        <span class="p-col-12 p-mt-3">         
+                                                            <p:selectBooleanCheckbox value="#{checkoutController.saveDC}" itemLabel="Save Card for Future Payments">
+                                                                <p:ajax update="@this"/>
+                                                            </p:selectBooleanCheckbox>
+                                                        </span> 
+
                                                         <span class="p-col-12 p-md-12 p-lg-12 p-mt-3">
                                                             <span class="p-grid p-m-0 p-align-center">
                                                                 <p:graphicImage name="visa.png" library="images"/>
@@ -181,7 +224,7 @@
                                     </p:column>
                                     <f:facet name="footer"> 
                                         <div class="reviewAndPlaceOrderBtn">
-                                            <p:commandButton actionListener="#{checkoutController.processTransaction(checkoutController.paymentMode)}" value="Review and Place Order" onclick="PF('progressPanel').show();PF('reviewAndPlaceOrderBtn').disable();" oncomplete="PF('progressPanel').close();PF('reviewAndPlaceOrderBtn').enable();" widgetVar="reviewAndPlaceOrderBtn" update=":form-payment-options:form-payment-options-msgs"/>
+                                            <p:commandButton id="reviewAndPlaceOrderBtn" actionListener="#{checkoutController.processTransaction(checkoutController.paymentMode)}" value="Review and Place Order" onclick="PF('progressPanel').show();PF('reviewAndPlaceOrderBtn').disable();" oncomplete="PF('progressPanel').close();PF('reviewAndPlaceOrderBtn').enable();" widgetVar="reviewAndPlaceOrderBtn" process="#{checkoutController.isPaymentThroughSavedCard eq true ? '@this,:form-payment-options:datatable-saved-instruments:savedCardCvv' : '@this'}" update=":form-payment-options:form-payment-options-msgs"/>
                                         </div>
                                     </f:facet>                                           
                                 </p:dataTable>

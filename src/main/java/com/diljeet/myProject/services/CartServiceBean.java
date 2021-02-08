@@ -71,7 +71,11 @@ public class CartServiceBean implements CartService {
 
     @Override
     public String itemsInCart() {
-        return Integer.toString(cartItems.size());
+        int items = 0;
+        for(Cart item : cartItems){
+            items = items + item.getMealPlanQuantity();
+        }
+        return Integer.toString(items);
     }
 
     @Override
