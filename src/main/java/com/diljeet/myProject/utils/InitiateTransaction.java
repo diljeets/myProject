@@ -12,14 +12,16 @@ package com.diljeet.myProject.utils;
 public class InitiateTransaction {
     
     private String payableAmount;
+    private String orderId;
     private String channelId;
     private String callbackUrl;
 
     public InitiateTransaction(){        
     }
     
-    public InitiateTransaction(String payableAmount, String channelId, String callbackUrl) {
+    public InitiateTransaction(String payableAmount, String orderId, String channelId, String callbackUrl) {
         this.payableAmount = payableAmount;
+        this.orderId = orderId;
         this.channelId = channelId;
         this.callbackUrl = callbackUrl;
     }
@@ -30,6 +32,14 @@ public class InitiateTransaction {
 
     public void setPayableAmount(String payableAmount) {
         this.payableAmount = payableAmount;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     public String getChannelId() {

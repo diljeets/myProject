@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -196,26 +197,121 @@ public class PaymentGatewayBean {
             InputStream is = connection.getInputStream();
             BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
             if ((responseData = responseReader.readLine()) != null) {
+                logger.log(Level.SEVERE, "initiateTransaction responseData is {0}", responseData);
                 JSONObject resObj = new JSONObject(responseData);
                 JSONObject bodyObj = resObj.getJSONObject("body");
-                //Get Transaction Token from body object and save in variable to be used in successive API calls
-                transactionToken = bodyObj.getString("txnToken");
                 //Get Result Info object from body Object
                 JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
                 String resultCode = resultInfoObj.getString("resultCode");
-                if (!resultCode.equals("0000")) {
-                    String resultMsg = resultInfoObj.getString("resultMsg");
+                if (resultCode.equals("0000") || resultCode.equals("0002")) {
+                    //Get Transaction Token from body object and save in variable to use in subsequent API calls
+                    transactionToken = bodyObj.getString("txnToken");
+                    //if success fetch Payment Options
+                    return fetchPaymentOptions(orderId);
+                } else if (resultCode.equals("2023")) {
+                    //if there is an update to existing orderId with no transaction in process for same orderId
+                    return updateTransaction(orderId,
+                            payableAmount,
+                            username);
+                } else if (resultCode.equals("1006")) {
+                    //if Session expires
                     return Response
-                            .status(Response.Status.NOT_ACCEPTABLE)
-                            .header("resultMsg", resultMsg)
+                            .status(Response.Status.GATEWAY_TIMEOUT)
                             .build();
                 } else {
-                    return fetchPaymentOptions(orderId);
+                    //if there is an error                    
+                    return Response
+                            .status(Response.Status.EXPECTATION_FAILED)
+                            .build();
                 }
             }
             responseReader.close();
         } catch (Exception exception) {
             exception.printStackTrace();
+        }
+        return null;
+    }
+
+    public Response updateTransaction(String orderId, String payableAmount, String username) {
+        JSONObject paytmParams = new JSONObject();
+        JSONObject body = new JSONObject();
+        JSONObject txnAmount = new JSONObject();
+
+        txnAmount.put("value", payableAmount);
+        txnAmount.put("currency", CURRENCY);
+        JSONObject userInfo = new JSONObject();
+        userInfo.put("custId", username);
+        body.put("txnAmount", txnAmount);
+        body.put("userInfo", userInfo);
+        /*
+    * Generate checksum by parameters we have in body
+    * You can get Checksum JAR from https://developer.paytm.com/docs/checksum/
+    * Find your Merchant Key in your Paytm Dashboard at https://dashboard.paytm.com/next/apikeys
+         */
+        String checksum = null;
+        try {
+            checksum = PaytmChecksum.generateSignature(body.toString(), MERCHANT_KEY);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        JSONObject head = new JSONObject();
+        head.put("txnToken", transactionToken);
+        head.put("signature", checksum);
+        paytmParams.put("body", body);
+        paytmParams.put("head", head);
+        String post_data = paytmParams.toString();
+
+        /* for Staging */
+        URL url = null;
+        try {
+            url = new URL("https://securegw-stage.paytm.in/theia/api/v1/updateTransactionDetail?mid=" + MID + "&orderId=" + orderId);
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
+        }
+
+        /* for Production */
+// URL url = new URL("https://securegw.paytm.in/theia/api/v1/updateTransactionDetail?mid=YOUR_MID_HERE&orderId=ORDERID_98765");
+        try {
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            DataOutputStream requestWriter = new DataOutputStream(connection.getOutputStream());
+            requestWriter.writeBytes(post_data);
+            requestWriter.close();
+            String responseData = "";
+            InputStream is = connection.getInputStream();
+            BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
+            if ((responseData = responseReader.readLine()) != null) {
+                logger.log(Level.SEVERE, "updateTransaction response is {0}", responseData);
+                JSONObject resObj = new JSONObject(responseData);
+                JSONObject bodyObj = resObj.getJSONObject("body");
+                //Get Result Info object from body Object
+                JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
+                String resultCode = resultInfoObj.getString("resultCode");
+                if (resultCode.equals("0000")) {
+                    //if success fetch Payment Options
+                    return fetchPaymentOptions(orderId);
+                } else if (resultCode.equals("1111")) {
+                    //if there is an update to existing orderId but transaction already in process for same orderId
+                    return Response
+                            .status(Response.Status.NOT_ACCEPTABLE)
+                            .build();
+                } else if (resultCode.equals("1006")) {
+                    //if Session expires
+                    return Response
+                            .status(Response.Status.GATEWAY_TIMEOUT)
+                            .build();
+                } else {
+                    //if there is an error                    
+                    return Response
+                            .status(Response.Status.EXPECTATION_FAILED)
+                            .build();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
@@ -265,13 +361,7 @@ public class PaymentGatewayBean {
                 iconBaseUrl = bodyObj.getString("iconBaseUrl");
                 JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
                 String resultCode = resultInfoObj.getString("resultCode");
-                if (!resultCode.equals("0000")) {
-                    String resultMsg = resultInfoObj.getString("resultMsg");
-                    return Response
-                            .status(Response.Status.NOT_ACCEPTABLE)
-                            .header("resultMsg", resultMsg)
-                            .build();
-                } else {
+                if (resultCode.equals("0000")) {
                     JSONObject merchantPayOptionObj = bodyObj.getJSONObject("merchantPayOption");
                     JSONArray paymentModesJsonArray = merchantPayOptionObj.getJSONArray("paymentModes");
                     for (int i = 0; i < paymentModesJsonArray.length(); i++) {
@@ -316,6 +406,20 @@ public class PaymentGatewayBean {
                             ));
                         }
                     }
+                    paymentOptions.add(new PaymentOptions(
+                            "POD",
+                            "Cash on Delivery"
+                    ));
+                } else if (resultCode.equals("1006")) {
+                    //if Session expires
+                    return Response
+                            .status(Response.Status.GATEWAY_TIMEOUT)
+                            .build();
+                } else {
+                    //if there is an error
+                    return Response
+                            .status(Response.Status.EXPECTATION_FAILED)
+                            .build();
                 }
             }
             responseReader.close();
@@ -779,14 +883,14 @@ public class PaymentGatewayBean {
 //        body.put("walletType", "PAYTMPG");
         if (paymentMode.equals("CREDIT_CARD") || paymentMode.equals("DEBIT_CARD")) {
             String cardInfo;
-            if (paymentRequestDetails.getCardId() != null) {                
+            if (paymentRequestDetails.getCardId() != null) {
                 cardInfo = paymentRequestDetails.getCardId() + "||" + paymentRequestDetails.getCvv() + "|";
             } else {
                 cardInfo = "|" + paymentRequestDetails.getCardNumber() + "|" + paymentRequestDetails.getCvv() + "|" + paymentRequestDetails.getExpiryDate();
                 body.put("storeInstrument", paymentRequestDetails.getSaveCard());
                 logger.log(Level.SEVERE, "storeInstrument {0}", paymentRequestDetails.getSaveCard());
             }
-            logger.log(Level.SEVERE, "cardInfo is {0}", cardInfo);            
+            logger.log(Level.SEVERE, "cardInfo is {0}", cardInfo);
             body.put("cardInfo", cardInfo);
 //            body.put("cardInfo", "|4854980801319205|123|032022");
 //            body.put("cardInfo", "|4111111111111111|111|032032");
@@ -841,11 +945,11 @@ public class PaymentGatewayBean {
                             .build();
                 } else {
                     if (paymentMode.equals("BALANCE")) {
-//                        String callBackUrl = bodyObj.getString("callBackUrl");
+                        String callBackUrl = bodyObj.getString("callBackUrl");
                         JSONObject txnInfoObj = bodyObj.getJSONObject("txnInfo");
                         getCustomerTransactionStatus(txnInfoObj.toString());
                         return Response
-                                .ok()
+                                .temporaryRedirect(URI.create(callBackUrl))
                                 .build();
                     }
                     if (paymentMode.equals("CREDIT_CARD") || paymentMode.equals("DEBIT_CARD") || paymentMode.equals("NET_BANKING")) {

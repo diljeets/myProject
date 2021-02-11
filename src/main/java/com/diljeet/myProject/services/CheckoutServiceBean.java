@@ -60,7 +60,6 @@ public class CheckoutServiceBean implements CheckoutService {
     TemplateController templateController;
 
 //    private String deliveryTime;
-
     public CheckoutServiceBean() {
     }
 
@@ -78,10 +77,15 @@ public class CheckoutServiceBean implements CheckoutService {
 //        logger.log(Level.SEVERE, "getDeliveryTime service bean {0}", deliveryTime);
 //        return Response.ok().entity(deliveryTime).build();
 //    }
+    @Override
+    public String createOrderId() {
+        return MyProjectUtils.createOrderId();
+    }
 
     @Override
     public Response initiateTransaction(InitiateTransaction initiateTransaction) {
-        String orderId = MyProjectUtils.createOrderId();
+        String orderId = initiateTransaction.getOrderId();
+        logger.log(Level.SEVERE, "initiateTransaction orderId is {0}", orderId);
         String username = req.getUserPrincipal().getName();
         String payableAmount = initiateTransaction.getPayableAmount();
         String channelId = initiateTransaction.getChannelId();
@@ -191,7 +195,7 @@ public class CheckoutServiceBean implements CheckoutService {
             e.printStackTrace();
         }
     }
-    
+
     @Override
     public Response processTransaction(PaymentRequestDetails paymentRequestDetails) {
         Response response = null;
@@ -258,8 +262,8 @@ public class CheckoutServiceBean implements CheckoutService {
     }
 
     @Override
-    public Response placeOrder(CustomerOrder customerOrder) {
-        String orderId = customerOrder.getCustomerTransaction().getOrderId();
+    public Response placeOrder(CustomerOrder customerOrder) {        
+//        String orderId = customerOrder.getCustomerTransaction().getOrderId();
 //        String payableAmount = customerOrder.getPayableAmount();
         String customerName = templateController.getCurrentCustomer();
         String username = req.getUserPrincipal().getName();
@@ -268,7 +272,7 @@ public class CheckoutServiceBean implements CheckoutService {
             customerOrder.setCustomerName(customerName);
             customerOrder.setUsername(username);
             customerOrder.setDateOrderCreated(new Date());
-            customerOrder.setOrderId(orderId);
+//            customerOrder.setOrderId(orderId);
             List<Cart> cartItems = customerOrder.getOrders();
             for (Cart cartItem : cartItems) {
                 cartItem.setCustomerOrder(customerOrder);
@@ -276,8 +280,8 @@ public class CheckoutServiceBean implements CheckoutService {
             em.persist(customerOrder);
         } catch (Exception e) {
             e.printStackTrace();
-        } 
-        
+        }
+
         return Response.ok().build();
     }
 

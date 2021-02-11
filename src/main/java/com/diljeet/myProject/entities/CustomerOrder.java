@@ -53,6 +53,8 @@ public class CustomerOrder implements Serializable {
     private String deliveryAddress;
 
     private String payableAmount;
+    
+    private String paymentMode;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateOrderCreated;
@@ -68,15 +70,33 @@ public class CustomerOrder implements Serializable {
     public CustomerOrder() {
     }
 
-    public CustomerOrder(String deliveryTime,
+    public CustomerOrder(String orderId,
+            String deliveryTime,
             String deliveryAddress,
+            String paymentMode,
             List<Cart> cartItems,
-            String payableAmount,
-            CustomerTransaction customerTransaction) {
+            String payableAmount) {
+        this.orderId = orderId;
         this.deliveryTime = deliveryTime;
         this.deliveryAddress = deliveryAddress;
+        this.paymentMode = paymentMode;
         this.orders = cartItems;
-        this.payableAmount = payableAmount;
+        this.payableAmount = payableAmount;        
+    }
+    
+    public CustomerOrder(String orderId,
+            String deliveryTime,
+            String deliveryAddress,
+            String paymentMode,
+            List<Cart> cartItems,
+            String payableAmount,            
+            CustomerTransaction customerTransaction) {
+        this.orderId = orderId;
+        this.deliveryTime = deliveryTime;
+        this.deliveryAddress = deliveryAddress;
+        this.paymentMode = paymentMode;
+        this.orders = cartItems;
+        this.payableAmount = payableAmount;        
         this.customerTransaction = customerTransaction;
     }
 
@@ -134,6 +154,14 @@ public class CustomerOrder implements Serializable {
 
     public void setPayableAmount(String payableAmount) {
         this.payableAmount = payableAmount;
+    }
+
+    public String getPaymentMode() {
+        return paymentMode;
+    }
+
+    public void setPaymentMode(String paymentMode) {
+        this.paymentMode = paymentMode;
     }
 
     public Date getDateOrderCreated() {

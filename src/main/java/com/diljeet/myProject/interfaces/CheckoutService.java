@@ -43,6 +43,11 @@ public interface CheckoutService {
 //    @Path("getDeliveryTime")
 //    @Produces({MediaType.APPLICATION_JSON})
 //    public Response getDeliveryTime();
+    
+    @GET
+    @Path("createOrderId")
+    @Produces({MediaType.APPLICATION_JSON})
+    public String createOrderId();
 
     @POST
     @Path("initiateTransaction")

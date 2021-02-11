@@ -20,6 +20,11 @@ public class PaymentOptions {
     public PaymentOptions() {
     }
 
+    public PaymentOptions(String paymentMode, String displayName) {
+        this.paymentMode = paymentMode;
+        this.displayName = displayName;
+    }
+
     public PaymentOptions(String paymentMode, String displayName, boolean isHybridDisabled, boolean onboarding, String priority) {
         this.paymentMode = paymentMode;
         this.displayName = displayName;

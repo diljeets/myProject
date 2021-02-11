@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
@@ -67,8 +68,10 @@ public class OrderStatusBean {
                 logger.log(Level.SEVERE, "orderId for customer order is {0}", customerTransaction.getOrderId());
 //                logger.log(Level.SEVERE, "Delivery time is {0}", checkoutController.getDeliveryTime());
                 if ((customerTransaction.getRespCode()).equals("01")) {
-                    placeOrder(new CustomerOrder(checkoutController.getDeliveryController().getDeliveryTime(),
+                    placeOrder(new CustomerOrder(checkoutController.getOrderId(),
+                            checkoutController.getDeliveryController().getDeliveryTime(),
                             checkoutController.getDeliveryController().getDeliveryAddress(),
+                            checkoutController.getPaymentMode(),
                             cartController.getCartItems(),
                             cartController.getPayableAmount(),
                             customerTransaction
@@ -79,18 +82,25 @@ public class OrderStatusBean {
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Could not place Order");
-        } finally {
-//            checkoutController.setDeliveryTime(null);
-//            checkoutController.getRegisteredUsersAddressController().setDeliveryAddress(null);
-            cartController.removeAllFromCart();
-            cartController.setPayableAmount(null);
         }
 
         return customerTransaction;
     }
 
+    public void placeOrder() {
+        logger.log(Level.SEVERE, "inside placeOrder method");
+        placeOrder(new CustomerOrder(checkoutController.getOrderId(),
+                checkoutController.getDeliveryController().getDeliveryTime(),
+                checkoutController.getDeliveryController().getDeliveryAddress(),
+                checkoutController.getPaymentMode(),
+                cartController.getCartItems(),
+                cartController.getPayableAmount()
+        ));
+    }
+
     public void placeOrder(CustomerOrder customerOrder) {
 //        checkoutService.placeOrder(customerOrder);
+        String paymentMode = customerOrder.getPaymentMode();
         Response response = null;
         try {
             response = client.target("http://localhost:8080/myProject/webapi/Checkout/placeOrder")
@@ -101,11 +111,31 @@ public class OrderStatusBean {
 //                    .submit(Response.class);
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 logger.log(Level.SEVERE, "Order Placed Successfully");
+                if (paymentMode.equals("POD"))
+                    FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/order-status.xhtml");
+            } else {
+                logger.log(Level.SEVERE, "Could not place Order.");
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            clear();
         }
 
+    }
+
+    public void clear() {
+        cartController.removeAllFromCart();
+        cartController.setPayableAmount(null);
+        checkoutController.setOrderId(null);
+        checkoutController.setPaymentMode(null);
+        checkoutController.setIsModeCC(false);
+        checkoutController.setIsModeDC(false);
+        checkoutController.setIsModeNB(false);
+        checkoutController.setIsModePaytm(false);
+        checkoutController.setIsModePOD(false);
+        checkoutController.setPaymentOption(null);
+        checkoutController.setSavedInstrument(null);
     }
 
 }

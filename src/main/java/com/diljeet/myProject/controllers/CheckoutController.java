@@ -14,6 +14,7 @@ import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
 import com.diljeet.myProject.utils.SavedInstruments;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Iterator;
@@ -50,7 +51,7 @@ public class CheckoutController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private CustomerOrder customerOrder;
-//    private String deliveryTime;
+    private String orderId;
     private PaymentOptions paymentOption;
     private List<PaymentOptions> paymentOptions;
     private PayChannelOptionsPaytmBalance payChannelOptionPaytmBalance;
@@ -59,6 +60,7 @@ public class CheckoutController implements Serializable {
     private List<SavedInstruments> savedInstruments;
     private PayChannelOptionsNetBanking payChannelOptionNetBanking;
     private List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking;
+    private PaymentRequestDetails paymentRequestDetails;
     private String paymentMode;
     private boolean isModePaytm;
     private String paytmMobile;
@@ -86,6 +88,7 @@ public class CheckoutController implements Serializable {
     private String isCardActive;
     private boolean isModeNB;
     private String channelCode;
+    private boolean isModePOD;
 
     @Inject
     DeliveryController deliveryController;
@@ -116,13 +119,14 @@ public class CheckoutController implements Serializable {
         this.customerOrder = customerOrder;
     }
 
-//    public String getDeliveryTime() {
-//        return deliveryTime;
-//    }
-//
-//    public void setDeliveryTime(String deliveryTime) {
-//        this.deliveryTime = deliveryTime;
-//    }
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
     public PaymentOptions getPaymentOption() {
         return paymentOption;
     }
@@ -185,6 +189,14 @@ public class CheckoutController implements Serializable {
 
     public void setPayChannelOptionsNetBanking(List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking) {
         this.payChannelOptionsNetBanking = payChannelOptionsNetBanking;
+    }
+
+    public PaymentRequestDetails getPaymentRequestDetails() {
+        return paymentRequestDetails;
+    }
+
+    public void setPaymentRequestDetails(PaymentRequestDetails paymentRequestDetails) {
+        this.paymentRequestDetails = paymentRequestDetails;
     }
 
     public String getPaymentMode() {
@@ -403,6 +415,14 @@ public class CheckoutController implements Serializable {
         this.channelCode = channelCode;
     }
 
+    public boolean isIsModePOD() {
+        return isModePOD;
+    }
+
+    public void setIsModePOD(boolean isModePOD) {
+        this.isModePOD = isModePOD;
+    }
+    
     public DeliveryController getDeliveryController() {
         return deliveryController;
     }
@@ -416,7 +436,9 @@ public class CheckoutController implements Serializable {
 //        checkoutService.addDeliveryTime(selectedTime);
 //    }
     public void initiateTransaction(String payableAmount) {
-        checkoutBean.initiateTransaction(payableAmount);
+        if (orderId == null)
+            orderId = checkoutBean.createOrderId();        
+        checkoutBean.initiateTransaction(payableAmount, orderId);
     }
 
     public void sendOTP(String paytmMobile) {
@@ -434,22 +456,30 @@ public class CheckoutController implements Serializable {
         checkoutBean.validateOtpAndFetchPaytmBalance(otpString);
     }
 
-    public void processTransaction(String paymentMode) {        
-        if (paymentMode.equals("BALANCE")) {
-            checkoutBean.processTransaction(new PaymentRequestDetails(
+    public void processTransaction(String paymentMode) {
+        if (paymentMode.equals("BALANCE") || paymentMode.equals("POD")) {
+            paymentRequestDetails = new PaymentRequestDetails(
                     paymentMode
-            ));
+            );
+            try {
+                //Redirect if paymode is BALANCE/POD
+                FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/redirect-form.xhtml");
+//            checkoutBean.processTransaction(paymentRequestDetails);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else if (paymentMode.equals("CREDIT_CARD")) {
             if (isPaymentThroughSavedCard) {
 //                logger.log(Level.SEVERE, "Payment through saved CC");
 //                logger.log(Level.SEVERE, paymentMode);
 //                logger.log(Level.SEVERE, cardId);
 //                logger.log(Level.SEVERE, "cardCvv is {0}", cardCvv);
-                checkoutBean.processTransaction(new PaymentRequestDetails(
+                paymentRequestDetails = new PaymentRequestDetails(
                         paymentMode,
                         cardId,
                         cardCvv
-                ));
+                );
+                checkoutBean.processTransaction(paymentRequestDetails);
             } else {
 //                logger.log(Level.SEVERE, "Payment through new CC");
 //                logger.log(Level.SEVERE, paymentMode);
@@ -457,13 +487,14 @@ public class CheckoutController implements Serializable {
                 String ccNumber = removeMaskingFromCardNumber(maskedCCNumber);
                 String ccExpiryDate = removeMaskingFromCardExpiryDate(maskedCCExpiryDate);
                 String saveCard = saveCC ? "1" : "0";
-                checkoutBean.processTransaction(new PaymentRequestDetails(
+                paymentRequestDetails = new PaymentRequestDetails(
                         paymentMode,
                         ccNumber,
                         ccExpiryDate,
                         ccCvv,
                         saveCard
-                ));
+                );
+                checkoutBean.processTransaction(paymentRequestDetails);
             }
         } else if (paymentMode.equals("DEBIT_CARD")) {
             if (isPaymentThroughSavedCard) {
@@ -471,11 +502,12 @@ public class CheckoutController implements Serializable {
 //                logger.log(Level.SEVERE, paymentMode);
 //                logger.log(Level.SEVERE, cardId);
 //                logger.log(Level.SEVERE, "cardCvv is {0}", cardCvv);
-                checkoutBean.processTransaction(new PaymentRequestDetails(
+                paymentRequestDetails = new PaymentRequestDetails(
                         paymentMode,
                         cardId,
                         cardCvv
-                ));
+                );
+                checkoutBean.processTransaction(paymentRequestDetails);
             } else {
 //                logger.log(Level.SEVERE, "Payment through new DC");
 //                logger.log(Level.SEVERE, paymentMode);
@@ -483,19 +515,21 @@ public class CheckoutController implements Serializable {
                 String dcNumber = removeMaskingFromCardNumber(maskedDCNumber);
                 String dcExpiryDate = removeMaskingFromCardExpiryDate(maskedDCExpiryDate);
                 String saveCard = saveDC ? "1" : "0";
-                checkoutBean.processTransaction(new PaymentRequestDetails(
+                paymentRequestDetails = new PaymentRequestDetails(
                         paymentMode,
                         dcNumber,
                         dcExpiryDate,
                         dcCvv,
                         saveCard
-                ));
+                );
+                checkoutBean.processTransaction(paymentRequestDetails);
             }
         } else {
-            checkoutBean.processTransaction(new PaymentRequestDetails(
+            paymentRequestDetails = new PaymentRequestDetails(
                     paymentMode,
                     channelCode
-            ));
+            );
+            checkoutBean.processTransaction(paymentRequestDetails);
         }
     }
 
@@ -505,6 +539,7 @@ public class CheckoutController implements Serializable {
         isModeCC = false;
         isModeDC = false;
         isModeNB = false;
+        isModePOD = false;
         paymentMode = event.getObject().getPaymentMode();
         if (paymentMode.equals("BALANCE")) {
             isModePaytm = true;
@@ -514,8 +549,10 @@ public class CheckoutController implements Serializable {
             isModeCC = true;
         } else if (paymentMode.equals("DEBIT_CARD")) {
             isModeDC = true;
-        } else {
+        } else if (paymentMode.equals("NET_BANKING")) {
             isModeNB = true;
+        } else {
+            isModePOD = true;
         }
     }
 
@@ -525,6 +562,7 @@ public class CheckoutController implements Serializable {
         isModeCC = false;
         isModeDC = false;
         isModeNB = true;
+        isModePOD = false;
         String selectedChannelCode = event.getObject().getChannelCode();
         if (selectedChannelCode.equals("OTHERS")) {
             checkoutBean.fetchOtherNetBankingPaymentChannels();
@@ -539,6 +577,7 @@ public class CheckoutController implements Serializable {
         isModeCC = false;
         isModeDC = false;
         isModeNB = false;
+        isModePOD = false;
         paymentMode = event.getObject().getPaymentMode();
     }
 
@@ -548,15 +587,16 @@ public class CheckoutController implements Serializable {
         isModeCC = false;
         isModeDC = false;
         isModeNB = false;
+        isModePOD = false;
         paymentMode = event.getObject().getCardType();
-        cardId = event.getObject().getCardId();        
+        cardId = event.getObject().getCardId();
         if (paymentMode.equals("CREDIT_CARD")) {
             isModeCC = true;
         } else {
             isModeDC = true;
         }
     }
-    
+
     public void fetchBinDetails(AjaxBehaviorEvent event) {
         String maskedCardNumber = (String) ((UIOutput) event.getSource()).getValue();
         String cardDigits = removeMaskingFromCardNumber(maskedCardNumber);

@@ -9,8 +9,8 @@
     </h:head>
     <h:body>
         <p:panel rendered="#{checkoutController.isModePaytm}">
-            <h:form a:method="get" a:action="http://localhost:8080/myProject/webapi/Checkout/pgResponse">               
-                <input type="submit" value="Place Order" name="Pay" />
+            <h:form>               
+                <p:commandButton value="Place Order" actionListener="#{checkoutBean.processTransaction(checkoutController.paymentRequestDetails)}"/>
             </h:form>
         </p:panel>
         <p:panel rendered="#{checkoutController.isModeCC or checkoutController.isModeDC}">
@@ -30,7 +30,11 @@
                 <input type="submit" value="Place Order" name="Pay" />
             </h:form>
         </p:panel>
-
+        <p:panel rendered="#{checkoutController.isModePOD}">
+            <h:form>               
+                <p:commandButton value="Place Order" actionListener="#{orderStatusBean.placeOrder()}"/>
+            </h:form>
+        </p:panel>
     </h:body>
     <!--    <script type="text/javascript">  document.forms[0].submit();</script>-->
 </html>

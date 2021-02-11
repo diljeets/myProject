@@ -77,8 +77,8 @@
                                              selection="#{checkoutController.paymentOption}"
                                              rowKey="#{paymentOption.paymentMode}"
                                              rendered="#{checkoutController.paymentOptions.size() > 0}"
-                                             summary="List of Payment Methods"
-                                             rowStyleClass="#{checkoutController.payChannelOptionsPaytmBalance.size() > 0 ? 'donotRender' : ''}">  
+                                             rowStyleClass="#{checkoutController.payChannelOptionsPaytmBalance.size() > 0 ? 'donotRender' : ''}" 
+                                             summary="List of Payment Methods">  
                                     <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking,reviewAndPlaceOrderBtn"/>
                                     <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking,reviewAndPlaceOrderBtn"/>                          
                                     <p:column selectionMode="single"/>                              
@@ -224,7 +224,12 @@
                                     </p:column>
                                     <f:facet name="footer"> 
                                         <div class="reviewAndPlaceOrderBtn">
-                                            <p:commandButton id="reviewAndPlaceOrderBtn" actionListener="#{checkoutController.processTransaction(checkoutController.paymentMode)}" value="Review and Place Order" onclick="PF('progressPanel').show();PF('reviewAndPlaceOrderBtn').disable();" oncomplete="PF('progressPanel').close();PF('reviewAndPlaceOrderBtn').enable();" widgetVar="reviewAndPlaceOrderBtn" process="#{checkoutController.isPaymentThroughSavedCard eq true ? '@this,:form-payment-options:datatable-saved-instruments:savedCardCvv' : '@this'}" update=":form-payment-options:form-payment-options-msgs"/>
+                                            <ui:fragment rendered="#{checkoutController.isModePOD eq false}">
+                                                <p:commandButton id="reviewAndPlaceOrderBtn" actionListener="#{checkoutController.processTransaction(checkoutController.paymentMode)}" value="Review and Place Order" onclick="PF('progressPanel').show();PF('reviewAndPlaceOrderBtn').disable();" oncomplete="PF('progressPanel').close();PF('reviewAndPlaceOrderBtn').enable();" widgetVar="reviewAndPlaceOrderBtn" process="#{checkoutController.isPaymentThroughSavedCard eq true ? '@this,:form-payment-options:datatable-saved-instruments:savedCardCvv' : '@this'}" update=":form-payment-options:form-payment-options-msgs"/>
+                                            </ui:fragment>
+                                            <ui:fragment rendered="#{checkoutController.isModePOD eq true}">
+                                                <p:commandButton action="redirect-form.xhtml" value="Review and Place Order" onclick="PF('progressPanel').show();PF('reviewAndPlaceOrderBtn').disable();" oncomplete="PF('progressPanel').close();PF('reviewAndPlaceOrderBtn').enable();" widgetVar="reviewAndPlaceOrderBtn" update=":form-payment-options:form-payment-options-msgs"/>
+                                            </ui:fragment>                                            
                                         </div>
                                     </f:facet>                                           
                                 </p:dataTable>
