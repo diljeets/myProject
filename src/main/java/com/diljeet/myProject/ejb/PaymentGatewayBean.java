@@ -983,7 +983,7 @@ public class PaymentGatewayBean {
         String TXNAMOUNT = txnInfoObj.getString("TXNAMOUNT");
         String TXNDATE = txnInfoObj.getString("TXNDATE");
         String TXNID = txnInfoObj.getString("TXNID");
-
+        String DISPLAYMSG;
         if (RESPCODE.equals("01")) {
             Response response = transactionStatus(ORDERID);
             if (response.getStatus() == Response.Status.OK.getStatusCode()
@@ -993,7 +993,7 @@ public class PaymentGatewayBean {
                 JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
                 String resultCode = resultInfoObj.getString("resultCode");
                 if (resultCode.equals("01")) {
-                    //Create CustomerTransaction Object in case Transaction is Successful
+                    //Create CustomerTransaction Object in case Transaction is Successful                    
                     customerTransaction = new CustomerTransaction(
                             BANKNAME,
                             BANKTXNID,
@@ -1011,7 +1011,7 @@ public class PaymentGatewayBean {
                 }
             }
         } else {
-            //Create CustomerTransaction Object in case Transaction is Failure
+            //Create CustomerTransaction Object in case Transaction is Failure            
             customerTransaction = new CustomerTransaction(
                     BANKNAME,
                     BANKTXNID,

@@ -38,6 +38,13 @@ public class CustomerTransaction implements Serializable {
 
     public CustomerTransaction(){        
     }
+
+    public CustomerTransaction(String orderId, String paymentMode, String respCode, String txnAmount) {
+        this.orderId = orderId;
+        this.paymentMode = paymentMode;
+        this.respCode = respCode;
+        this.txnAmount = txnAmount;
+    }
     
     public CustomerTransaction(String bankName, String bankTxnId, String currency, String gatewayName, String orderId, String paymentMode, String respCode, String respMsg, String txnAmount, String txnDate, String txnId) {
         this.bankName = bankName;
@@ -124,7 +131,7 @@ public class CustomerTransaction implements Serializable {
     public void setRespMsg(String respMsg) {
         this.respMsg = respMsg;
     }
-
+   
     public String getTxnAmount() {
         return txnAmount;
     }

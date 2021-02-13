@@ -5,14 +5,8 @@
  */
 package com.diljeet.myProject.services;
 
-import com.diljeet.myProject.controllers.TemplateController;
 import com.diljeet.myProject.ejb.PaymentGatewayBean;
-import com.diljeet.myProject.entities.Cart;
-import com.diljeet.myProject.entities.CustomerOrder;
-import com.diljeet.myProject.entities.CustomerTransaction;
-import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import java.util.logging.Logger;
-import javax.ejb.Stateful;
 import com.diljeet.myProject.interfaces.CheckoutService;
 import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.InitiateTransaction;
@@ -23,7 +17,6 @@ import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
 import com.diljeet.myProject.utils.SavedInstruments;
 import java.net.URI;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -56,8 +49,8 @@ public class CheckoutServiceBean implements CheckoutService {
     @Inject
     HttpServletRequest req;
 
-    @Inject
-    TemplateController templateController;
+//    @Inject
+//    TemplateController templateController;
 
 //    private String deliveryTime;
     public CheckoutServiceBean() {
@@ -231,24 +224,24 @@ public class CheckoutServiceBean implements CheckoutService {
                 .build();
     }
 
-    @Override
-    public Response getCustomerTransactionStatus() {
-        try {
-            CustomerTransaction customerTransaction = paymentGatewayBean.getCustomerTransaction();
-            if (customerTransaction != null) {
-                return Response
-                        .status(Response.Status.FOUND)
-                        .entity(customerTransaction)
-                        .build();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return Response
-                .status(Response.Status.NOT_FOUND)
-                .build();
-    }
+//    @Override
+//    public Response getCustomerTransactionStatus() {
+//        try {
+//            CustomerTransaction customerTransaction = paymentGatewayBean.getCustomerTransaction();
+//            if (customerTransaction != null) {
+//                return Response
+//                        .status(Response.Status.FOUND)
+//                        .entity(customerTransaction)
+//                        .build();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        return Response
+//                .status(Response.Status.NOT_FOUND)
+//                .build();
+//    }
 
     @Override
     public Response transactionStatus(String orderId) {
@@ -261,28 +254,43 @@ public class CheckoutServiceBean implements CheckoutService {
         return response;
     }
 
-    @Override
-    public Response placeOrder(CustomerOrder customerOrder) {        
-//        String orderId = customerOrder.getCustomerTransaction().getOrderId();
-//        String payableAmount = customerOrder.getPayableAmount();
-        String customerName = templateController.getCurrentCustomer();
-        String username = req.getUserPrincipal().getName();
-        try {
-//            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username);
-            customerOrder.setCustomerName(customerName);
-            customerOrder.setUsername(username);
-            customerOrder.setDateOrderCreated(new Date());
-//            customerOrder.setOrderId(orderId);
-            List<Cart> cartItems = customerOrder.getOrders();
-            for (Cart cartItem : cartItems) {
-                cartItem.setCustomerOrder(customerOrder);
-            }
-            em.persist(customerOrder);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return Response.ok().build();
-    }
+//    @Override
+//    public Response placeOrder(CustomerOrder customerOrder) {
+////        String orderId = customerOrder.getCustomerTransaction().getOrderId();
+////        String payableAmount = customerOrder.getPayableAmount();
+//        String paymentMode = customerOrder.getPaymentMode();
+//        String customerName = templateController.getCurrentCustomer();
+//        String username = req.getUserPrincipal().getName();
+//        try {
+////            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username);
+//            customerOrder.setCustomerName(customerName);
+//            customerOrder.setUsername(username);
+//            customerOrder.setDateOrderCreated(new Date());
+////            customerOrder.setOrderId(orderId);
+//            List<Cart> cartItems = customerOrder.getOrders();
+//            for (Cart cartItem : cartItems) {
+//                cartItem.setCustomerOrder(customerOrder);
+//            }
+//            em.persist(customerOrder);
+//            if (paymentMode.equals("POD")) {
+//                CustomerTransaction customerTransaction = new CustomerTransaction(
+//                        customerOrder.getOrderId(),
+//                        customerOrder.getPaymentMode(),
+//                        "01",
+//                        customerOrder.getPayableAmount()
+//                );
+//                paymentGatewayBean.setCustomerTransaction(customerTransaction);
+//            }
+//            
+//            return Response
+//                .status(Response.Status.CREATED)
+//                .build();
+//            
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        
+//        return null;
+//    }
 
 }

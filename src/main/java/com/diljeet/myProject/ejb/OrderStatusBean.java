@@ -58,7 +58,7 @@ public class OrderStatusBean {
     public CustomerTransaction getCustomerTransactionStatus() {
         CustomerTransaction customerTransaction = null;
         try {
-            Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/getCustomerTransactionStatus")
+            Response response = client.target("http://localhost:8080/myProject/webapi/OrderStatus/getCustomerTransactionStatus")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .get();
@@ -66,8 +66,7 @@ public class OrderStatusBean {
                     && response.hasEntity()) {
                 customerTransaction = response.readEntity(CustomerTransaction.class);
                 logger.log(Level.SEVERE, "orderId for customer order is {0}", customerTransaction.getOrderId());
-//                logger.log(Level.SEVERE, "Delivery time is {0}", checkoutController.getDeliveryTime());
-                if ((customerTransaction.getRespCode()).equals("01")) {
+                if ((!(customerTransaction.getPaymentMode()).equals("POD")) && (customerTransaction.getRespCode()).equals("01")) {
                     placeOrder(new CustomerOrder(checkoutController.getOrderId(),
                             checkoutController.getDeliveryController().getDeliveryTime(),
                             checkoutController.getDeliveryController().getDeliveryAddress(),
@@ -88,7 +87,6 @@ public class OrderStatusBean {
     }
 
     public void placeOrder() {
-        logger.log(Level.SEVERE, "inside placeOrder method");
         placeOrder(new CustomerOrder(checkoutController.getOrderId(),
                 checkoutController.getDeliveryController().getDeliveryTime(),
                 checkoutController.getDeliveryController().getDeliveryAddress(),
@@ -99,22 +97,21 @@ public class OrderStatusBean {
     }
 
     public void placeOrder(CustomerOrder customerOrder) {
-//        checkoutService.placeOrder(customerOrder);
         String paymentMode = customerOrder.getPaymentMode();
         Response response = null;
         try {
-            response = client.target("http://localhost:8080/myProject/webapi/Checkout/placeOrder")
+            response = client.target("http://localhost:8080/myProject/webapi/OrderStatus/placeOrder")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .post(Entity.entity(customerOrder, MediaType.APPLICATION_JSON), Response.class);
-//                    .buildPost(Entity.entity(customerOrder, MediaType.APPLICATION_JSON))                  
-//                    .submit(Response.class);
-            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                    .post(Entity.entity(customerOrder, MediaType.APPLICATION_JSON), Response.class);            
+            if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
                 logger.log(Level.SEVERE, "Order Placed Successfully");
-                if (paymentMode.equals("POD"))
-                    FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/order-status.xhtml");
+                if (paymentMode.equals("POD"))                    
+                    FacesContext.getCurrentInstance().getExternalContext().redirect(req.getContextPath() + "/order-status.xhtml");                
             } else {
                 logger.log(Level.SEVERE, "Could not place Order.");
+                if (paymentMode.equals("POD"))
+                    FacesContext.getCurrentInstance().getExternalContext().redirect(req.getContextPath() + "/order-status.xhtml");                
             }
         } catch (Exception e) {
             e.printStackTrace();

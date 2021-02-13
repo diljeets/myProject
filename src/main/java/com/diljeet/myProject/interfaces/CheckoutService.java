@@ -5,8 +5,6 @@
  */
 package com.diljeet.myProject.interfaces;
 
-import com.diljeet.myProject.entities.CustomerOrder;
-import com.diljeet.myProject.entities.RegisteredUsersAddress;
 import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.InitiateTransaction;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
@@ -111,18 +109,18 @@ public interface CheckoutService {
     @Path("pgResponse")    
     public Response pgPostResponse(@Context HttpServletRequest req, @Context HttpServletResponse resp);
     
-    @GET
-    @Path("getCustomerTransactionStatus")
-    @Produces({MediaType.APPLICATION_JSON})
-    public Response getCustomerTransactionStatus();
+//    @GET
+//    @Path("getCustomerTransactionStatus")
+//    @Produces({MediaType.APPLICATION_JSON})
+//    public Response getCustomerTransactionStatus();
 
     @POST
     @Path("transactionStatus")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response transactionStatus(String orderId);
 
-    @POST
-    @Path("placeOrder")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response placeOrder(CustomerOrder customerOrder);
+//    @POST
+//    @Path("placeOrder")
+//    @Consumes(MediaType.APPLICATION_JSON)
+//    public Response placeOrder(CustomerOrder customerOrder);
 }
