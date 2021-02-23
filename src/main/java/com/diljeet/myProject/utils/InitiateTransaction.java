@@ -13,15 +13,17 @@ public class InitiateTransaction {
     
     private String payableAmount;
     private String orderId;
+    private String username;
     private String channelId;
     private String callbackUrl;
 
     public InitiateTransaction(){        
     }
     
-    public InitiateTransaction(String payableAmount, String orderId, String channelId, String callbackUrl) {
+    public InitiateTransaction(String payableAmount, String orderId, String username, String channelId, String callbackUrl) {
         this.payableAmount = payableAmount;
         this.orderId = orderId;
+        this.username = username;
         this.channelId = channelId;
         this.callbackUrl = callbackUrl;
     }
@@ -40,6 +42,14 @@ public class InitiateTransaction {
 
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getChannelId() {

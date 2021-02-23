@@ -92,7 +92,7 @@
         <web-resource-collection>
             <web-resource-name>webapi</web-resource-name>            
             <!--            <url-pattern>/webapi/MealPlanCategory/*</url-pattern>              -->
-            <url-pattern>/webapi/RegisteredUsersAddress/*</url-pattern> 
+            <url-pattern>/webapi/RegisteredUsersAddress/*</url-pattern>             
         </web-resource-collection>
         <auth-constraint>
             <role-name>Administrator</role-name>

@@ -35,6 +35,7 @@ import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 
@@ -49,7 +50,7 @@ public class CheckoutController implements Serializable {
     private static final Logger logger = Logger.getLogger(CheckoutController.class.getCanonicalName());
 
     private static final long serialVersionUID = 1L;
-
+    
     private CustomerOrder customerOrder;
     private String orderId;
     private PaymentOptions paymentOption;
@@ -422,7 +423,7 @@ public class CheckoutController implements Serializable {
     public void setIsModePOD(boolean isModePOD) {
         this.isModePOD = isModePOD;
     }
-    
+
     public DeliveryController getDeliveryController() {
         return deliveryController;
     }
@@ -436,8 +437,9 @@ public class CheckoutController implements Serializable {
 //        checkoutService.addDeliveryTime(selectedTime);
 //    }
     public void initiateTransaction(String payableAmount) {
-        if (orderId == null)
-            orderId = checkoutBean.createOrderId();        
+        if (orderId == null) {
+            orderId = checkoutBean.createOrderId();
+        }
         checkoutBean.initiateTransaction(payableAmount, orderId);
     }
 

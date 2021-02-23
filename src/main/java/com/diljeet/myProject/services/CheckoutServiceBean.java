@@ -5,7 +5,10 @@
  */
 package com.diljeet.myProject.services;
 
+import com.diljeet.myProject.controllers.OrderController;
+import com.diljeet.myProject.controllers.OrderStatusController;
 import com.diljeet.myProject.ejb.PaymentGatewayBean;
+import com.diljeet.myProject.entities.CustomerTransaction;
 import java.util.logging.Logger;
 import com.diljeet.myProject.interfaces.CheckoutService;
 import com.diljeet.myProject.utils.CardDetails;
@@ -16,12 +19,16 @@ import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
 import com.diljeet.myProject.utils.SavedInstruments;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -29,6 +36,7 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import org.json.JSONObject;
 
 /**
@@ -50,8 +58,10 @@ public class CheckoutServiceBean implements CheckoutService {
     HttpServletRequest req;
 
 //    @Inject
-//    TemplateController templateController;
+//    OrderController orderController;
 
+//    @Inject
+//    TemplateController templateController;
 //    private String deliveryTime;
     public CheckoutServiceBean() {
     }
@@ -79,7 +89,8 @@ public class CheckoutServiceBean implements CheckoutService {
     public Response initiateTransaction(InitiateTransaction initiateTransaction) {
         String orderId = initiateTransaction.getOrderId();
         logger.log(Level.SEVERE, "initiateTransaction orderId is {0}", orderId);
-        String username = req.getUserPrincipal().getName();
+        String username = initiateTransaction.getUsername();
+        logger.log(Level.SEVERE, "initiateTransaction username is {0}", username);
         String payableAmount = initiateTransaction.getPayableAmount();
         String channelId = initiateTransaction.getChannelId();
         String callbackUrl = initiateTransaction.getCallbackUrl();
@@ -200,30 +211,84 @@ public class CheckoutServiceBean implements CheckoutService {
         return response;
     }
 
-    @Override
-    public void pgGetResponse(HttpServletRequest req, HttpServletResponse resp) {
-        try {
-            resp.sendRedirect(req.getContextPath() + "/order-status.xhtml");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    @Override
+//    public void pgGetResponse(HttpServletRequest req, HttpServletResponse resp) {
+//
+//        try {
+////            String respCode = req.getHeader("respCode");
+////            logger.log(Level.SEVERE, "respCode in pgGetResponse is {0}", respCode);
+////            Map<String, String[]> mapData = req.getParameterMap();
+////            JSONObject parameters = new JSONObject();
+////            mapData.forEach((key, val) -> parameters.put(key, val[0]));
+////            logger.log(Level.SEVERE, "customerTransaction entity map is {0}", parameters.toString());
+////            String responseData = "";
+//////            InputStream is = req.getInputStream();
+//////            BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
+////            BufferedReader responseReader = req.getReader();
+////            if ((responseData = responseReader.readLine()) != null) {
+////                logger.log(Level.SEVERE, "customerTransaction entity is {0}", responseData);
+////            }
+//            resp.sendRedirect(req.getContextPath() + "/order-status.xhtml");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
-    @Override
-    public Response pgPostResponse(HttpServletRequest req, HttpServletResponse resp) {
-        Map<String, String[]> mapData = req.getParameterMap();
-        JSONObject parameters = new JSONObject();
-        mapData.forEach((key, val) -> parameters.put(key, val[0]));
-        logger.log(Level.SEVERE, "Final payment response is {0}", parameters.toString());
+//    @Override
+//    public Response pgPostResponse(HttpServletRequest req, HttpServletResponse resp) {
+//        Map<String, String[]> mapData = req.getParameterMap();
+//        JSONObject parameters = new JSONObject();
+//        mapData.forEach((key, val) -> parameters.put(key, val[0]));
+//        logger.log(Level.SEVERE, "Final payment response is {0}", parameters.toString());
+//
+//        //Get Customer Transaction Status
+//        CustomerTransaction customerTransaction = paymentGatewayBean.getCustomerTransactionStatus(parameters.toString());
+////        try {            
+////            resp.setContentType("application/json");
+////            resp.setCharacterEncoding("UTF-8");
+////            resp.getWriter().write(customerTransaction.toString()); 
+////            req.getRequestDispatcher("getPGResponse").forward(req, resp);
+////        } catch (Exception e) {
+////            e.printStackTrace();
+////        }
+//
+//        //Create and Place Order if transaction is successful
+//        String respCode = customerTransaction.getRespCode();
+//        if (respCode.equals("01")) {
+//            return Response
+//                .seeOther(URI.create("/Checkout/createAndPlaceCustomerOrder"))
+//                .build();
+//        } 
+//        
+//        //Do not Create and Place Order but redirect Customer to Transaction Status page showing unsuccessful Transaction message
+//        return Response
+//                .seeOther(URI.create("/Order/pgResponse"))
+//                .build();
+//    }
+//
+//    @Override
+//    public void createAndPlaceCustomerOrder() {
+//        orderController.createAndPlaceCustomerOrder();
+//    }
 
-        //Get Customer Transaction Status
-        paymentGatewayBean.getCustomerTransactionStatus(parameters.toString());
-
-        return Response
-                .seeOther(URI.create("/Checkout/pgResponse"))
-                .build();
-    }
-
+//    @Override
+//    public Response getPGResponse(HttpServletRequest req, HttpServletResponse resp) {
+//        logger.log(Level.SEVERE, "inside getPGResponse");
+//        try {
+//            String responseData = "";
+////            InputStream is = req.getInputStream();
+////            BufferedReader responseReader = new BufferedReader(new InputStreamReader(is));
+//            BufferedReader responseReader = req.getReader();
+//            if ((responseData = responseReader.readLine()) != null) {
+//                logger.log(Level.SEVERE, "customerTransaction entity is {0}", responseData);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return Response
+//                .seeOther(URI.create("/Checkout/pgResponse"))
+//                .build();
+//    }
 //    @Override
 //    public Response getCustomerTransactionStatus() {
 //        try {
@@ -242,7 +307,6 @@ public class CheckoutServiceBean implements CheckoutService {
 //                .status(Response.Status.NOT_FOUND)
 //                .build();
 //    }
-
     @Override
     public Response transactionStatus(String orderId) {
         Response response = null;
@@ -292,5 +356,4 @@ public class CheckoutServiceBean implements CheckoutService {
 //        
 //        return null;
 //    }
-
 }

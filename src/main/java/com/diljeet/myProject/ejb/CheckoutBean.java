@@ -7,6 +7,7 @@ package com.diljeet.myProject.ejb;
 
 import com.diljeet.myProject.controllers.CartController;
 import com.diljeet.myProject.controllers.CheckoutController;
+import com.diljeet.myProject.controllers.OrderController;
 import com.diljeet.myProject.controllers.RedirectFormController;
 import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.InitiateTransaction;
@@ -62,6 +63,9 @@ public class CheckoutBean {
 
     @Inject
     RedirectFormController redirectFormController;
+    
+    @Inject
+    OrderController orderController;
 
     @PostConstruct
     public void init() {
@@ -101,8 +105,9 @@ public class CheckoutBean {
         }
         InitiateTransaction initiateTransaction = new InitiateTransaction(payableAmount,
                 orderId,
+                req.getUserPrincipal().getName(),
                 "WEB",
-                "http://localhost:8080/myProject/webapi/Checkout/pgResponse");
+                "http://localhost:8080/myProject/webapi/Order/pgResponse");
         try {
             Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/initiateTransaction")
                     .request(MediaType.APPLICATION_JSON)
@@ -310,7 +315,7 @@ public class CheckoutBean {
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(paymentRequestDetails, MediaType.APPLICATION_JSON), Response.class);
             if (response.getStatus() == Response.Status.TEMPORARY_REDIRECT.getStatusCode()) {
-                //Redirect if paymode is BALANCE
+                //Redirect if paymode is BALANCE and Customer Transaction is unsuccessful
                 FacesContext.getCurrentInstance().getExternalContext().redirect(response.getLocation().toString());
             } else if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 if (response.hasEntity()) {
@@ -362,6 +367,10 @@ public class CheckoutBean {
 
                     //Redirect if paymode is CREDIT_CARD / DEBIT_CARD / NET_BANKING
                     FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/redirect-form.xhtml");
+                } else {
+                    //Save Customer Order in Database and Redirect if paymode is BALANCE and Customer Transaction is successful
+                    orderController.createAndPlaceCustomerOrder();
+                    FacesContext.getCurrentInstance().getExternalContext().redirect(response.getLocation().toString());
                 }
             } else {
                 String resultMsg = response.getHeaderString("resultMsg");
@@ -386,6 +395,7 @@ public class CheckoutBean {
             e.printStackTrace();
         }
         return response;
-    }
+    }    
+    
 
 }

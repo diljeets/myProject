@@ -32,7 +32,7 @@
         </p:panel>
         <p:panel rendered="#{checkoutController.isModePOD}">
             <h:form>               
-                <p:commandButton value="Place Order" actionListener="#{orderStatusBean.placeOrder()}"/>
+                <p:commandButton value="Place Order" actionListener="#{orderController.createAndPlaceCustomerOrder()}"/>
             </h:form>
         </p:panel>
     </h:body>

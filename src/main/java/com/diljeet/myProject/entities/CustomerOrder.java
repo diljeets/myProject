@@ -75,13 +75,17 @@ public class CustomerOrder implements Serializable {
             String deliveryAddress,
             String paymentMode,
             List<Cart> cartItems,
-            String payableAmount) {
+            String payableAmount,
+            String customerName,
+            String username) {
         this.orderId = orderId;
         this.deliveryTime = deliveryTime;
         this.deliveryAddress = deliveryAddress;
         this.paymentMode = paymentMode;
         this.orders = cartItems;
         this.payableAmount = payableAmount;        
+        this.customerName = customerName;
+        this.username = username;
     }
     
     public CustomerOrder(String orderId,
@@ -89,14 +93,18 @@ public class CustomerOrder implements Serializable {
             String deliveryAddress,
             String paymentMode,
             List<Cart> cartItems,
-            String payableAmount,            
+            String payableAmount,
+            String customerName,
+            String username,
             CustomerTransaction customerTransaction) {
         this.orderId = orderId;
         this.deliveryTime = deliveryTime;
         this.deliveryAddress = deliveryAddress;
         this.paymentMode = paymentMode;
         this.orders = cartItems;
-        this.payableAmount = payableAmount;        
+        this.payableAmount = payableAmount;                    
+        this.customerName = customerName;
+        this.username = username;
         this.customerTransaction = customerTransaction;
     }
 

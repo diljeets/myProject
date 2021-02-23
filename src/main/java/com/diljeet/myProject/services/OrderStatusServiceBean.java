@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 
 /**
@@ -38,12 +39,11 @@ public class OrderStatusServiceBean implements OrderStatusService {
     @EJB
     PaymentGatewayBean paymentGatewayBean;
 
-    @Inject
-    HttpServletRequest req;
-
-    @Inject
-    TemplateController templateController;
-
+//    @Inject
+//    HttpServletRequest req;
+//
+//    @Inject
+//    TemplateController templateController;
 //    private String deliveryTime;
     public OrderStatusServiceBean() {
     }
@@ -70,44 +70,44 @@ public class OrderStatusServiceBean implements OrderStatusService {
                 .status(Response.Status.NOT_FOUND)
                 .build();
     }
-   
-    @Override
-    public Response placeOrder(CustomerOrder customerOrder) {
-//        String orderId = customerOrder.getCustomerTransaction().getOrderId();
-//        String payableAmount = customerOrder.getPayableAmount();
-        String paymentMode = customerOrder.getPaymentMode();
-        String customerName = templateController.getCurrentCustomer();
-        String username = req.getUserPrincipal().getName();
-        try {
-//            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username);
-            customerOrder.setCustomerName(customerName);
-            customerOrder.setUsername(username);
-            customerOrder.setDateOrderCreated(new Date());
-//            customerOrder.setOrderId(orderId);
-            List<Cart> cartItems = customerOrder.getOrders();
-            for (Cart cartItem : cartItems) {
-                cartItem.setCustomerOrder(customerOrder);
-            }
-            em.persist(customerOrder);
-            if (paymentMode.equals("POD")) {
-                CustomerTransaction customerTransaction = new CustomerTransaction(
-                        customerOrder.getOrderId(),
-                        customerOrder.getPaymentMode(),
-                        "01",
-                        customerOrder.getPayableAmount()
-                );
-                paymentGatewayBean.setCustomerTransaction(customerTransaction);
-            }
-            
-            return Response
-                .status(Response.Status.CREATED)
-                .build();
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        return null;
-    }
 
+//    @Override
+//    public Response placeOrder(CustomerOrder customerOrder) {
+////        String orderId = customerOrder.getCustomerTransaction().getOrderId();
+////        String payableAmount = customerOrder.getPayableAmount();
+//
+//        try {
+////            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username);
+//            String paymentMode = customerOrder.getPaymentMode();
+////            String customerName = templateController.getCurrentCustomer();
+////            String username = req.getUserPrincipal().getName();
+////            customerOrder.setCustomerName(customerName);
+////            customerOrder.setUsername(username);
+//            customerOrder.setDateOrderCreated(new Date());
+////            customerOrder.setOrderId(orderId);
+//            List<Cart> cartItems = customerOrder.getOrders();
+//            for (Cart cartItem : cartItems) {
+//                cartItem.setCustomerOrder(customerOrder);
+//            }
+//            em.persist(customerOrder);
+//            if (paymentMode.equals("POD")) {
+//                CustomerTransaction customerTransaction = new CustomerTransaction(
+//                        customerOrder.getOrderId(),
+//                        customerOrder.getPaymentMode(),
+//                        "01",
+//                        customerOrder.getPayableAmount()
+//                );
+//                paymentGatewayBean.setCustomerTransaction(customerTransaction);
+//            }
+//
+//            return Response
+//                    .status(Response.Status.CREATED)
+//                    .build();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        return null;
+//    }
 }

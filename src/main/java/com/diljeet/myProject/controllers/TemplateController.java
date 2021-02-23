@@ -27,6 +27,8 @@ public class TemplateController implements Serializable {
     private static final Logger logger = Logger.getLogger(TemplateController.class.getCanonicalName());
 
     private static final long serialVersionUID = 1L;
+    
+//    private String username;
 
     private String currentCustomer;
 
@@ -45,6 +47,22 @@ public class TemplateController implements Serializable {
      */
     public TemplateController() {
     }
+
+//    public String getUsername() {
+//        String _username = null;
+//        try {
+//            _username = req.getUserPrincipal().getName();
+//        } catch (NullPointerException e) {
+//            return "Guest";
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }  
+//        return _username;
+//    }
+//
+//    public void setUsername(String username) {
+//        this.username = username;
+//    }
 
     public String getCurrentCustomer() {
         String user = null;

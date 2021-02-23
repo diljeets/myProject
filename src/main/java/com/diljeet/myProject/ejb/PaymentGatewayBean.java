@@ -5,6 +5,7 @@
  */
 package com.diljeet.myProject.ejb;
 
+import com.diljeet.myProject.controllers.OrderStatusController;
 import com.diljeet.myProject.entities.CustomerTransaction;
 import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
@@ -25,7 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
 import org.json.JSONArray;
@@ -226,8 +229,10 @@ public class PaymentGatewayBean {
                 }
             }
             responseReader.close();
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+
         }
         return null;
     }
@@ -947,10 +952,17 @@ public class PaymentGatewayBean {
                     if (paymentMode.equals("BALANCE")) {
                         String callBackUrl = bodyObj.getString("callBackUrl");
                         JSONObject txnInfoObj = bodyObj.getJSONObject("txnInfo");
-                        getCustomerTransactionStatus(txnInfoObj.toString());
-                        return Response
-                                .temporaryRedirect(URI.create(callBackUrl))
-                                .build();
+                        CustomerTransaction custTransaction = getCustomerTransactionStatus(txnInfoObj.toString());
+                        if (custTransaction.getRespCode().equals("01")) {
+                            return Response
+                                    .ok()
+                                    .location(URI.create(callBackUrl))
+                                    .build();
+                        } else {
+                            return Response
+                                    .temporaryRedirect(URI.create(callBackUrl))
+                                    .build();
+                        }
                     }
                     if (paymentMode.equals("CREDIT_CARD") || paymentMode.equals("DEBIT_CARD") || paymentMode.equals("NET_BANKING")) {
                         return Response
@@ -967,7 +979,7 @@ public class PaymentGatewayBean {
         return null;
     }
 
-    public void getCustomerTransactionStatus(String txnInfo) {
+    public CustomerTransaction getCustomerTransactionStatus(String txnInfo) {
         JSONObject txnInfoObj = new JSONObject(txnInfo);
         String BANKNAME = txnInfoObj.getString("BANKNAME");
         String BANKTXNID = txnInfoObj.getString("BANKTXNID");
@@ -983,7 +995,6 @@ public class PaymentGatewayBean {
         String TXNAMOUNT = txnInfoObj.getString("TXNAMOUNT");
         String TXNDATE = txnInfoObj.getString("TXNDATE");
         String TXNID = txnInfoObj.getString("TXNID");
-        String DISPLAYMSG;
         if (RESPCODE.equals("01")) {
             Response response = transactionStatus(ORDERID);
             if (response.getStatus() == Response.Status.OK.getStatusCode()
@@ -1027,6 +1038,8 @@ public class PaymentGatewayBean {
             );
             logger.log(Level.SEVERE, "customerTransaction object created for Failure {0}", customerTransaction.getOrderId());
         }
+
+        return customerTransaction;
     }
 
     public Response transactionStatus(String orderId) {

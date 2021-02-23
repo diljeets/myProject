@@ -101,13 +101,18 @@ public interface CheckoutService {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response processTransaction(PaymentRequestDetails paymentRequestDetails); 
     
-    @GET
-    @Path("pgResponse")        
-    public void pgGetResponse(@Context HttpServletRequest req, @Context HttpServletResponse resp);
+//    @GET
+//    @Path("pgResponse") 
+//    public void pgGetResponse(@Context HttpServletRequest req, @Context HttpServletResponse resp);
       
-    @POST
-    @Path("pgResponse")    
-    public Response pgPostResponse(@Context HttpServletRequest req, @Context HttpServletResponse resp);
+//    @POST
+//    @Path("pgResponse")  
+//    public Response pgPostResponse(@Context HttpServletRequest req, @Context HttpServletResponse resp); 
+//    
+//    @GET
+//    @Path("createAndPlaceCustomerOrder")  
+//    public void createAndPlaceCustomerOrder();
+//    
     
 //    @GET
 //    @Path("getCustomerTransactionStatus")
