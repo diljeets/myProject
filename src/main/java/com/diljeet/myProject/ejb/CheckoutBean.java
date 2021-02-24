@@ -116,20 +116,13 @@ public class CheckoutBean {
 
             if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
                 checkoutController.setOrderId(createOrderId());
-//                logger.log(Level.SEVERE, "New OrderId is {0}", checkoutController.getOrderId());
-//                logger.log(Level.SEVERE, "New payableamount is {0}", cartController.getPayableAmount());
                 initiateTransaction(cartController.getPayableAmount(), checkoutController.getOrderId());
-                //Redirect to generate new OrderId
-//                FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/index.xhtml");
             }
             if (response.getStatus() == Response.Status.GATEWAY_TIMEOUT.getStatusCode()) {
                 msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info!", "Your Session has Expired. Kindly Login again.");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }
             if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
-//                logger.log(Level.SEVERE, "There is an error");
-//                logger.log(Level.SEVERE, "response code is {0}", Integer.toString(response.getStatus()));
-//                String resultMsg = response.getHeaderString("resultMsg");
                 msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "1Something went wrong. Please try again.");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }

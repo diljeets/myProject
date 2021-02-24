@@ -5,7 +5,6 @@
  */
 package com.diljeet.myProject.ejb;
 
-import com.diljeet.myProject.controllers.OrderStatusController;
 import com.diljeet.myProject.entities.CustomerTransaction;
 import com.diljeet.myProject.utils.CardDetails;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
@@ -26,9 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.Response;
 import org.json.JSONArray;

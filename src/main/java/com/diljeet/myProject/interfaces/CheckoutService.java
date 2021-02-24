@@ -13,14 +13,11 @@ import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
 import com.diljeet.myProject.utils.SavedInstruments;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -31,16 +28,6 @@ import javax.ws.rs.core.Response;
 //@Remote
 @Path("/Checkout")
 public interface CheckoutService {
-
-//    @POST
-//    @Path("setDeliveryTime")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public void addDeliveryTime(String selectedTime);
-
-//    @GET
-//    @Path("getDeliveryTime")
-//    @Produces({MediaType.APPLICATION_JSON})
-//    public Response getDeliveryTime();
     
     @GET
     @Path("createOrderId")
@@ -100,32 +87,10 @@ public interface CheckoutService {
     @Path("processTransaction")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response processTransaction(PaymentRequestDetails paymentRequestDetails); 
-    
-//    @GET
-//    @Path("pgResponse") 
-//    public void pgGetResponse(@Context HttpServletRequest req, @Context HttpServletResponse resp);
-      
-//    @POST
-//    @Path("pgResponse")  
-//    public Response pgPostResponse(@Context HttpServletRequest req, @Context HttpServletResponse resp); 
-//    
-//    @GET
-//    @Path("createAndPlaceCustomerOrder")  
-//    public void createAndPlaceCustomerOrder();
-//    
-    
-//    @GET
-//    @Path("getCustomerTransactionStatus")
-//    @Produces({MediaType.APPLICATION_JSON})
-//    public Response getCustomerTransactionStatus();
 
     @POST
     @Path("transactionStatus")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response transactionStatus(String orderId);
 
-//    @POST
-//    @Path("placeOrder")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public Response placeOrder(CustomerOrder customerOrder);
 }

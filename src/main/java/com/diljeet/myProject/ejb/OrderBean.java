@@ -7,11 +7,7 @@ package com.diljeet.myProject.ejb;
 
 import com.diljeet.myProject.controllers.CartController;
 import com.diljeet.myProject.controllers.CheckoutController;
-import com.diljeet.myProject.controllers.TemplateController;
-import com.diljeet.myProject.entities.Cart;
 import com.diljeet.myProject.entities.CustomerOrder;
-import com.diljeet.myProject.entities.CustomerTransaction;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -21,11 +17,9 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -70,14 +64,8 @@ public class OrderBean {
                     .post(Entity.entity(customerOrder, MediaType.APPLICATION_JSON), Response.class);
             if (response.getStatus() == Response.Status.CREATED.getStatusCode()) {
                 logger.log(Level.SEVERE, "Order Placed Successfully");
-//                if (paymentMode.equals("POD")) {
-//                    FacesContext.getCurrentInstance().getExternalContext().redirect(req.getContextPath() + "/order-status.xhtml");
-//                }
             } else {
                 logger.log(Level.SEVERE, "Could not place Order.");
-//                if (paymentMode.equals("POD")) {
-//                    FacesContext.getCurrentInstance().getExternalContext().redirect(req.getContextPath() + "/order-status.xhtml");
-//                }
             }
             if (paymentMode.equals("POD")) {
                 FacesContext.getCurrentInstance().getExternalContext().redirect(req.getContextPath() + "/webapi/Order/pgResponse");
@@ -89,18 +77,6 @@ public class OrderBean {
         }
 
     }
-
-//    public void pgGetResponse() {
-//        Response response = null;
-//        try {
-//            response = client.target("http://localhost:8080/myProject/webapi/Order/pgResponse")
-//                    .request(MediaType.TEXT_HTML)
-//                    .header("Cookie", req.getHeader("Cookie"))
-//                    .get();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     public void clear() {
         cartController.removeAllFromCart();

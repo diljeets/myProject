@@ -6,14 +6,12 @@
 package com.diljeet.myProject.services;
 
 import com.diljeet.myProject.controllers.OrderController;
-import com.diljeet.myProject.controllers.TemplateController;
 import com.diljeet.myProject.ejb.PaymentGatewayBean;
 import com.diljeet.myProject.entities.Cart;
 import com.diljeet.myProject.entities.CustomerOrder;
 import com.diljeet.myProject.entities.CustomerTransaction;
 import com.diljeet.myProject.interfaces.OrderService;
 import java.util.logging.Logger;
-import com.diljeet.myProject.interfaces.OrderStatusService;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +25,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import org.json.JSONObject;
 
@@ -65,22 +62,10 @@ public class OrderServiceBean implements OrderService {
 
         //Get Customer Transaction Status
         CustomerTransaction customerTransaction = paymentGatewayBean.getCustomerTransactionStatus(parameters.toString());
-//        try {            
-//            resp.setContentType("application/json");
-//            resp.setCharacterEncoding("UTF-8");
-//            resp.getWriter().write(customerTransaction.toString()); 
-//            req.getRequestDispatcher("getPGResponse").forward(req, resp);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
         //Create and Place Order if transaction is successful if paymentMode is either CREDIT_CARD/ DEBIT_CARD/ NET_BANKING
         String respCode = customerTransaction.getRespCode();
         if (respCode.equals("01")) {
-//            orderController.createAndPlaceCustomerOrder();
-//            return Response
-//                    .temporaryRedirect(URI.create("/Order/createAndPlaceCustomerOrder"))
-//                    .build();
             return Response
                     .seeOther(URI.create("/Order/createAndPlaceCustomerOrder"))
                     .build();
@@ -112,19 +97,10 @@ public class OrderServiceBean implements OrderService {
     }
 
     @Override
-    public Response placeOrder(CustomerOrder customerOrder, HttpServletRequest req, HttpServletResponse resp) {
-//        String orderId = customerOrder.getCustomerTransaction().getOrderId();
-//        String payableAmount = customerOrder.getPayableAmount();
-
+    public Response placeOrder(CustomerOrder customerOrder) {
         try {
-//            paymentGatewayBean.initiateTransaction(orderId, payableAmount, username);
             String paymentMode = customerOrder.getPaymentMode();
-//            String customerName = templateController.getCurrentCustomer();
-//            String username = req.getUserPrincipal().getName();
-//            customerOrder.setCustomerName(customerName);
-//            customerOrder.setUsername(req.getUserPrincipal().getName());
             customerOrder.setDateOrderCreated(new Date());
-//            customerOrder.setOrderId(orderId);
             List<Cart> cartItems = customerOrder.getOrders();
             for (Cart cartItem : cartItems) {
                 cartItem.setCustomerOrder(customerOrder);
@@ -140,7 +116,6 @@ public class OrderServiceBean implements OrderService {
                 paymentGatewayBean.setCustomerTransaction(customerTransaction);
             }
 
-//            resp.sendRedirect(req.getContextPath() + "/order-status.xhtml");
             return Response
                     .status(Response.Status.CREATED)
                     .build();

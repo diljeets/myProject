@@ -20,8 +20,6 @@ import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.logging.Logger;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
@@ -35,7 +33,6 @@ import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 
@@ -50,7 +47,7 @@ public class CheckoutController implements Serializable {
     private static final Logger logger = Logger.getLogger(CheckoutController.class.getCanonicalName());
 
     private static final long serialVersionUID = 1L;
-    
+
     private CustomerOrder customerOrder;
     private String orderId;
     private PaymentOptions paymentOption;
@@ -432,10 +429,6 @@ public class CheckoutController implements Serializable {
         this.deliveryController = deliveryController;
     }
 
-//    public void addDeliveryTime(SelectEvent event) {
-//        String selectedTime = event.getObject().toString();
-//        checkoutService.addDeliveryTime(selectedTime);
-//    }
     public void initiateTransaction(String payableAmount) {
         if (orderId == null) {
             orderId = checkoutBean.createOrderId();
@@ -466,16 +459,11 @@ public class CheckoutController implements Serializable {
             try {
                 //Redirect if paymode is BALANCE/POD
                 FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/redirect-form.xhtml");
-//            checkoutBean.processTransaction(paymentRequestDetails);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else if (paymentMode.equals("CREDIT_CARD")) {
             if (isPaymentThroughSavedCard) {
-//                logger.log(Level.SEVERE, "Payment through saved CC");
-//                logger.log(Level.SEVERE, paymentMode);
-//                logger.log(Level.SEVERE, cardId);
-//                logger.log(Level.SEVERE, "cardCvv is {0}", cardCvv);
                 paymentRequestDetails = new PaymentRequestDetails(
                         paymentMode,
                         cardId,
@@ -483,9 +471,6 @@ public class CheckoutController implements Serializable {
                 );
                 checkoutBean.processTransaction(paymentRequestDetails);
             } else {
-//                logger.log(Level.SEVERE, "Payment through new CC");
-//                logger.log(Level.SEVERE, paymentMode);
-//                logger.log(Level.SEVERE, ccCvv);
                 String ccNumber = removeMaskingFromCardNumber(maskedCCNumber);
                 String ccExpiryDate = removeMaskingFromCardExpiryDate(maskedCCExpiryDate);
                 String saveCard = saveCC ? "1" : "0";
@@ -500,10 +485,6 @@ public class CheckoutController implements Serializable {
             }
         } else if (paymentMode.equals("DEBIT_CARD")) {
             if (isPaymentThroughSavedCard) {
-//                logger.log(Level.SEVERE, "Payment through saved DC");
-//                logger.log(Level.SEVERE, paymentMode);
-//                logger.log(Level.SEVERE, cardId);
-//                logger.log(Level.SEVERE, "cardCvv is {0}", cardCvv);
                 paymentRequestDetails = new PaymentRequestDetails(
                         paymentMode,
                         cardId,
@@ -511,9 +492,6 @@ public class CheckoutController implements Serializable {
                 );
                 checkoutBean.processTransaction(paymentRequestDetails);
             } else {
-//                logger.log(Level.SEVERE, "Payment through new DC");
-//                logger.log(Level.SEVERE, paymentMode);
-//                logger.log(Level.SEVERE, dcCvv);
                 String dcNumber = removeMaskingFromCardNumber(maskedDCNumber);
                 String dcExpiryDate = removeMaskingFromCardExpiryDate(maskedDCExpiryDate);
                 String saveCard = saveDC ? "1" : "0";
