@@ -14,6 +14,12 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+import javax.servlet.annotation.WebListener;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
+import org.primefaces.PrimeFaces;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 
@@ -22,7 +28,7 @@ import org.primefaces.event.SelectEvent;
  * @author diljeet
  */
 @Named(value = "registeredUsersAddressController")
-@SessionScoped
+@ViewScoped
 public class RegisteredUsersAddressController implements Serializable {
 
     private static final Logger logger = Logger.getLogger(RegisteredUsersAddressController.class.getCanonicalName());
@@ -31,6 +37,9 @@ public class RegisteredUsersAddressController implements Serializable {
 
     private RegisteredUsersAddress address;
     private List<RegisteredUsersAddress> addresses;    
+    
+    @Inject
+    TemplateController templateController;
 
     @EJB
     RegisteredUsersAddressService registeredUsersAddressService;
@@ -38,7 +47,12 @@ public class RegisteredUsersAddressController implements Serializable {
     @PostConstruct
     public void init() {
         address = new RegisteredUsersAddress();
-        setAddresses(registeredUsersAddressService.getAllRegisteredAddressByUsername());
+        if (!templateController.getCurrentCustomer().equals("Guest")){
+            setAddresses(registeredUsersAddressService.getAllRegisteredAddressByUsername());
+        } else {
+            PrimeFaces current = PrimeFaces.current();
+            current.executeScript("PF('credentials-sidebar').show()");
+        }            
     }
 
     public RegisteredUsersAddressController() {

@@ -75,7 +75,7 @@
             <url-pattern>/meal-plan-category.xhtml</url-pattern>       
             <url-pattern>/delivery-hours.xhtml</url-pattern>
             <!--            <url-pattern>/cart.xhtml</url-pattern>     -->
-            <url-pattern>/select-address-time.xhtml</url-pattern>    
+<!--            <url-pattern>/select-address-time.xhtml</url-pattern>    -->
             <url-pattern>/select-payment-option.xhtml</url-pattern>  
             <!--            <url-pattern>/change-password.xhtml</url-pattern>    -->
         </web-resource-collection>

@@ -17,16 +17,34 @@ and open the template in the editor.
 .top, #content{
     font-size: 1.2em;
 }*/
+body .credentials-sidebar .ui-tabs .ui-tabs-panels .ui-tabs-panel {
+    padding: 1rem 0;
+}
+body .credentials-sidebar .ui-tabs .ui-tabs-nav li.ui-tabs-header {
+    flex: 1;
+    justify-content: center;
+}
+body .credentials-sidebar .ui-tabs .ui-tabs-nav li.ui-tabs-header a {
+    font-size: 1.1em;
+    letter-spacing: 1px;
+    font-weight: normal;
+}
 .ui-float-label{
-    margin-top: 25px;
+    margin-top: 15px;
+}
+body .credentials-sidebar .ui-float-label > label {
+    margin-left: 0.8rem;
+}
+body .credentials-sidebar .ui-inputfield {
+    padding: 0.8rem 0.8rem;
 }
 .cmdBtn{
-    margin-top: 25px !important;
+    margin-top: 15px !important;
 }
-body .ui-progressbar {
-    height: 6px;
+body .ui-progressbar, body .credentials-sidebar .ui-progressbar {
+    height: 5px;
 }
-body .ui-panel .ui-panel-content {
+body .ui-panel .ui-panel-content, body .credentials-sidebar .ui-panel .ui-panel-content {
     border: 0;
     background: 0;
     padding: 0;    
@@ -119,7 +137,7 @@ body #cartForm .ui-datatable .ui-datatable-footer .proceedBtn{
 }
 .set-bg{
     background-color: whitesmoke;
-/*    border: 1px solid #e8d1d1;*/
+    /*    border: 1px solid #e8d1d1;*/
     /*    box-shadow: #e8d1d1 2px 2px 2px;*/
 }
 .continueBtn{
@@ -206,14 +224,17 @@ body #cartForm .ui-datatable .ui-datatable-footer .proceedBtn{
     .web-menu .fa-user{
         font-size: 1em;
     }
-/*    body .ui-button.ui-button-text-icon-left .ui-button-text {
-        font-size: 11px;
-    } */
+    /*    body .ui-button.ui-button-text-icon-left .ui-button-text {
+            font-size: 11px;
+        } */
+    .ui-sidebar-right {
+        width: 30em;
+    }
 }
 @media screen and (min-width: 1200px){
     .donot-show{
         display: block;
-    }         
+    }             
 }
 @media screen and (min-width: 1280px){
     .fix-jc{
@@ -221,9 +242,9 @@ body #cartForm .ui-datatable .ui-datatable-footer .proceedBtn{
     }        
 }
 @media screen and (min-width: 1400px){
-/*    body .ui-button.ui-button-text-icon-left .ui-button-text {
-        font-size: 13px;
-    }       */
+    /*    body .ui-button.ui-button-text-icon-left .ui-button-text {
+            font-size: 13px;
+        }       */
 }
 
 

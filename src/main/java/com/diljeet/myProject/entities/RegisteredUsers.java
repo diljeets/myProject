@@ -48,23 +48,23 @@ public class RegisteredUsers implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;    
     
-    @NotBlank
-    @NotEmpty    
+//    @NotBlank
+//    @NotEmpty    
     @Pattern(regexp = "^[A-Za-z]+(\\s\\w+)*$" , message="invalid name")
     private String name;
     
-    @NotBlank
-    @NotEmpty
+//    @NotBlank
+//    @NotEmpty
     @Size(min = 10 , max = 10 , message = "Mobile should be a 10 digit number.")
     @Pattern(regexp = "^[0-9]+$" , message="invalid mobile")
     private String mobile;
     
-    @NotBlank
-    @NotEmpty
+//    @NotBlank
+//    @NotEmpty
     @Email(message = "Not a valid Email Id.")
     private String username;
     
-    @NotNull
+//    @NotNull
     @Size(min = 8 , max = 15 , message = "Password can be 8-15 characters in length")
     @Pattern(regexp = "^[A-Za-z0-9!@#$%&]+$" , message="invalid password")
     private String password;    

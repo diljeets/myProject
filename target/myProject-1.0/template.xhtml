@@ -9,7 +9,7 @@
         <title>Facelets Template</title>  
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />        
         <h:outputStylesheet library="css" name="primeflex.css"/>
-        <h:outputStylesheet library="css" name="common.css"/>
+
         <script>
             $(document).ready(function () {
                 $(".hamicon").click(function () {
@@ -47,10 +47,20 @@
                             <div class="p-col-4 p-sm-5 p-md-2 p-xl-3">
                                 <div class="p-grid p-jc-end p-jc-sm-end p-jc-md-end p-jc-lg-end p-jc-xl-evenly p-align-end fix-jc">
                                     <div class="p-col-3 p-sm-3 p-md-4 p-lg-4 p-xl-4 p-pb-0">
-                                        <p:commandLink action="/login.xhtml">
+                                        <!--                                        <p:commandLink action="/login.xhtml">
+                                                                                    <div class="p-grid p-align-end">
+                                                                                        <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-right">
+                                                                                                                                                <i class="fa fa-fw fa-user"></i>
+                                                                                            <i class="pi pi-sign-in p-mr-1"></i>
+                                                                                        </div>
+                                                                                        <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-left donot-show">
+                                                                                            <span>Login</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </p:commandLink>-->
+                                        <p:commandLink actionListener="#{templateController.setTabIndex('0')}" onclick="PF('credentials-sidebar').show()" update="tabView">
                                             <div class="p-grid p-align-end">
-                                                <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-right">
-                                                    <!--                                                    <i class="fa fa-fw fa-user"></i>-->
+                                                <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-right">  
                                                     <i class="pi pi-sign-in p-mr-1"></i>
                                                 </div>
                                                 <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-left donot-show">
@@ -60,10 +70,20 @@
                                         </p:commandLink>
                                     </div>
                                     <div class="p-col-3 p-sm-3 p-md-4 p-lg-4 p-xl-4 p-pb-0">
-                                        <p:commandLink action="/signup.xhtml">
+                                        <!--                                        <p:commandLink action="/signup.xhtml">
+                                                                                    <div class="p-grid p-align-end">
+                                                                                        <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-right">
+                                                                                                                                                <i class="fa fa-fw fa-user-plus"></i>
+                                                                                            <i class="pi pi-user-plus p-mr-1"></i>
+                                                                                        </div>
+                                                                                        <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center donot-show">
+                                                                                            <span>Register</span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </p:commandLink>-->
+                                        <p:commandLink actionListener="#{templateController.setTabIndex('1')}" onclick="PF('credentials-sidebar').show()" update="tabView">
                                             <div class="p-grid p-align-end">
                                                 <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center p-text-xl-right">
-                                                    <!--                                                    <i class="fa fa-fw fa-user-plus"></i>-->
                                                     <i class="pi pi-user-plus p-mr-1"></i>
                                                 </div>
                                                 <div class="p-col p-py-0 p-px-xl-0 p-text-lg-center donot-show">
@@ -132,7 +152,25 @@
                 <ui:insert name="content">Main Content</ui:insert>
             </div>
         </div> 
+        <p:sidebar class="credentials-sidebar" widgetVar="credentials-sidebar" position="right" baseZIndex="10000" blockScroll="true">
+            <p:panel widgetVar="progressPanelSidebar"
+                     visible="false"
+                     style="border:none;"
+                     closable="true"
+                     toggleable="true">
+                <p:progressBar mode="indeterminate"/>
+            </p:panel>
+            <p:tabView id="tabView" activeIndex="#{templateController.tabIndex}" styleClass="p-mt-5 p-px-2 p-px-lg-4" prependId="false">
+                <p:tab title="Sign In">
+                    <ui:include src="login_sidebar.xhtml"/>
+                </p:tab>
+                <p:tab title="Sign Up">                    
+                    <ui:include src="signup_sidebar.xhtml"/>
+                </p:tab>                   
+            </p:tabView>
+        </p:sidebar>
         <div class="overlay"></div>
+        <h:outputStylesheet library="css" name="common.css"/>
     </h:body>
 </html>
 

@@ -23,39 +23,43 @@
                 </p>
 
                 <p:panelGrid>
-
-                    <span class="ui-float-label">                        
-                        <p:inputText id="name" value="#{registeredUsersController.user.name}" maxlength="25"/>
-                        <p:outputLabel for="@previous" value="Name"/>
-                        <p:message for="name"/>
-                    </span>
-
-                    <span class="ui-float-label"> 
-                        <p:inputText id="mobile" value="#{registeredUsersController.user.mobile}"/>
-                        <p:outputLabel for="mobile" value="Mobile"/>
-                        <p:message for="mobile"/>
-                    </span>
-
-                    <span class="ui-float-label">                             
-                        <p:inputText id="email" value="#{registeredUsersController.user.username}"/>
-                        <p:outputLabel for="email" value="Email Id"/>
-                        <p:message for="email"/>
-                    </span>
-
-                    <span class="ui-float-label">                             
-                        <p:password id="password" value="#{registeredUsersController.user.password}"/>  
-                        <p:outputLabel for="password" value="Password"/>
-                        <p:message for="password"/>
-                    </span>
-
-                    <span class="ui-float-label">                             
-                        <p:password id="confirmPassword" value="#{registeredUsersController.user.confirmPassword}"/>
-                        <p:outputLabel for="confirmPassword" value="Confirm Password"/>
-                        <p:message for="confirmPassword"/> 
-                    </span>
-
+                    <p:row>
+                        <span class="ui-float-label">                        
+                            <p:inputText id="name" value="#{registeredUsersController.user.name}" maxlength="25"/>
+                            <p:outputLabel for="@previous" value="Name"/>
+                            <p:message for="name"/>
+                        </span>
+                    </p:row>
+                    <p:row>
+                        <span class="ui-float-label"> 
+                            <p:inputText id="mobile" value="#{registeredUsersController.user.mobile}"/>
+                            <p:outputLabel for="mobile" value="Mobile"/>
+                            <p:message for="mobile"/>
+                        </span>
+                    </p:row>
+                    <p:row>
+                        <span class="ui-float-label">                             
+                            <p:inputText id="email" value="#{registeredUsersController.user.username}"/>
+                            <p:outputLabel for="email" value="Email Id"/>
+                            <p:message for="email"/>
+                        </span>
+                    </p:row>
+                    <p:row>
+                        <span class="ui-float-label">                             
+                            <p:password id="password" value="#{registeredUsersController.user.password}"/>  
+                            <p:outputLabel for="password" value="Password"/>
+                            <p:message for="password"/>
+                        </span>
+                    </p:row>
+                    <p:row>
+                        <span class="ui-float-label">                             
+                            <p:password id="confirmPassword" value="#{registeredUsersController.user.confirmPassword}"/>
+                            <p:outputLabel for="confirmPassword" value="Confirm Password"/>
+                            <p:message for="confirmPassword"/> 
+                        </span>
+                    </p:row>
                 </p:panelGrid> 
-                
+
                 <p:commandButton value="Create" id="createBtn" class="cmdBtn" action="#{registeredUsersController.createUser(registeredUsersController.user)}" binding="#{registeredUsersController.createBtn}" update="signupForm msgs" onclick="PF('progressPanel').show();PF('actionBtn').disable();" oncomplete="PF('progressPanel').close();PF('actionBtn').enable();" widgetVar="actionBtn"/>
             </h:form>
         </p>

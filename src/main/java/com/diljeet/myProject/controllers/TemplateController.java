@@ -7,6 +7,7 @@ package com.diljeet.myProject.controllers;
 
 import com.diljeet.myProject.ejb.RegisteredUsersBean;
 import java.io.Serializable;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -29,6 +30,7 @@ public class TemplateController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String currentCustomer;
+    private String tabIndex;
 
     @EJB
     RegisteredUsersBean registeredUsersBean;
@@ -63,6 +65,14 @@ public class TemplateController implements Serializable {
         this.currentCustomer = currentCustomer;
     }
 
+    public String getTabIndex() {
+        return tabIndex;
+    }
+
+    public void setTabIndex(String tabIndex) {
+        this.tabIndex = tabIndex;
+    }    
+    
     public String logout() {
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         return "/login.xhtml";
