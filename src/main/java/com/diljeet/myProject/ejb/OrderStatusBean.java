@@ -5,6 +5,7 @@
  */
 package com.diljeet.myProject.ejb;
 
+import com.diljeet.myProject.controllers.CheckoutController;
 import com.diljeet.myProject.entities.CustomerTransaction;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +34,9 @@ public class OrderStatusBean {
 
     @Inject
     HttpServletRequest req;
+    
+    @Inject
+    CheckoutController checkoutController;
 
     @PostConstruct
     public void init() {
@@ -60,9 +64,21 @@ public class OrderStatusBean {
             }
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Could not place Order");
+        } finally {
+            clear();
         }
 
         return customerTransaction;
     }   
+    
+    public void clear() {
+        checkoutController.setIsModeCC(false);
+        checkoutController.setIsModeDC(false);
+        checkoutController.setIsModeNB(false);
+        checkoutController.setIsModePaytm(false);
+        checkoutController.setIsModePOD(false);
+        checkoutController.setPaymentOption(null);
+        checkoutController.setSavedInstrument(null);
+    }
 
 }

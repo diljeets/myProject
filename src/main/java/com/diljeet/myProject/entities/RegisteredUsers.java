@@ -28,9 +28,6 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 //import org.jboss.security.auth.spi.Util;
 
-
-
-
 /**
  *
  * @author diljeet
@@ -40,58 +37,58 @@ import javax.validation.constraints.Size;
 @NamedQuery(name = "getAllUsers",
         query = "Select u from RegisteredUsers u")
 public class RegisteredUsers implements Serializable {
-    
+
     private static final Logger logger = Logger.getLogger(RegisteredUsers.class.getCanonicalName());
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;    
-    
-    @NotBlank
-    @NotEmpty    
-    @Pattern(regexp = "^[A-Za-z]+(\\s\\w+)*$" , message="invalid name")
+    private Long id;
+
+    //    @NotBlank
+//    @NotEmpty    
+    @Pattern(regexp = "^[A-Za-z]+(\\s\\w+)*$", message = "invalid name")
     private String name;
-    
-    @NotBlank
-    @NotEmpty
-    @Size(min = 10 , max = 10 , message = "Mobile should be a 10 digit number.")
-    @Pattern(regexp = "^[0-9]+$" , message="invalid mobile")
+
+//    @NotBlank
+//    @NotEmpty
+    @Size(min = 10, max = 10, message = "Mobile should be a 10 digit number.")
+    @Pattern(regexp = "^[0-9]+$", message = "invalid mobile")
     private String mobile;
-    
-    @NotBlank
-    @NotEmpty
+
+//    @NotBlank
+//    @NotEmpty
     @Email(message = "Not a valid Email Id.")
     private String username;
-    
-    @NotNull
-    @Size(min = 8 , max = 15 , message = "Password can be 8-15 characters in length")
-    @Pattern(regexp = "^[A-Za-z0-9!@#$%&]+$" , message="invalid password")
-    private String password;    
-    
+
+//    @NotNull
+    @Size(min = 8, max = 15, message = "Password can be 8-15 characters in length")
+    @Pattern(regexp = "^[A-Za-z0-9!@#$%&]+$", message = "invalid password")
+    private String password;
+
     @Transient
     private String confirmPassword;
-    
+
     private String role;
-    
-    private String salt;   
-    
+
+    private String salt;
+
     private String isActive;
-    
+
     private String isPasswordChangeRequest;
-    
+
     private Date dateCustomerCreated;
-    
+
     private Date dateCustomerLastUpdated;
-    
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "registeredUser")
     @JsonbTransient
 //    @XmlTransient
     private List<RegisteredUsersAddress> addresses = new ArrayList<>();
 
-    public RegisteredUsers() {        
+    public RegisteredUsers() {
 
-    }       
+    }
 
     public Long getId() {
         return id;
@@ -115,7 +112,7 @@ public class RegisteredUsers implements Serializable {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
-    }   
+    }
 
     public String getUsername() {
         return username;
@@ -123,7 +120,7 @@ public class RegisteredUsers implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
-    }  
+    }
 
     public String getPassword() {
         return password;
@@ -140,7 +137,7 @@ public class RegisteredUsers implements Serializable {
     public void setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
     }
-    
+
     public String getRole() {
         return role;
     }
@@ -155,7 +152,7 @@ public class RegisteredUsers implements Serializable {
 
     public void setSalt(String salt) {
         this.salt = salt;
-    }    
+    }
 
     public String getIsActive() {
         return isActive;
@@ -171,7 +168,7 @@ public class RegisteredUsers implements Serializable {
 
     public void setIsPasswordChangeRequest(String isPasswordChangeRequest) {
         this.isPasswordChangeRequest = isPasswordChangeRequest;
-    }    
+    }
 
     public Date getDateCustomerCreated() {
         return dateCustomerCreated;
@@ -196,7 +193,7 @@ public class RegisteredUsers implements Serializable {
     public void setAddresses(List<RegisteredUsersAddress> addresses) {
         this.addresses = addresses;
     }
-      
+
     public void addAddress(RegisteredUsersAddress address) {
         addresses.add(address);
         address.setRegisteredUser(this);
@@ -206,7 +203,7 @@ public class RegisteredUsers implements Serializable {
         addresses.remove(address);
         address.setRegisteredUser(this);
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -231,5 +228,5 @@ public class RegisteredUsers implements Serializable {
     public String toString() {
         return "com.diljeet.test.entity.TestUsers[ id=" + id + " ]";
     }
-    
+
 }

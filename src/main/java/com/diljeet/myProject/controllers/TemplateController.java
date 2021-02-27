@@ -7,13 +7,17 @@ package com.diljeet.myProject.controllers;
 
 import com.diljeet.myProject.ejb.RegisteredUsersBean;
 import java.io.Serializable;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -29,15 +33,32 @@ public class TemplateController implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String currentCustomer;
-    
+    private String tabIndex;
+//    private String originalURL;
+
     @Inject
     HttpServletRequest req;
 
     @EJB
-    RegisteredUsersBean registeredUsersBean;    
+    RegisteredUsersBean registeredUsersBean;
 
     @PostConstruct
     public void init() {
+//        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+//        HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
+        
+//        originalURL = request.getRequestURL().toString();
+//
+//        if (originalURL == null) {
+//            originalURL = externalContext.getRequestContextPath() + "/index.xhtml";
+        //} else {
+//            String originalQuery = (String) externalContext.getRequestMap().get(RequestDispatcher.FORWARD_QUERY_STRING);
+//
+//            if (originalQuery != null) {
+//                originalURL += "?" + originalQuery;
+//            }
+//        }
+//        logger.log(Level.SEVERE, "Original URL is {0}", originalURL);
     }
 
     /**
@@ -54,14 +75,30 @@ public class TemplateController implements Serializable {
             return "Guest";
         } catch (Exception e) {
             e.printStackTrace();
-        }       
+        }
 
-        return registeredUsersBean.getUser(user);    
+        return registeredUsersBean.getUser(user);
     }
 
     public void setCurrentCustomer(String currentCustomer) {
         this.currentCustomer = currentCustomer;
     }
+
+    public String getTabIndex() {
+        return tabIndex;
+    }
+
+    public void setTabIndex(String tabIndex) {
+        this.tabIndex = tabIndex;
+    }
+
+//    public String getOriginalURL() {
+//        return originalURL;
+//    }
+//
+//    public void setOriginalURL(String originalURL) {
+//        this.originalURL = originalURL;
+//    }
 
     public String logout() {
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();

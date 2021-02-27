@@ -24,7 +24,8 @@
                                              var="cartItem"
                                              rendered="#{cartController.cartItems.size() > -1}"
                                              summary="List of Ordered Plans"
-                                             reflow="true">
+                                             reflow="true"
+                                             emptyMessage="Sorry, You have an empty Cart">
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Name"/>

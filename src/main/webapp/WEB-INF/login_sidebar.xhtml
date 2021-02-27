@@ -1,0 +1,47 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">  
+    <h3>Hello, kindly log in</h3>
+    <p>
+        <h:outputText value="Authentication failed" rendered="#{param['fail'] == 'true'}" style="color:#ff0000"/>
+    </p>    
+    <p>
+        <h:outputText value="Account is Active. Kindly login again." rendered="#{param['account'] == 'true'}" style="color:#ff0000"/>
+    </p>
+    <p>
+        <h:outputText value="Account/User either is inactive or does not exist." rendered="#{param['account'] == 'false'}" style="color:#ff0000"/>
+    </p>
+    <p>
+        <h:outputText value="Account/User is already Active." rendered="#{param['isactive'] == 'true'}" style="color:#ff0000"/>
+    </p>
+    <p>
+        <h:outputText value="Kindly use Password sent to your registered Email id to login." rendered="#{param['sentPassword'] == 'true'}" style="color:#ff0000"/>
+    </p>
+    <p>
+        <h:outputText value="Password changed Successfully." rendered="#{param['passwordChanged'] == 'true'}" style="color:#ff0000"/>
+    </p>
+    <p>
+        <h:outputText value="Password has already been changed." rendered="#{param['passwordAlreadyChanged'] == 'true'}" style="color:#ff0000"/>
+    </p>        
+
+    <h:form id="login" onsubmit="document.getElementById('login').action = 'j_security_check';" prependId="false">
+        <div class="ui-fluid p-formgrid p-grid">
+            <span class="ui-float-label p-field p-col-12">                    
+                <p:inputText id="j_username"/>  
+                <p:outputLabel for="j_username" value="Username" />
+            </span>
+
+            <span class="ui-float-label p-field p-col-12">                     
+                <p:password id="j_password"/>
+                <p:outputLabel for="j_password" value="Password" />
+            </span>
+
+            <span class="ui-float-label p-field p-col-12"> 
+                <p:commandButton type="submit" value="Submit" ajax="false" onclick="PF('progressPanelSidebar').show();" styleClass="ui-button-raised p-py-1"/>
+            </span>
+        </div>
+    </h:form>
+</ui:composition>

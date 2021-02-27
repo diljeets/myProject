@@ -17,8 +17,8 @@
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/CheckoutServiceBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/PayChannelOptionsNetBanking.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/RedirectForm.java
-/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/OrderStatusController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/OrderController.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/OrderStatusController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/entities/Cart.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/DeliveryController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/interfaces/RegisteredUsersService.java
