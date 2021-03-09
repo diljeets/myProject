@@ -58,7 +58,7 @@ public class OrderBean {
         String paymentMode = customerOrder.getPaymentMode();
         Response response = null;
         try {
-            response = client.target("http://localhost:8080/myProject/webapi/Order/placeOrder")
+            response = client.target("http://192.168.43.80:8080/myProject/webapi/Order/placeOrder")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(customerOrder, MediaType.APPLICATION_JSON), Response.class);

@@ -88,7 +88,7 @@ public class CheckoutBean {
     public String createOrderId() {
         String orderId = null;
         try {
-            orderId = client.target("http://localhost:8080/myProject/webapi/Checkout/createOrderId")
+            orderId = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/createOrderId")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .get(String.class);
@@ -107,9 +107,9 @@ public class CheckoutBean {
                 orderId,
                 req.getUserPrincipal().getName(),
                 "WEB",
-                "http://localhost:8080/myProject/webapi/Order/pgResponse");
+                "http://192.168.43.80:8080/myProject/webapi/Order/pgResponse");
         try {
-            Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/initiateTransaction")
+            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/initiateTransaction")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(initiateTransaction, MediaType.APPLICATION_JSON), Response.class);
@@ -138,7 +138,7 @@ public class CheckoutBean {
     public List<PaymentOptions> fetchPaymentOptions() {
         List<PaymentOptions> paymentOptions = null;
         try {
-            paymentOptions = client.target("http://localhost:8080/myProject/webapi/Checkout/fetchPaymentOptions")
+            paymentOptions = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchPaymentOptions")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .get(new GenericType<List<PaymentOptions>>() {
@@ -154,7 +154,7 @@ public class CheckoutBean {
     public List<PayChannelOptionsPaytmBalance> fetchPayChannelOptionsPaytmBalance() {
         List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance = null;
         try {
-            payChannelOptionsPaytmBalance = client.target("http://localhost:8080/myProject/webapi/Checkout/fetchPayChannelOptionsPaytmBalance")
+            payChannelOptionsPaytmBalance = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchPayChannelOptionsPaytmBalance")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .get(new GenericType<List<PayChannelOptionsPaytmBalance>>() {
@@ -170,7 +170,7 @@ public class CheckoutBean {
     public List<SavedInstruments> fetchSavedInstruments() {
         List<SavedInstruments> savedInstruments = null;
         try {
-            savedInstruments = client.target("http://localhost:8080/myProject/webapi/Checkout/fetchSavedInstruments")
+            savedInstruments = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchSavedInstruments")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .get(new GenericType<List<SavedInstruments>>() {
@@ -186,7 +186,7 @@ public class CheckoutBean {
     public List<PayChannelOptionsNetBanking> fetchPayChannelOptionsNetBanking() {
         List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = null;
         try {
-            payChannelOptionsNetBanking = client.target("http://localhost:8080/myProject/webapi/Checkout/fetchPayChannelOptionsNetBanking")
+            payChannelOptionsNetBanking = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchPayChannelOptionsNetBanking")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .get(new GenericType<List<PayChannelOptionsNetBanking>>() {
@@ -204,7 +204,7 @@ public class CheckoutBean {
             return;
         }
         try {
-            Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/sendOTP")
+            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/sendOTP")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(paytmMobile, MediaType.APPLICATION_JSON), Response.class);
@@ -228,13 +228,13 @@ public class CheckoutBean {
             return;
         }
         try {
-            Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/validateOTP/fetchBalance")
+            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/validateOTP/fetchBalance")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(otp, MediaType.APPLICATION_JSON), Response.class);
             String resultMsg = response.getHeaderString("resultMsg");
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/select-payment-option.xhtml");
+                FacesContext.getCurrentInstance().getExternalContext().redirect("http://192.168.43.80:8080/myProject/select-payment-option.xhtml");
             } else if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
                 msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
                 FacesContext.getCurrentInstance().addMessage(null, msg);
@@ -248,7 +248,7 @@ public class CheckoutBean {
 
     public boolean fetchBinDetails(String firstSixCardDigits) {
         try {
-            Response response = client.target("http://localhost:8080/myProject/webapi/Checkout/card/fetchBinDetails")
+            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/card/fetchBinDetails")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(firstSixCardDigits, MediaType.APPLICATION_JSON), Response.class);
@@ -272,7 +272,7 @@ public class CheckoutBean {
     public List<CardDetails> fetchCardDetails() {
         List<CardDetails> cardDetails = null;
         try {
-            cardDetails = client.target("http://localhost:8080/myProject/webapi/Checkout/fetchCardDetails")
+            cardDetails = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchCardDetails")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .get(new GenericType<List<CardDetails>>() {
@@ -287,7 +287,7 @@ public class CheckoutBean {
 
     public void fetchOtherNetBankingPaymentChannels() {
         try {
-            client.target("http://localhost:8080/myProject/webapi/Checkout/fetchOtherNetBankingPaymentChannels")
+            client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchOtherNetBankingPaymentChannels")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .get();
@@ -303,7 +303,7 @@ public class CheckoutBean {
         String paymentMode = paymentRequestDetails.getPaymentMode();
         Response response = null;
         try {
-            response = client.target("http://localhost:8080/myProject/webapi/Checkout/processTransaction")
+            response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/processTransaction")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(paymentRequestDetails, MediaType.APPLICATION_JSON), Response.class);
@@ -359,7 +359,7 @@ public class CheckoutBean {
                     }
 
                     //Redirect if paymode is CREDIT_CARD / DEBIT_CARD / NET_BANKING
-                    FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/redirect-form.xhtml");
+                    FacesContext.getCurrentInstance().getExternalContext().redirect("http://192.168.43.80:8080/myProject/redirect-form.xhtml");
                 } else {
                     //Save Customer Order in Database and Redirect if paymode is BALANCE and Customer Transaction is successful
                     orderController.createAndPlaceCustomerOrder();
@@ -380,7 +380,7 @@ public class CheckoutBean {
     public Response transactionStatus(String orderId) {
         Response response = null;
         try {
-            response = client.target("http://localhost:8080/myProject/webapi/Checkout/transactionStatus")
+            response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/transactionStatus")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(orderId, MediaType.APPLICATION_JSON), Response.class);

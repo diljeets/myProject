@@ -458,7 +458,7 @@ public class CheckoutController implements Serializable {
             );
             try {
                 //Redirect if paymode is BALANCE/POD
-                FacesContext.getCurrentInstance().getExternalContext().redirect("http://localhost:8080/myProject/redirect-form.xhtml");
+                FacesContext.getCurrentInstance().getExternalContext().redirect("http://192.168.43.80:8080/myProject/redirect-form.xhtml");
             } catch (IOException e) {
                 e.printStackTrace();
             }

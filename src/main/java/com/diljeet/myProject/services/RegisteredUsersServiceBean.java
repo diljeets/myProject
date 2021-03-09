@@ -10,6 +10,7 @@ import com.diljeet.myProject.interfaces.RegisteredUsersService;
 import com.diljeet.myProject.entities.RegisteredUsers;
 import com.diljeet.myProject.utils.MyProjectUtils;
 import static com.diljeet.myProject.utils.MyProjectUtils.manipulateEncodedPassword;
+import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -28,8 +29,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Response;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
@@ -115,6 +119,108 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
 
     }
 
+//    @Override
+//    public Response loginUser(RegisteredUsers user, HttpServletRequest req, HttpServletResponse res) {
+//        if (user == null) {
+//            return null;
+//        } else {
+//            logger.log(Level.SEVERE, "user is {0}", user.getUsername());
+//        }
+//        return null;
+//    }
+    @Override
+    public Response loginUser(String channel,
+            RegisteredUsers user,
+            HttpServletRequest req,
+            HttpServletResponse res) {
+        if (user == null) {
+            logger.log(Level.SEVERE, "user is null");
+//            return null;
+        } else {
+            try {
+                Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
+                query.setParameter("username", user.getUsername());
+                Object accountExists = query.getSingleResult();
+                RegisteredUsers existingUser = (RegisteredUsers) accountExists;
+                if (existingUser instanceof RegisteredUsers) {
+                    if ((existingUser.getIsActive()).equals("yes")) {
+                        logger.log(Level.SEVERE, "Account is Active");
+                        String encodedSalt = existingUser.getSalt();
+                        String password = user.getPassword();
+
+                        Decoder decoder = Base64.getDecoder();
+                        byte[] saltInBytes = decoder.decode(encodedSalt);
+                        byte[] passwordInBytes = password.getBytes();
+                        MessageDigest md = MessageDigest.getInstance("SHA-512");
+                        md.update(saltInBytes);
+                        md.update(passwordInBytes);
+                        byte[] digest = md.digest();
+
+                        Encoder encoder = Base64.getEncoder();
+                        String encodedPassword = encoder.encodeToString(digest);
+
+                        if (encodedPassword.equals(existingUser.getPassword())) {
+                            logger.log(Level.SEVERE, "Login Successful");
+                            if (channel.equals("WAP")) {
+                                HttpSession session = req.getSession();
+                                session.setAttribute("user", existingUser);
+                                return Response
+                                        .status(Response.Status.CREATED)
+                                        .build();
+                            } else {
+                                return Response
+                                        .status(Response.Status.ACCEPTED)
+                                        .entity(existingUser)
+                                        .build();
+                            }
+
+//                            String sessionId = session.getId();
+//                            logger.log(Level.SEVERE, "User Session Id is {0}", session.getId());
+//                            Cookie cookie = new Cookie("JSESSIONID", session.getId());
+//                            res.addCookie(cookie);
+//                            RegisteredUsers sessionUser = (RegisteredUsers) session.getAttribute("user");
+//                            logger.log(Level.SEVERE, "Session user object is {0}", sessionUser.getUsername());
+//                            RequestDispatcher dispatcher = req.getRequestDispatcher(req.getContextPath());
+//                            dispatcher.forward(req, res);
+//                            res.sendRedirect(req.getContextPath() + "/index.xhtml");                            
+//                            return Response
+//                                    .temporaryRedirect(URI.create("http://192.168.43.80:8080/myProject/index.xhtml"))
+//                                    .build();
+                        } else {
+                            logger.log(Level.SEVERE, "Login Unsuccessful");
+                            return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+                        }
+//                        return Response.status(Response.Status.FOUND).build();
+                    } else {
+                        logger.log(Level.SEVERE, "Account is inActive");
+                        return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+                    }
+                } else {
+                    logger.log(Level.SEVERE, "Account does not Exist");
+                    return Response.status(Response.Status.NOT_FOUND).build();
+                }
+            } catch (Exception e) {
+                if (e instanceof NoResultException) {
+                    logger.log(Level.SEVERE, "Account does not Exist 1");
+                    return Response.status(Response.Status.NOT_FOUND).build();
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void loginRedirect(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            logger.log(Level.SEVERE, "inside loginRedirect");
+            resp.sendRedirect(req.getContextPath() + "/index.xhtml");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public List<RegisteredUsers> getAllUsers() {
         //logger.log(Level.SEVERE, "Coming from service");
@@ -127,28 +233,28 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
         return users;
     }
 
-    @Override    
+    @Override
 //    @RolesAllowed("Administrator")
-    public Response getUser(String username) {        
+    public Response getUser(String username) {
         try {
             Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
             query.setParameter("username", username);
             Object accountExists = query.getSingleResult();
             RegisteredUsers existingUser = (RegisteredUsers) accountExists;
-            if (existingUser instanceof RegisteredUsers) {                
+            if (existingUser instanceof RegisteredUsers) {
                 return Response.status(Response.Status.FOUND).entity(existingUser).build();
-            } else {                
+            } else {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-        } catch(Exception e){            
+        } catch (Exception e) {
             return null;
-        }          
+        }
     }
 
     @Override
     public void activateAccount(String encodedEmail,
             HttpServletRequest req,
-             HttpServletResponse res
+            HttpServletResponse res
     ) {
         try {
             Decoder decoder = Base64.getDecoder();
@@ -159,7 +265,6 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
             query.setParameter("username", username);
             Object accountExists = query.getSingleResult();
             RegisteredUsers existingUser = (RegisteredUsers) accountExists;
-
             if (existingUser instanceof RegisteredUsers) {
                 if ((existingUser.getIsActive()).equals("no")) {
                     existingUser.setIsActive("yes");
@@ -229,9 +334,53 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
 
     }
 
+//    @Override
+//    public Response getUserByUsername(String username, RegisteredUsers user) {
+//        try {
+//            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
+//            query.setParameter("username", username);
+//            Object accountExists = query.getSingleResult();
+//            RegisteredUsers existingUser = (RegisteredUsers) accountExists;
+//
+//            if ((existingUser instanceof RegisteredUsers)
+//                    && (existingUser.getIsActive()).equals("yes")) {
+//                existingUser.setIsPasswordChangeRequest("yes");
+//                if ((user.getPassword()).equals(user.getConfirmPassword())) {
+//                    String encodedSalt = existingUser.getSalt();
+//
+//                    Decoder decoder = Base64.getDecoder();
+//
+//                    byte[] saltInBytes = decoder.decode(encodedSalt);
+//                    byte[] passwordInBytes = user.getPassword().getBytes();
+//                    MessageDigest md = MessageDigest.getInstance("SHA-512");
+//                    md.update(saltInBytes);
+//                    md.update(passwordInBytes);
+//                    byte[] digest = md.digest();
+//
+//                    if ((existingUser.getIsPasswordChangeRequest()).equals("yes")) {
+//                        MyProjectUtils.sendChangePasswordConsentLinkOnMail(mailSession, username, digest);
+//                    }
+//
+//                    return Response.status(Response.Status.ACCEPTED).build();
+//                } else {
+//                    return Response.status(Response.Status.PRECONDITION_FAILED).build();
+//                }
+//            } else {
+//                return Response.status(Response.Status.NOT_FOUND).build();
+//            }
+//        } catch (Exception e) {
+//            if (e instanceof NoResultException) {
+//                return Response.status(Response.Status.NOT_FOUND).build();
+//            } else {
+////                logger.log(Level.SEVERE, e.getMessage());
+////                LOG.error(e.getMessage());
+//                return null;
+//            }
+//        }
+//    }
     @Override
-    public Response getUserByUsername(String username, RegisteredUsers user
-    ) {
+    public Response changePasswordByUsername(RegisteredUsers user) {
+        String username = user.getUsername();
         try {
             Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
             query.setParameter("username", username);
@@ -278,7 +427,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
     @Override
     public void changePassword(String encodedEmail,
             String encodedPassword,
-             HttpServletRequest req,
+            HttpServletRequest req,
             HttpServletResponse res
     ) {
         try {
@@ -298,7 +447,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                 }
                 existingUser.setPassword(encodedPassword);
                 existingUser.setIsPasswordChangeRequest("no");
-                existingUser.setDateCustomerLastUpdated(new Date());                
+                existingUser.setDateCustomerLastUpdated(new Date());
                 res.sendRedirect(req.getContextPath() + "/login.xhtml?passwordChanged=true");
             } else if ((existingUser.getIsPasswordChangeRequest()).equals("no")) {
                 res.sendRedirect(req.getContextPath() + "/login.xhtml?passwordAlreadyChanged=true");

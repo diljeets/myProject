@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -30,7 +31,20 @@ public interface RegisteredUsersService {
 
     @POST
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response createUser(RegisteredUsers user) throws NoSuchAlgorithmException;
+    public Response createUser(RegisteredUsers user) throws NoSuchAlgorithmException; 
+    
+    @POST
+    @Path("login")    
+    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    public Response loginUser(@HeaderParam("channel") String channel,
+            RegisteredUsers user,
+            @Context HttpServletRequest req,
+            @Context HttpServletResponse res);
+    
+    @GET
+    @Path("loginRedirect")
+    public void loginRedirect(@Context HttpServletRequest req, @Context HttpServletResponse resp);
 
     @GET
     @Path("all")
@@ -42,11 +56,17 @@ public interface RegisteredUsersService {
     @Produces({MediaType.APPLICATION_JSON})    
     public Response getUser(@PathParam("username") String email);
     
+//    @POST
+//    @Path("{username}")
+//    @Produces({MediaType.APPLICATION_JSON})
+//    @Consumes({MediaType.APPLICATION_JSON})
+//    public Response getUserByUsername(@PathParam("username") String email , RegisteredUsers user);
+    
     @POST
-    @Path("{username}")
+    @Path("change-password")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response getUserByUsername(@PathParam("username") String email , RegisteredUsers user);
+    public Response changePasswordByUsername(RegisteredUsers user);
 
     @GET
     @Produces({MediaType.APPLICATION_JSON})

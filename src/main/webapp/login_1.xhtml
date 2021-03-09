@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Login</title>           
+        <style type="text/css">            
+            .container{
+                top:-300px;
+                bottom:0;
+                right:0;
+                left:0;
+                position:absolute;
+                width:500px;
+                margin:auto;
+                height:fit-content;
+                background-color: #efefef;
+                padding: 30px;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <div class="container">
+            <p:panel widgetVar="progressPanel"
+                     visible="false"
+                     style="border:none;"
+                     closable="true"
+                     toggleable="true" 
+                     rendered="#{!param['fail'] == 'true'}">
+                <p:progressBar mode="indeterminate"/>
+            </p:panel>
+            <h2>Hello, please log in:</h2>             
+            <h:form id="login">
+                <p:panelGrid>
+                    <p:row>
+                        <span class="ui-float-label">                    
+                            <p:inputText id="username" value="#{registeredUsersController.user.username}"/>  
+                            <p:outputLabel for="username" value="Username" />
+                        </span>
+                    </p:row>
+                    <p:row>
+                        <span class="ui-float-label">                    
+                            <p:password id="password" value="#{registeredUsersController.user.password}"/>
+                            <p:outputLabel for="password" value="Password" />
+                        </span>
+                    </p:row>
+                    <p:row>
+                        <p:commandButton value="Submit" class="cmdBtn" action="#{registeredUsersController.loginUser(registeredUsersController.user)}" update="login" onclick="PF('progressPanel').show();PF('actionBtn').disable();" oncomplete="PF('progressPanel').close();PF('actionBtn').enable();" widgetVar="actionBtn"/>
+                    </p:row>                     
+                </p:panelGrid>
+            </h:form>
+
+            <p>
+                <a href="forgot-password.xhtml">Forgot Password</a>?
+            </p>            
+            <p>
+                New User? <a href="signup.xhtml">Sign Up</a>?
+            </p>
+
+
+        </div>
+        <h:outputStylesheet library="css" name="common.css"/>
+    </h:body>
+</html>
+

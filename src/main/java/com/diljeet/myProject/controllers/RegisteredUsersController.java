@@ -95,6 +95,11 @@ public class RegisteredUsersController implements Serializable {
         registeredUsersBean.createUser(user);
         clearFields();
     }
+    
+    public void loginUser(RegisteredUsers user) {
+        registeredUsersBean.loginUser(user);
+        clearFields();
+    }
 
     public void forgotPassword(String username) {
         registeredUsersBean.forgotPassword(username);

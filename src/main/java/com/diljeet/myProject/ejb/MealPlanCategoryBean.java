@@ -55,7 +55,7 @@ public class MealPlanCategoryBean {
             return;
         }
         try {
-            Response response = client.target("http://localhost:8080/myProject/webapi/MealPlanCategory")
+            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/MealPlanCategory")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(mealPlan, MediaType.APPLICATION_JSON), Response.class);
@@ -75,7 +75,7 @@ public class MealPlanCategoryBean {
 
     public List<MealPlanCategory> getMealPlanCategories() {
         List<MealPlanCategory> mealPlans = null;
-        mealPlans = client.target("http://localhost:8080/myProject/webapi/MealPlanCategory")
+        mealPlans = client.target("http://192.168.43.80:8080/myProject/webapi/MealPlanCategory")
                 .path("all")
                 .request(MediaType.APPLICATION_JSON)
 //                .header("Cookie", req.getHeader("Cookie"))

@@ -52,10 +52,10 @@ public class MyProjectUtils {
             m.setSentDate(new java.util.Date());
 //            m.setContent("Thank you for registering with us.<br/>"
 //                    + "Kindly click on the below link to activate your account.<br/>"
-//                    + "<a href='http://localhost:8080/test/webapi/TestUsers?username="+username+"'>http://localhost:8080/test/webapi/TestUsers?username="+username+"</a>", "text/html");
+//                    + "<a href='http://192.168.43.80:8080/test/webapi/TestUsers?username="+username+"'>http://192.168.43.80:8080/test/webapi/TestUsers?username="+username+"</a>", "text/html");
             m.setContent("Thank you for registering with us.<br/>"
                     + "Kindly click on the below link to activate your account.<br/>"
-                    + "<a href='http://localhost:8080/myProject/webapi/RegisteredUsers/activate-account/" + encodedEmail + "'>http://localhost:8080/myProject/webapi/RegisteredUsers/activate-account/" + encodedEmail + "</a>", "text/html");
+                    + "<a href='http://192.168.43.80:8080/myProject/webapi/RegisteredUsers/activate-account/" + encodedEmail + "'>http://192.168.43.80:8080/myProject/webapi/RegisteredUsers/activate-account/" + encodedEmail + "</a>", "text/html");
             Transport.send(m);
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,7 +107,7 @@ public class MyProjectUtils {
             m.setContent("Dear Customer;<br/>"
                     + "We have received a Password change Request for your Account.<br/>"
                     + "Kindly click on the below link to proceed with the request.<br/>"
-                    + "<a href='http://localhost:8080/myProject/webapi/RegisteredUsers/change-password/" + encodedEmail + "/" + encodedPassword + "'>http://localhost:8080/myProject/webapi/RegisteredUsers/change-password/" + encodedEmail + "/" + encodedPassword + "</a>", "text/html");
+                    + "<a href='http://192.168.43.80:8080/myProject/webapi/RegisteredUsers/change-password/" + encodedEmail + "/" + encodedPassword + "'>http://192.168.43.80:8080/myProject/webapi/RegisteredUsers/change-password/" + encodedEmail + "/" + encodedPassword + "</a>", "text/html");
             Transport.send(m);
         } catch (Exception e) {
             e.printStackTrace();

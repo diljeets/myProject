@@ -51,7 +51,7 @@ public class OrderStatusBean {
     public CustomerTransaction getCustomerTransactionStatus() {
         CustomerTransaction customerTransaction = null;
         try {
-            Response response = client.target("http://localhost:8080/myProject/webapi/OrderStatus/getCustomerTransactionStatus")
+            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/OrderStatus/getCustomerTransactionStatus")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .get();
