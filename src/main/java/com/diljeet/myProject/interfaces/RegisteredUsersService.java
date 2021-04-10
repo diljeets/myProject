@@ -18,6 +18,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -44,7 +45,11 @@ public interface RegisteredUsersService {
     
     @GET
     @Path("loginRedirect")
-    public void loginRedirect(@Context HttpServletRequest req, @Context HttpServletResponse resp);
+    public void loginRedirect(@QueryParam("account") String account,
+            @QueryParam("isactive") String isactive,
+            @QueryParam("tab") String tab,
+            @Context HttpServletRequest req,
+            @Context HttpServletResponse resp);
 
     @GET
     @Path("all")
@@ -84,7 +89,7 @@ public interface RegisteredUsersService {
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/activate-account/{username}")
-    public void activateAccount(@PathParam("username") String encodedEmail,
+    public Response activateAccount(@PathParam("username") String encodedEmail,
             @Context HttpServletRequest req,
             @Context HttpServletResponse res);
 

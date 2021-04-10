@@ -117,9 +117,6 @@ public class RegisteredUsersBean {
                     .request(MediaType.APPLICATION_JSON)
                     .header("channel", "WEB")
                     .post(Entity.entity(user, MediaType.APPLICATION_JSON), Response.class);
-//            if (response.getStatus() == Response.Status.TEMPORARY_REDIRECT.getStatusCode()) {
-//                FacesContext.getCurrentInstance().getExternalContext().redirect(response.getLocation().toString());
-//            }
             if (response.getStatus() == Response.Status.ACCEPTED.getStatusCode()) {
                 FacesContext context = FacesContext.getCurrentInstance();
                 ExternalContext externalContext = context.getExternalContext();
@@ -130,25 +127,6 @@ public class RegisteredUsersBean {
                     externalContext.getSessionMap().put("user", existingUser);
                     externalContext.redirect("http://192.168.43.80:8080/myProject/index.xhtml");
                 }
-//                NewCookie newCookie = response.getCookies().get("JSESSIONID");
-//                logger.log(Level.SEVERE, "JSESSIONID is {0}", newCookie.toString());
-
-//                Map<String, NewCookie> cookieMap = response.getCookies();
-//                Collection<NewCookie> cookieCollection = cookieMap.values();
-//                Iterator<NewCookie> itrNewCookie = cookieCollection.iterator();
-//                String cookieName = null;
-//                String cookieValue = null;
-//                while (itrNewCookie.hasNext()) {
-//                    NewCookie newCookie = itrNewCookie.next();
-//                    cookieName = newCookie.getName();
-//                    cookieValue = newCookie.getValue();
-//                    logger.log(Level.SEVERE, "1 Cook name is {0}", cookieName);
-//                    logger.log(Level.SEVERE, "1 Cook val is {0}", cookieValue);
-//                }
-//                String setCookie = response.getHeaderString("Set-Cookie");
-//                logger.log(Level.SEVERE, "JSESSIONID is {0}", setCookie);                
-//                Cookie cookie = new Cookie(cookieName, cookieValue);                
-//                FacesContext.getCurrentInstance().getExternalContext().redirect("http://192.168.43.80:8080/myProject/index.xhtml");
             }
         } catch (Exception e) {
             e.printStackTrace();

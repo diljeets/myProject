@@ -132,7 +132,7 @@
                                 </div>                                
                             </div>
                             <div class="p-col p-sm p-md-1 p-xl-1 p-pl-sm-0 p-pl-md-0 p-text-right">
-                                <p:commandLink id="itemCount" action="/cart.xhtml" >Cart #{cartController.itemsInCart}</p:commandLink>         
+                                <p:commandLink id="itemCount" action="/cart.xhtml?faces-redirect=true" >Cart #{cartController.itemsInCart}</p:commandLink>         
                             </div>
                             <div class="p-col-12 p-sm-12 p-md-6 hamicon">
                                 <!--                                <i class="fa fa-fw fa-navicon"></i>-->
@@ -149,7 +149,7 @@
                 <ui:insert name="content">Main Content</ui:insert>
             </div>
         </div> 
-        <p:sidebar class="credentials-sidebar" widgetVar="credentials-sidebar" position="right" baseZIndex="10000" blockScroll="true">
+        <p:sidebar class="credentials-sidebar" widgetVar="credentials-sidebar" position="right" baseZIndex="10000" blockScroll="true" visible="#{templateController.hasQueryString}">
             <p:panel widgetVar="progressPanelSidebar"
                      visible="false"
                      style="border:none;"

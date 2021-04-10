@@ -119,15 +119,6 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
 
     }
 
-//    @Override
-//    public Response loginUser(RegisteredUsers user, HttpServletRequest req, HttpServletResponse res) {
-//        if (user == null) {
-//            return null;
-//        } else {
-//            logger.log(Level.SEVERE, "user is {0}", user.getUsername());
-//        }
-//        return null;
-//    }
     @Override
     public Response loginUser(String channel,
             RegisteredUsers user,
@@ -135,7 +126,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
             HttpServletResponse res) {
         if (user == null) {
             logger.log(Level.SEVERE, "user is null");
-//            return null;
+            return null;
         } else {
             try {
                 Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
@@ -173,19 +164,6 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                                         .entity(existingUser)
                                         .build();
                             }
-
-//                            String sessionId = session.getId();
-//                            logger.log(Level.SEVERE, "User Session Id is {0}", session.getId());
-//                            Cookie cookie = new Cookie("JSESSIONID", session.getId());
-//                            res.addCookie(cookie);
-//                            RegisteredUsers sessionUser = (RegisteredUsers) session.getAttribute("user");
-//                            logger.log(Level.SEVERE, "Session user object is {0}", sessionUser.getUsername());
-//                            RequestDispatcher dispatcher = req.getRequestDispatcher(req.getContextPath());
-//                            dispatcher.forward(req, res);
-//                            res.sendRedirect(req.getContextPath() + "/index.xhtml");                            
-//                            return Response
-//                                    .temporaryRedirect(URI.create("http://192.168.43.80:8080/myProject/index.xhtml"))
-//                                    .build();
                         } else {
                             logger.log(Level.SEVERE, "Login Unsuccessful");
                             return Response.status(Response.Status.NOT_ACCEPTABLE).build();
@@ -208,14 +186,12 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                 }
             }
         }
-        return null;
     }
 
     @Override
-    public void loginRedirect(HttpServletRequest req, HttpServletResponse resp) {
-        try {
-            logger.log(Level.SEVERE, "inside loginRedirect");
-            resp.sendRedirect(req.getContextPath() + "/index.xhtml");
+    public void loginRedirect(String account, String isactive, String tab, HttpServletRequest req, HttpServletResponse resp) {
+        try {           
+            resp.sendRedirect(req.getContextPath() + "/index.xhtml?account=" + account + "&isactive=" + isactive + "&tab=" + tab);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -252,7 +228,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
     }
 
     @Override
-    public void activateAccount(String encodedEmail,
+    public Response activateAccount(String encodedEmail,
             HttpServletRequest req,
             HttpServletResponse res
     ) {
@@ -268,20 +244,29 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
             if (existingUser instanceof RegisteredUsers) {
                 if ((existingUser.getIsActive()).equals("no")) {
                     existingUser.setIsActive("yes");
-                    res.sendRedirect(req.getContextPath() + "/login.xhtml?account=true");
+                    return Response
+                            .seeOther(URI.create("/RegisteredUsers/loginRedirect?account=true&isactive=&tab=0"))
+                            .build();
+//                    res.sendRedirect(req.getContextPath() + "/login.xhtml?account=true");
                 } else {
-                    res.sendRedirect(req.getContextPath() + "/login.xhtml?isactive=true");
+                    return Response
+                            .seeOther(URI.create("/RegisteredUsers/loginRedirect?account=&isactive=true&tab=0"))
+                            .build();
+//                    res.sendRedirect(req.getContextPath() + "/login.xhtml?isactive=true");
                 }
             } else {
                 logger.log(Level.SEVERE, "Account does not Exist");
-//                LOG.error("Account does not Exist");
-                res.sendRedirect(req.getContextPath() + "/login.xhtml?account=false");
+//                res.sendRedirect(req.getContextPath() + "/login.xhtml?account=false&isactive=&tab=0");
+                return Response
+                        .seeOther(URI.create("/RegisteredUsers/loginRedirect?account=false&isactive=&tab=0"))
+                        .build();
             }
         } catch (Exception e) {
             e.printStackTrace();
 //            logger.log(Level.SEVERE, e.getMessage());
 //            LOG.error(e.getMessage());
         }
+        return null;
     }
 
     @Override

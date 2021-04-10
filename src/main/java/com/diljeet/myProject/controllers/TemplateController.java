@@ -7,6 +7,7 @@ package com.diljeet.myProject.controllers;
 
 import com.diljeet.myProject.ejb.RegisteredUsersBean;
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -27,26 +28,28 @@ import javax.servlet.http.HttpServletRequest;
 @Named(value = "templateController")
 @SessionScoped
 public class TemplateController implements Serializable {
-
+    
     private static final Logger logger = Logger.getLogger(TemplateController.class.getCanonicalName());
-
+    
     private static final long serialVersionUID = 1L;
-
+    
     private String currentCustomer;
     private String tabIndex;
+    private boolean hasQueryString;    
+    private boolean account;
 //    private String originalURL;
 
     @Inject
     HttpServletRequest req;
-
+    
     @EJB
     RegisteredUsersBean registeredUsersBean;
-
+    
     @PostConstruct
     public void init() {
 //        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 //        HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
-        
+
 //        originalURL = request.getRequestURL().toString();
 //
 //        if (originalURL == null) {
@@ -66,7 +69,7 @@ public class TemplateController implements Serializable {
      */
     public TemplateController() {
     }
-
+    
     public String getCurrentCustomer() {
         String user = null;
         try {
@@ -76,20 +79,55 @@ public class TemplateController implements Serializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        
         return registeredUsersBean.getUser(user);
     }
-
+    
     public void setCurrentCustomer(String currentCustomer) {
         this.currentCustomer = currentCustomer;
     }
-
+    
     public String getTabIndex() {
         return tabIndex;
     }
-
+    
     public void setTabIndex(String tabIndex) {
         this.tabIndex = tabIndex;
+    }
+    
+//    public boolean getHasQueryString() {
+//        
+//        hasQueryString = !FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().isEmpty();
+//        
+//        logger.log(Level.SEVERE, "has param is {0}", Boolean.toString(hasQueryString));
+//        
+//        return hasQueryString;
+//    }
+//    
+//    public void setHasQueryString(boolean hasQueryString) {
+//        this.hasQueryString = hasQueryString;
+//    }
+
+    public boolean isHasQueryString() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        hasQueryString = !externalContext.getRequestParameterMap().isEmpty();        
+        if (hasQueryString) {
+            String tab = externalContext.getRequestParameterMap().get("tab");
+            setTabIndex(tab);
+        }
+        return hasQueryString;
+    }
+
+    public void setHasQueryString(boolean hasQueryString) {
+        this.hasQueryString = hasQueryString;
+    }
+    
+    public boolean getAccount() {
+        return account;
+    }
+    
+    public void setAccount(boolean account) {
+        this.account = account;
     }
 
 //    public String getOriginalURL() {
@@ -99,10 +137,9 @@ public class TemplateController implements Serializable {
 //    public void setOriginalURL(String originalURL) {
 //        this.originalURL = originalURL;
 //    }
-
     public String logout() {
         FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
         return "/login.xhtml";
     }
-
+    
 }
