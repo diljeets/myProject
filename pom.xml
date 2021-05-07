@@ -29,8 +29,7 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>2.3.0.redhat-00003</version>
-            <type>jar</type>
+            <version>2.3.1</version>
         </dependency>
         <dependency>
             <groupId>javax</groupId>

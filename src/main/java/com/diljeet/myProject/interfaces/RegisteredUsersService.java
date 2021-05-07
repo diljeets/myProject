@@ -12,6 +12,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -90,6 +91,7 @@ public interface RegisteredUsersService {
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/activate-account/{username}")
     public Response activateAccount(@PathParam("username") String encodedEmail,
+            @DefaultValue("WEB") @HeaderParam("channel") String channel,
             @Context HttpServletRequest req,
             @Context HttpServletResponse res);
 

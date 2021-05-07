@@ -151,13 +151,22 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                         String encodedPassword = encoder.encodeToString(digest);
 
                         if (encodedPassword.equals(existingUser.getPassword())) {
-                            logger.log(Level.SEVERE, "Login Successful");
                             if (channel.equals("WAP")) {
-                                HttpSession session = req.getSession();
-                                session.setAttribute("user", existingUser);
-                                return Response
-                                        .status(Response.Status.CREATED)
-                                        .build();
+                                HttpSession session = req.getSession(false);
+                                if (session == null) {
+                                    session = req.getSession();
+                                    session.setAttribute("user", existingUser.getUsername());
+                                    return Response
+                                            .status(Response.Status.CREATED)
+                                            .header("customerName", existingUser.getName())
+                                            .build();
+                                } else {
+                                    return Response
+                                            .status(Response.Status.FOUND)
+                                            .header("resMessage", "User already in session")
+                                            .build();
+                                }
+
                             } else {
                                 return Response
                                         .status(Response.Status.ACCEPTED)
@@ -171,7 +180,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
 //                        return Response.status(Response.Status.FOUND).build();
                     } else {
                         logger.log(Level.SEVERE, "Account is inActive");
-                        return Response.status(Response.Status.NOT_ACCEPTABLE).build();
+                        return Response.status(Response.Status.NOT_FOUND).build();
                     }
                 } else {
                     logger.log(Level.SEVERE, "Account does not Exist");
@@ -190,7 +199,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
 
     @Override
     public void loginRedirect(String account, String isactive, String tab, HttpServletRequest req, HttpServletResponse resp) {
-        try {           
+        try {
             resp.sendRedirect(req.getContextPath() + "/index.xhtml?account=" + account + "&isactive=" + isactive + "&tab=" + tab);
         } catch (Exception e) {
             e.printStackTrace();
@@ -229,6 +238,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
 
     @Override
     public Response activateAccount(String encodedEmail,
+            String channel,
             HttpServletRequest req,
             HttpServletResponse res
     ) {
@@ -244,22 +254,39 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
             if (existingUser instanceof RegisteredUsers) {
                 if ((existingUser.getIsActive()).equals("no")) {
                     existingUser.setIsActive("yes");
-                    return Response
-                            .seeOther(URI.create("/RegisteredUsers/loginRedirect?account=true&isactive=&tab=0"))
-                            .build();
+                    if (channel.equals("WAP")) {
+                        return Response
+                                .status(Response.Status.OK)
+                                .build();
+                    } else {
+                        return Response
+                                .seeOther(URI.create("/RegisteredUsers/loginRedirect?account=true&isactive=&tab=0"))
+                                .build();
+                    }
 //                    res.sendRedirect(req.getContextPath() + "/login.xhtml?account=true");
                 } else {
-                    return Response
-                            .seeOther(URI.create("/RegisteredUsers/loginRedirect?account=&isactive=true&tab=0"))
-                            .build();
+                    if (channel.equals("WAP")) {
+                        return Response
+                                .status(Response.Status.BAD_REQUEST)
+                                .build();
+                    } else {
+                        return Response
+                                .seeOther(URI.create("/RegisteredUsers/loginRedirect?account=&isactive=true&tab=0"))
+                                .build();
+                    }
 //                    res.sendRedirect(req.getContextPath() + "/login.xhtml?isactive=true");
                 }
             } else {
-                logger.log(Level.SEVERE, "Account does not Exist");
-//                res.sendRedirect(req.getContextPath() + "/login.xhtml?account=false&isactive=&tab=0");
-                return Response
-                        .seeOther(URI.create("/RegisteredUsers/loginRedirect?account=false&isactive=&tab=0"))
-                        .build();
+                if (channel.equals("WAP")) {
+                    return Response
+                            .status(Response.Status.NOT_FOUND)
+                            .build();
+                } else {
+                    return Response
+                            .seeOther(URI.create("/RegisteredUsers/loginRedirect?account=false&isactive=&tab=0"))
+                            .build();
+                }
+//                res.sendRedirect(req.getContextPath() + "/login.xhtml?account=false&isactive=&tab=0");                
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -27,19 +27,20 @@
                         </p>
 
                         <p:panelGrid>
-
-                            <span class="ui-float-label">   
-                                <p:inputText id="mealPlan" value="#{mealPlanCategoryController.mealPlan.mealPlanName}"/>
-                                <p:outputLabel for="mealPlan" value="Meal Plan"/>
-                                <p:message for="mealPlan"/>
-                            </span>
-
-                            <span class="ui-float-label">   
-                                <p:inputText id="rate" value="#{mealPlanCategoryController.mealPlan.mealPlanRate}" required="true"/>  
-                                <p:outputLabel for="rate" value="Rate"/>
-                                <p:message for="rate"/>
-                            </span>
-
+                            <p:row>
+                                <span class="ui-float-label">   
+                                    <p:inputText id="mealPlan" value="#{mealPlanCategoryController.mealPlan.mealPlanName}"/>
+                                    <p:outputLabel for="mealPlan" value="Meal Plan"/>
+                                    <p:message for="mealPlan"/>
+                                </span>
+                            </p:row>
+                            <p:row>
+                                <span class="ui-float-label">   
+                                    <p:inputText id="rate" value="#{mealPlanCategoryController.mealPlan.mealPlanRate}" required="true"/>  
+                                    <p:outputLabel for="rate" value="Rate"/>
+                                    <p:message for="rate"/>
+                                </span>
+                            </p:row>
                         </p:panelGrid>
                         <p:commandButton value="Add Meal Plan" id="addMealPlanBtn" class="cmdBtn" action="#{mealPlanCategoryController.addMealPlan(mealPlanCategoryController.mealPlan)}" update=":addMealPlanForm:msgs :myDatatable:datatable" onclick="PF('progressPanel').show();PF('actionBtn').disable();" oncomplete="PF('progressPanel').close();PF('actionBtn').enable();" widgetVar="actionBtn"/>               
                     </h:form>
