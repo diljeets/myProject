@@ -437,8 +437,9 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
     }
 
     @Override
-    public void changePassword(String encodedEmail,
+    public Response changePassword(String encodedEmail,
             String encodedPassword,
+            String channel,
             HttpServletRequest req,
             HttpServletResponse res
     ) {
@@ -460,17 +461,36 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                 existingUser.setPassword(encodedPassword);
                 existingUser.setIsPasswordChangeRequest("no");
                 existingUser.setDateCustomerLastUpdated(new Date());
-                res.sendRedirect(req.getContextPath() + "/login.xhtml?passwordChanged=true");
+                if (channel.equals("WAP")) {
+                    return Response
+                            .status(Response.Status.OK)
+                            .build();
+                } else {
+                    res.sendRedirect(req.getContextPath() + "/login.xhtml?passwordChanged=true");
+                }
             } else if ((existingUser.getIsPasswordChangeRequest()).equals("no")) {
-                res.sendRedirect(req.getContextPath() + "/login.xhtml?passwordAlreadyChanged=true");
+                if (channel.equals("WAP")) {
+                    return Response
+                            .status(Response.Status.BAD_REQUEST)
+                            .build();
+                } else {
+                    res.sendRedirect(req.getContextPath() + "/login.xhtml?passwordAlreadyChanged=true");
+                }                
             } else {
-                res.sendRedirect(req.getContextPath() + "/login.xhtml?account=false");
+                if (channel.equals("WAP")) {
+                    return Response
+                            .status(Response.Status.NOT_FOUND)
+                            .build();
+                } else {
+                    res.sendRedirect(req.getContextPath() + "/login.xhtml?account=false");
+                }                
             }
         } catch (Exception e) {
             e.printStackTrace();
 //            logger.log(Level.SEVERE, e.getMessage());
 //            LOG.error(e.getMessage());
         }
+        return null;
     }
 
 }

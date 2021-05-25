@@ -82,8 +82,9 @@ public interface RegisteredUsersService {
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     @Path("/change-password/{username}/{password}")
-    public void changePassword(@PathParam("username") String encodedEmail, 
+    public Response changePassword(@PathParam("username") String encodedEmail, 
             @PathParam("password") String encodedPassword,
+            @DefaultValue("WEB") @HeaderParam("channel") String channel,
             @Context HttpServletRequest req,
             @Context HttpServletResponse res);
 
