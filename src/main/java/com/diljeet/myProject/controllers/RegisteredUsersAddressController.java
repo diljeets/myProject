@@ -12,13 +12,11 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.inject.Named;
-import javax.enterprise.context.SessionScoped;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.RowEditEvent;
-import org.primefaces.event.SelectEvent;
 
 /**
  *
@@ -46,7 +44,7 @@ public class RegisteredUsersAddressController implements Serializable {
         address = new RegisteredUsersAddress();
         if (!templateController.getCurrentCustomer().equals("Guest")) {
             setAddresses(registeredUsersAddressService.getAllRegisteredAddressByUsername());
-        } else {            
+        } else {
             PrimeFaces current = PrimeFaces.current();
             current.executeScript("PF('credentials-sidebar').show()");
         }
@@ -77,7 +75,7 @@ public class RegisteredUsersAddressController implements Serializable {
         clear();
     }
 
-    public void deleteRegisteredAddressById(int addressId) {
+    public void deleteRegisteredAddressById(long addressId) {
         registeredUsersAddressService.deleteRegisteredAddressById(addressId);
         setAddresses(registeredUsersAddressService.getAllRegisteredAddressByUsername());
     }

@@ -28,7 +28,7 @@ import javax.ws.rs.core.Response;
 //@Remote
 @Path("/Checkout")
 public interface CheckoutService {
-    
+
     @GET
     @Path("createOrderId")
     @Produces({MediaType.APPLICATION_JSON})
@@ -48,7 +48,7 @@ public interface CheckoutService {
     @Path("fetchPayChannelOptionsPaytmBalance")
     @Produces({MediaType.APPLICATION_JSON})
     public List<PayChannelOptionsPaytmBalance> fetchPayChannelOptionsPaytmBalance();
-    
+
     @GET
     @Path("fetchSavedInstruments")
     @Produces({MediaType.APPLICATION_JSON})
@@ -61,12 +61,14 @@ public interface CheckoutService {
 
     @POST
     @Path("sendOTP")
-    @Consumes(MediaType.APPLICATION_JSON)
+//    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.TEXT_PLAIN)
     public Response sendOTP(String paytmMobile);
 
     @POST
     @Path("validateOTP/fetchBalance")
-    @Consumes(MediaType.APPLICATION_JSON)
+//    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.TEXT_PLAIN)
     public Response validateOtpAndFetchPaytmBalance(String otp);
 
     @POST
@@ -78,15 +80,15 @@ public interface CheckoutService {
     @Path("fetchCardDetails")
     @Produces({MediaType.APPLICATION_JSON})
     public List<CardDetails> fetchCardDetails();
-    
+
     @GET
-    @Path("fetchOtherNetBankingPaymentChannels")    
+    @Path("fetchOtherNetBankingPaymentChannels")
     public void fetchOtherNetBankingPaymentChannels();
-    
+
     @POST
     @Path("processTransaction")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response processTransaction(PaymentRequestDetails paymentRequestDetails); 
+    public Response processTransaction(PaymentRequestDetails paymentRequestDetails);
 
     @POST
     @Path("transactionStatus")

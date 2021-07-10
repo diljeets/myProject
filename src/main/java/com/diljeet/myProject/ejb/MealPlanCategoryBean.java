@@ -38,8 +38,8 @@ public class MealPlanCategoryBean {
     private FacesMessage msg;
 
     @Inject
-    HttpServletRequest req; 
-    
+    HttpServletRequest req;
+
     @PostConstruct
     public void init() {
         client = ClientBuilder.newClient();
@@ -73,12 +73,13 @@ public class MealPlanCategoryBean {
 
     }
 
+//    @RolesAllowed("Administrator")
     public List<MealPlanCategory> getMealPlanCategories() {
         List<MealPlanCategory> mealPlans = null;
         mealPlans = client.target("http://192.168.43.80:8080/myProject/webapi/MealPlanCategory")
                 .path("all")
                 .request(MediaType.APPLICATION_JSON)
-//                .header("Cookie", req.getHeader("Cookie"))
+                //                .header("Cookie", req.getHeader("Cookie"))
                 .get(new GenericType<List<MealPlanCategory>>() {
                 });
 

@@ -12,6 +12,8 @@
     <class>com.diljeet.myProject.entities.RegisteredUsersAddress</class>
     <class>com.diljeet.myProject.entities.CustomerTransaction</class>
     <class>com.diljeet.myProject.entities.DeliveryHour</class>
+    <class>com.diljeet.myProject.entities.City</class>
+    <class>com.diljeet.myProject.entities.Locality</class>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>
       <property name="javax.persistence.validation.mode" value="none"/>

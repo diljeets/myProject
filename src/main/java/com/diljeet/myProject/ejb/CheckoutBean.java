@@ -57,13 +57,13 @@ public class CheckoutBean {
 
     @Inject
     CheckoutController checkoutController;
-    
+
     @Inject
     CartController cartController;
 
     @Inject
     RedirectFormController redirectFormController;
-    
+
     @Inject
     OrderController orderController;
 
@@ -122,7 +122,7 @@ public class CheckoutBean {
                 msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info!", "Your Session has Expired. Kindly Login again.");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }
-            if (response.getStatus() == Response.Status.EXPECTATION_FAILED.getStatusCode()) {
+            if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
                 msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "1Something went wrong. Please try again.");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }
@@ -205,9 +205,10 @@ public class CheckoutBean {
         }
         try {
             Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/sendOTP")
-                    .request(MediaType.APPLICATION_JSON)
+                    //                    .request(MediaType.APPLICATION_JSON)
+                    .request(MediaType.TEXT_PLAIN)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .post(Entity.entity(paytmMobile, MediaType.APPLICATION_JSON), Response.class);
+                    .post(Entity.entity(paytmMobile, MediaType.TEXT_PLAIN), Response.class);
             String resultMsg = response.getHeaderString("resultMsg");
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", resultMsg);
@@ -229,9 +230,10 @@ public class CheckoutBean {
         }
         try {
             Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/validateOTP/fetchBalance")
-                    .request(MediaType.APPLICATION_JSON)
+                    //                    .request(MediaType.APPLICATION_JSON)
+                    .request(MediaType.TEXT_PLAIN)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .post(Entity.entity(otp, MediaType.APPLICATION_JSON), Response.class);
+                    .post(Entity.entity(otp, MediaType.TEXT_PLAIN), Response.class);
             String resultMsg = response.getHeaderString("resultMsg");
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 FacesContext.getCurrentInstance().getExternalContext().redirect("http://192.168.43.80:8080/myProject/select-payment-option.xhtml");
@@ -388,7 +390,6 @@ public class CheckoutBean {
             e.printStackTrace();
         }
         return response;
-    }    
-    
+    }
 
 }

@@ -1,18 +1,23 @@
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/interfaces/MealPlanCategoryService.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/RedirectFormController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/entities/MealPlanCategory.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/LocalityController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/DeliveryTimeService.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/interfaces/OrderStatusService.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/CityController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/RegisteredUsersAddressServiceBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/PaymentRequestDetails.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/customexceptions/ErrorCreatingUserException.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/PayChannelOptionsPaytmBalance.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/customexceptions/ChangePasswordRequestAcceptedException.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/interfaces/CityService.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/entities/Locality.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/CartServiceBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/PaymentOptions.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/DeliveryHourController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/RegisteredUsersBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/customexceptions/PasswordsDontMatchException.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/LocalityServiceBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/CheckoutBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/PayChannelOptionsNetBanking.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/CheckoutServiceBean.java
@@ -23,6 +28,7 @@
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/DeliveryController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/interfaces/RegisteredUsersService.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/SavedInstruments.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/interfaces/LocalityService.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/entities/RegisteredUsersAddress.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/CardDetails.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/utils/MyProjectUtils.java
@@ -30,6 +36,7 @@
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/RegisteredUsersServiceBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/TemplateController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/IndexBean.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/entities/City.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/interfaces/DeliveryHourService.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/OrderBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/PaymentGatewayBean.java
@@ -43,6 +50,7 @@
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/bootstrap/MyProjectApplication.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/OrderStatusServiceBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/MealPlanCategoryServiceBean.java
+/home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/services/CityServiceBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/controllers/CheckoutController.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/ejb/MealPlanCategoryBean.java
 /home/diljeet/NetBeansProjects/myProject/src/main/java/com/diljeet/myProject/customexceptions/UserAccountDoesNotExistException.java

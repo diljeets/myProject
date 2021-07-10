@@ -11,43 +11,43 @@
         <param-name>primefaces.THEME</param-name>
         <param-value>mytheme</param-value>
     </context-param>-->
-    <context-param>     
-        <param-name>primefaces.THEME</param-name>   
-        <param-value>saga</param-value> 
+    <context-param>
+        <param-name>primefaces.THEME</param-name>
+        <param-value>saga</param-value>
     </context-param>
-    <context-param>     
-        <param-name>primefaces.FONT_AWESOME</param-name>   
-        <param-value>true</param-value> 
+    <context-param>
+        <param-name>primefaces.FONT_AWESOME</param-name>
+        <param-value>true</param-value>
     </context-param>
     <!--    <context-param>
         <param-name>primefaces.THEME</param-name>
         <param-value>nova-light</param-value>
     </context-param>-->
-    
+
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>        
+        <load-on-startup>1</load-on-startup>
     </servlet>
     <!--    <servlet>
         <servlet-name>Faces Servlet forward</servlet-name>
         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>        
+        <load-on-startup>1</load-on-startup>
     </servlet>-->
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
-        <url-pattern>*.xhtml</url-pattern>        
+        <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
     <!--     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
-        <url-pattern>/fwd/callback.xhtml</url-pattern>        
+        <url-pattern>/fwd/callback.xhtml</url-pattern>
     </servlet-mapping>-->
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
-    <welcome-file-list>        
+    <welcome-file-list>
         <welcome-file>index.xhtml</welcome-file>
     </welcome-file-list>
     <error-page>
@@ -66,42 +66,42 @@
         <extension>jsp</extension>
         <mime-type>text/html</mime-type>
     </mime-mapping>-->
-    
+
     <security-constraint>
         <display-name>Constraint1</display-name>
         <web-resource-collection>
             <web-resource-name>Administrator/Customer</web-resource-name>
             <!--            <url-pattern>/index.xhtml</url-pattern>      -->
-            <url-pattern>/meal-plan-category.xhtml</url-pattern>       
+            <url-pattern>/meal-plan-category.xhtml</url-pattern>
             <url-pattern>/delivery-hours.xhtml</url-pattern>
             <!--            <url-pattern>/cart.xhtml</url-pattern>     -->
-<!--            <url-pattern>/select-address-time.xhtml</url-pattern>    
+            <!--            <url-pattern>/select-address-time.xhtml</url-pattern>
             <url-pattern>/select-payment-option.xhtml</url-pattern>  -->
             <!--            <url-pattern>/change-password.xhtml</url-pattern>    -->
         </web-resource-collection>
         <auth-constraint>
-            <role-name>Administrator</role-name>            
+            <role-name>Administrator</role-name>
         </auth-constraint>
-        <user-data-constraint>                                    
+        <user-data-constraint>
             <transport-guarantee>NONE</transport-guarantee>
         </user-data-constraint>
-    </security-constraint>  
-    
+    </security-constraint>
+
     <security-constraint>
         <display-name>Constraint2</display-name>
         <web-resource-collection>
-            <web-resource-name>webapi</web-resource-name>            
-            <!--            <url-pattern>/webapi/MealPlanCategory/*</url-pattern>              -->
-            <url-pattern>/webapi/RegisteredUsersAddress/*</url-pattern>             
+            <web-resource-name>webapi</web-resource-name>
+            <!--            <url-pattern>/webapi/MealPlanCategory/*</url-pattern>-->
+            <url-pattern>/webapi/RegisteredUsersAddress/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>Administrator</role-name>
         </auth-constraint>
-        <user-data-constraint>                                    
+        <user-data-constraint>
             <transport-guarantee>NONE</transport-guarantee>
         </user-data-constraint>
-    </security-constraint>        
-   
+    </security-constraint>
+
     <login-config>
         <auth-method>FORM</auth-method>
         <realm-name>myProjectJdbcRealmApplicationDomain</realm-name>
@@ -113,20 +113,20 @@
             <form-login-page>/login.xhtml</form-login-page>
             <form-error-page>/login.xhtml?fail=true</form-error-page>
         </form-login-config>
-    </login-config>  
-      
+    </login-config>
+
     <security-role>
         <role-name>Administrator</role-name>
-    </security-role>  
-      
+    </security-role>
+
     <security-role>
         <role-name>Manager</role-name>
     </security-role>
-    
+
     <security-role>
         <role-name>Monitor</role-name>
     </security-role>
-    
+
     <security-role>
         <role-name>Customer</role-name>
     </security-role>

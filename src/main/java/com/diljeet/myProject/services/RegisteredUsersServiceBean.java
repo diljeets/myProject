@@ -5,9 +5,8 @@
  */
 package com.diljeet.myProject.services;
 
-import com.diljeet.myProject.customexceptions.UserAccountDoesNotExistException;
-import com.diljeet.myProject.interfaces.RegisteredUsersService;
 import com.diljeet.myProject.entities.RegisteredUsers;
+import com.diljeet.myProject.interfaces.RegisteredUsersService;
 import com.diljeet.myProject.utils.MyProjectUtils;
 import static com.diljeet.myProject.utils.MyProjectUtils.manipulateEncodedPassword;
 import java.net.URI;
@@ -21,22 +20,16 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
-import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
-import javax.faces.context.FacesContext;
 import javax.mail.Session;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Response;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -156,11 +149,14 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                                 if (session == null) {
                                     session = req.getSession();
                                     session.setAttribute("user", existingUser.getUsername());
+//                                    session.setAttribute("user", user);
+                                    logger.log(Level.SEVERE, "Session successfully created");
                                     return Response
                                             .status(Response.Status.CREATED)
                                             .header("customerName", existingUser.getName())
                                             .build();
                                 } else {
+                                    logger.log(Level.SEVERE, "Session active");
                                     return Response
                                             .status(Response.Status.FOUND)
                                             .header("resMessage", "User already in session")
@@ -237,6 +233,24 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
     }
 
     @Override
+    public String getUserInSession(HttpServletRequest req) {
+        String userInSession = null;
+        try {
+            String username = req.getUserPrincipal().getName();
+            Query query = em.createQuery("Select u FROM RegisteredUsers u where u.username = :username");
+            query.setParameter("username", username);
+            Object accountExists = query.getSingleResult();
+            RegisteredUsers existingUser = (RegisteredUsers) accountExists;
+            if (existingUser instanceof RegisteredUsers) {
+                userInSession = existingUser.getName();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return userInSession;
+    }
+
+    @Override
     public Response activateAccount(String encodedEmail,
             String channel,
             HttpServletRequest req,
@@ -286,7 +300,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                             .seeOther(URI.create("/RegisteredUsers/loginRedirect?account=false&isactive=&tab=0"))
                             .build();
                 }
-//                res.sendRedirect(req.getContextPath() + "/login.xhtml?account=false&isactive=&tab=0");                
+//                res.sendRedirect(req.getContextPath() + "/login.xhtml?account=false&isactive=&tab=0");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -475,7 +489,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                             .build();
                 } else {
                     res.sendRedirect(req.getContextPath() + "/login.xhtml?passwordAlreadyChanged=true");
-                }                
+                }
             } else {
                 if (channel.equals("WAP")) {
                     return Response
@@ -483,7 +497,7 @@ public class RegisteredUsersServiceBean implements RegisteredUsersService {
                             .build();
                 } else {
                     res.sendRedirect(req.getContextPath() + "/login.xhtml?account=false");
-                }                
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -219,9 +219,9 @@ public class PaymentGatewayBean {
                             .status(Response.Status.GATEWAY_TIMEOUT)
                             .build();
                 } else {
-                    //if there is an error                    
+                    //if there is an error
                     return Response
-                            .status(Response.Status.EXPECTATION_FAILED)
+                            .status(Response.Status.BAD_REQUEST)
                             .build();
                 }
             }
@@ -235,6 +235,9 @@ public class PaymentGatewayBean {
     }
 
     public Response updateTransaction(String orderId, String payableAmount, String username) {
+        logger.log(Level.SEVERE, "orderId is {0}", orderId);
+        logger.log(Level.SEVERE, "payableAmount is {0}", payableAmount);
+        logger.log(Level.SEVERE, "txnToken is {0}", transactionToken);
         JSONObject paytmParams = new JSONObject();
         JSONObject body = new JSONObject();
         JSONObject txnAmount = new JSONObject();
@@ -306,9 +309,9 @@ public class PaymentGatewayBean {
                             .status(Response.Status.GATEWAY_TIMEOUT)
                             .build();
                 } else {
-                    //if there is an error                    
+                    //if there is an error
                     return Response
-                            .status(Response.Status.EXPECTATION_FAILED)
+                            .status(Response.Status.BAD_REQUEST)
                             .build();
                 }
             }
@@ -319,7 +322,8 @@ public class PaymentGatewayBean {
     }
 
     public Response fetchPaymentOptions(String orderId) {
-
+        logger.log(Level.SEVERE, "orderId is {0}", orderId);
+        logger.log(Level.SEVERE, "txnToken is {0}", transactionToken);
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -420,7 +424,7 @@ public class PaymentGatewayBean {
                 } else {
                     //if there is an error
                     return Response
-                            .status(Response.Status.EXPECTATION_FAILED)
+                            .status(Response.Status.BAD_REQUEST)
                             .build();
                 }
             }
@@ -434,7 +438,7 @@ public class PaymentGatewayBean {
     }
 
     public Response sendOTP(String paytmMobile) {
-
+        logger.log(Level.SEVERE, "paytmMobile is {0}", paytmMobile);
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -1001,7 +1005,7 @@ public class PaymentGatewayBean {
                 JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
                 String resultCode = resultInfoObj.getString("resultCode");
                 if (resultCode.equals("01")) {
-                    //Create CustomerTransaction Object in case Transaction is Successful                    
+                    //Create CustomerTransaction Object in case Transaction is Successful
                     customerTransaction = new CustomerTransaction(
                             BANKNAME,
                             BANKTXNID,
@@ -1019,7 +1023,7 @@ public class PaymentGatewayBean {
                 }
             }
         } else {
-            //Create CustomerTransaction Object in case Transaction is Failure            
+            //Create CustomerTransaction Object in case Transaction is Failure
             customerTransaction = new CustomerTransaction(
                     BANKNAME,
                     BANKTXNID,

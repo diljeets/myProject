@@ -23,11 +23,12 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "registeredUsersAddress")
 @NamedQuery(name = "getAllRegisteredAddress",
-        query = "Select a From RegisteredUsersAddress a Order By a.id Desc"
+        query = "Select a From RegisteredUsersAddress AS a Order By a.id Desc"
 )
 @NamedQuery(
         name = "getAllRegisteredAddressByUsername",
-        query = "SELECT DISTINCT a FROM RegisteredUsersAddress a, IN (a.registeredUser.addresses) u where u.registeredUser.username = :username"
+        query = "SELECT NEW com.diljeet.myProject.entities.RegisteredUsersAddress(a.id, a.houseNo, a.buildingNo, a.street, a.city, a.state, a.pincode) FROM RegisteredUsersAddress a WHERE a.registeredUser.username = :username"
+//        query = "SELECT DISTINCT a FROM RegisteredUsersAddress a, IN (a.registeredUser.addresses) u where u.registeredUser.username = :username"
 )
 @NamedQuery(name = "getRegisteredAddressById",
         query = "Select a From RegisteredUsersAddress a where a.id = :addressId"
@@ -56,6 +57,19 @@ public class RegisteredUsersAddress implements Serializable {
     @ManyToOne
     @JoinColumn(name = "REGISTEREDUSER_ID")
     private RegisteredUsers registeredUser;
+
+    public RegisteredUsersAddress() {
+    }
+
+    public RegisteredUsersAddress(Long id, String houseNo, String buildingNo, String street, String city, String state, String pincode) {
+        this.id = id;
+        this.houseNo = houseNo;
+        this.buildingNo = buildingNo;
+        this.street = street;
+        this.city = city;
+        this.state = state;
+        this.pincode = pincode;
+    }
 
     public Long getId() {
         return id;
