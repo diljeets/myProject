@@ -12,82 +12,82 @@
     <h:body>
         <ui:composition template="./template.xhtml">
             <ui:define name="top"></ui:define>
-            <ui:define name="content"> 
+            <ui:define name="content">
                 <div class="p-grid p-justify-center">
                     <div class="p-col-12 p-md-10 p-lg-9 p-xl-9">
                         <h3>Select Payment Method</h3>
-                        <h:form id="form-payment-options">    
+                        <h:form id="form-payment-options">
                             <p:messages id="form-payment-options-msgs" showDetail="true" showSummary="false" closable="true">
                                 <p:autoUpdate disabled="true"/>
-                            </p:messages>                             
-                            <p> 
+                            </p:messages>
+                            <p>
                                 <p:dataTable id="datatable-paytm-wallet"
-                                             class="table-paytm-wallet"                                    
-                                             value="#{checkoutController.payChannelOptionsPaytmBalance}"        
+                                             class="table-paytm-wallet"
+                                             value="#{checkoutController.payChannelOptionsPaytmBalance}"
                                              var="payChannelOptionPaytmBalance"
                                              selection="#{checkoutController.payChannelOptionPaytmBalance}"
                                              rowKey="#{payChannelOptionPaytmBalance.paymentMode}"
                                              rendered="#{checkoutController.payChannelOptionsPaytmBalance.size() > 0}"
-                                             rowStyleClass="#{payChannelOptionPaytmBalance.displayName eq 'Gift Voucher' ? 'ui-helper-hidden' : ''}"> 
+                                             rowStyleClass="#{payChannelOptionPaytmBalance.displayName eq 'Gift Voucher' ? 'ui-helper-hidden' : ''}">
                                     <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPayChannelOptionsPaytmBalance}" update=":form-payment-options:datatable-paymentoptions:reviewAndPlaceOrderBtn"/>
-                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPayChannelOptionsPaytmBalance}" update=":form-payment-options:datatable-paymentoptions:reviewAndPlaceOrderBtn"/>  
-                                    <p:column selectionMode="single"/>                              
+                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPayChannelOptionsPaytmBalance}" update=":form-payment-options:datatable-paymentoptions:reviewAndPlaceOrderBtn"/>
+                                    <p:column selectionMode="single"/>
                                     <p:column>
-                                        <span class="p-grid p-align-center">                                                                                  
+                                        <span class="p-grid p-align-center">
                                             <p:graphicImage url="#{payChannelOptionPaytmBalance.imageUrl}" width="40px"/>
-                                            <h:outputText styleClass="p-ml-2" value="#{payChannelOptionPaytmBalance.displayName} #{payChannelOptionPaytmBalance.balance}"/>                                         
+                                            <h:outputText styleClass="p-ml-2" value="#{payChannelOptionPaytmBalance.displayName} #{payChannelOptionPaytmBalance.balance}"/>
                                         </span>
                                     </p:column>
                                 </p:dataTable>
                                 <p:dataTable id="datatable-saved-instruments"
-                                             class="table-saved-instruments"                                    
-                                             value="#{checkoutController.savedInstruments}"        
+                                             class="table-saved-instruments"
+                                             value="#{checkoutController.savedInstruments}"
                                              var="savedInstrument"
                                              selection="#{checkoutController.savedInstrument}"
                                              rowKey="#{savedInstrument.cardId}"
-                                             rendered="#{checkoutController.savedInstruments.size() > 0}" size="small"> 
+                                             rendered="#{checkoutController.savedInstruments.size() > 0}" size="small">
                                     <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectSavedInstruments}" update=":form-payment-options:datatable-paymentoptions:reviewAndPlaceOrderBtn"/>
                                     <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectSavedInstruments}" update=":form-payment-options:datatable-paymentoptions:reviewAndPlaceOrderBtn"/>
-                                    <p:column selectionMode="single"/>                              
+                                    <p:column selectionMode="single"/>
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Card"/>
-                                        </f:facet> 
+                                        </f:facet>
                                         <h:outputText value="#{savedInstrument.displayName} starting with #{savedInstrument.firstSixDigit} ending in #{savedInstrument.lastFourDigit}"/>
                                     </p:column>
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Expires on"/>
-                                        </f:facet> 
+                                        </f:facet>
                                         <h:outputText value="#{savedInstrument.expiryDate}"/>
                                     </p:column>
                                     <p:column>
                                         <f:facet name="header">
                                             <h:outputText value="Cvv"/>
-                                        </f:facet> 
+                                        </f:facet>
                                         <p:password id="savedCardCvv" value="#{checkoutController.cardCvv}" maxlength="3" placeholder="e.g 123">
                                             <p:ajax update="@this"/>
                                         </p:password>
                                     </p:column>
                                 </p:dataTable>
                                 <p:dataTable id="datatable-paymentoptions"
-                                             class="table-paymentoptions"                                    
-                                             value="#{checkoutController.paymentOptions}"        
+                                             class="table-paymentoptions"
+                                             value="#{checkoutController.paymentOptions}"
                                              var="paymentOption"
                                              selection="#{checkoutController.paymentOption}"
                                              rowKey="#{paymentOption.paymentMode}"
                                              rendered="#{checkoutController.paymentOptions.size() > 0}"
-                                             rowStyleClass="#{checkoutController.payChannelOptionsPaytmBalance.size() > 0 ? 'donotRender' : ''}" 
-                                             summary="List of Payment Methods">  
+                                             rowStyleClass="#{checkoutController.payChannelOptionsPaytmBalance.size() > 0 ? 'donotRender' : ''}"
+                                             summary="List of Payment Methods">
                                     <p:ajax event="rowSelectRadio" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking,reviewAndPlaceOrderBtn"/>
-                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking,reviewAndPlaceOrderBtn"/>                          
-                                    <p:column selectionMode="single"/>                              
+                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPaymentOption}" process="@this,creditcard,debitcard,netbanking" update="@this,creditcard,debitcard,netbanking,reviewAndPlaceOrderBtn"/>
+                                    <p:column selectionMode="single"/>
                                     <p:column>
-                                        <h:outputText value="#{paymentOption.displayName}"/>      
-                                        <p:panel id="creditcard" 
+                                        <h:outputText value="#{paymentOption.displayName}"/>
+                                        <p:panel id="creditcard"
                                                  rendered="#{checkoutController.isModeCC}"
                                                  style="border:none;">
-                                            <p:panel rendered="#{paymentOption.paymentMode eq 'CREDIT_CARD'}" style="border:none;">  
+                                            <p:panel rendered="#{paymentOption.paymentMode eq 'CREDIT_CARD'}" style="border:none;">
                                                 <h:form>
                                                     <p:panel visible="false" widgetVar="panelCCDetails">
                                                         <div class="p-grid">
@@ -106,39 +106,39 @@
                                                         </span>
 
                                                         <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-2 p-mt-3">
-                                                            <p:outputLabel for="ccExpiryDate" value="Expiry Date"/> 
+                                                            <p:outputLabel for="ccExpiryDate" value="Expiry Date"/>
                                                             <p:inputMask id="ccExpiryDate" value="#{checkoutController.maskedCCExpiryDate}" required="true" requiredMessage="Please enter Credit Card Expiry Month" placeholder="e.g 01/2050" mask="99/9999" validateMask="true" styleClass="p-mt-1">
-                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/> 
-                                                            </p:inputMask>                                                     
+                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/>
+                                                            </p:inputMask>
                                                         </span>
 
                                                         <span class="p-col-12 p-sm-6 p-md-6 p-lg-2 p-xl-2 p-mt-3">
-                                                            <p:outputLabel for="ccCvv" value="Cvv"/>  
+                                                            <p:outputLabel for="ccCvv" value="Cvv"/>
                                                             <p:password id="ccCvv" value="#{checkoutController.ccCvv}" maxlength="3" required="true" requiredMessage="Please enter Card CVV number" validator="#{checkoutController.validateCvv}" placeholder="e.g 123" styleClass="p-mt-1">
-                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/> 
+                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/>
                                                             </p:password>
-                                                        </span> 
+                                                        </span>
 
-                                                         <span class="p-col-12 p-mt-3">         
-                                                             <p:selectBooleanCheckbox value="#{checkoutController.saveCC}" itemLabel="Save Card for Future Payments">
+                                                        <span class="p-col-12 p-mt-3">
+                                                            <p:selectBooleanCheckbox value="#{checkoutController.saveCC}" itemLabel="Save Card for Future Payments">
                                                                 <p:ajax update="@this"/>
                                                             </p:selectBooleanCheckbox>
-                                                        </span> 
-                                                        
+                                                        </span>
+
                                                         <span class="p-col-12 p-md-12 p-lg-12 p-mt-3">
                                                             <span class="p-grid p-m-0 p-align-center">
                                                                 <p:graphicImage name="visa.png" library="images"/>
                                                                 <p:graphicImage name="mastercard.png" library="images"/>
                                                                 <p:graphicImage name="maestro.png" library="images"/>
-                                                                <p:graphicImage name="amex.png" library="images"/> 
+                                                                <p:graphicImage name="amex.png" library="images"/>
                                                             </span>
                                                         </span>
                                                     </div>
                                                 </h:form>
-                                            </p:panel>                                                                    
+                                            </p:panel>
                                         </p:panel>
 
-                                        <p:panel id="debitcard" 
+                                        <p:panel id="debitcard"
                                                  rendered="#{checkoutController.isModeDC}"
                                                  style="border:none;">
                                             <p:panel rendered="#{paymentOption.paymentMode eq 'DEBIT_CARD'}" style="border:none;">
@@ -153,90 +153,90 @@
                                                     <div class="ui-fluid p-formgrid p-grid">
                                                         <span class="p-col-12 p-sm-6 p-md-6 p-lg-6 p-xl-4 p-mt-3">
                                                             <p:outputLabel for="dcNumber" value="Debit Card Number"/>
-                                                            <p:inputMask id="dcNumber" value="#{checkoutController.maskedDCNumber}" required="true" requiredMessage="Please enter Debit Card Number" placeholder="16-digit Card Number" mask="9999-9999-9999-9999" validateMask="true" styleClass="p-mt-1">  
+                                                            <p:inputMask id="dcNumber" value="#{checkoutController.maskedDCNumber}" required="true" requiredMessage="Please enter Debit Card Number" placeholder="16-digit Card Number" mask="9999-9999-9999-9999" validateMask="true" styleClass="p-mt-1">
                                                                 <p:ajax event="blur" listener="#{checkoutController.fetchBinDetails}" oncomplete="PF('panelDCDetails').show();"  process="@this,dcIcon,dcIssuingBank" update="dcIcon,dcIssuingBank,:form-payment-options:form-payment-options-msgs"/>
                                                             </p:inputMask>
                                                             <p:graphicImage class="cardIcon" id="dcIcon" value="#{checkoutController.cardIconUrl}"/>
                                                         </span>
 
                                                         <span class="p-col-12 p-sm-6 p-md-6 p-lg-4 p-xl-2 p-mt-3">
-                                                            <p:outputLabel for="dcExpiryDate" value="Expiry Date"/> 
+                                                            <p:outputLabel for="dcExpiryDate" value="Expiry Date"/>
                                                             <p:inputMask id="dcExpiryDate" value="#{checkoutController.maskedDCExpiryDate}" required="true" requiredMessage="Please enter Debit Card Expiry Date" placeholder="e.g 01/2050" mask="99/9999" validateMask="true" styleClass="p-mt-1">
-                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/> 
-                                                            </p:inputMask>                                                        
+                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/>
+                                                            </p:inputMask>
                                                         </span>
 
                                                         <span class="p-col-12 p-sm-6 p-md-6 p-lg-2 p-xl-2 p-mt-3">
-                                                            <p:outputLabel for="dcCvv" value="Cvv"/>  
+                                                            <p:outputLabel for="dcCvv" value="Cvv"/>
                                                             <p:password id="dcCvv" value="#{checkoutController.dcCvv}" maxlength="3" required="true" requiredMessage="Please enter Card CVV number" validator="#{checkoutController.validateCvv}" placeholder="e.g 123" styleClass="p-mt-1">
-                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/>    
+                                                                <p:ajax event="blur" update=":form-payment-options:form-payment-options-msgs"/>
                                                             </p:password>
-                                                        </span> 
+                                                        </span>
 
-                                                        <span class="p-col-12 p-mt-3">         
+                                                        <span class="p-col-12 p-mt-3">
                                                             <p:selectBooleanCheckbox value="#{checkoutController.saveDC}" itemLabel="Save Card for Future Payments">
                                                                 <p:ajax update="@this"/>
                                                             </p:selectBooleanCheckbox>
-                                                        </span> 
+                                                        </span>
 
                                                         <span class="p-col-12 p-md-12 p-lg-12 p-mt-3">
                                                             <span class="p-grid p-m-0 p-align-center">
                                                                 <p:graphicImage name="visa.png" library="images"/>
                                                                 <p:graphicImage name="mastercard.png" library="images"/>
                                                                 <p:graphicImage name="maestro.png" library="images"/>
-                                                                <p:graphicImage name="amex.png" library="images"/> 
+                                                                <p:graphicImage name="amex.png" library="images"/>
                                                             </span>
                                                         </span>
                                                     </div>
                                                 </h:form>
-                                            </p:panel>                                     
+                                            </p:panel>
                                         </p:panel>
 
-                                        <p:panel id="netbanking" 
+                                        <p:panel id="netbanking"
                                                  rendered="#{checkoutController.isModeNB}"
                                                  style="border:none;">
-                                            <p:panel rendered="#{paymentOption.paymentMode eq 'NET_BANKING'}" style="border:none;"> 
+                                            <p:panel rendered="#{paymentOption.paymentMode eq 'NET_BANKING'}" style="border:none;">
                                                 <p:dataTable id="datatable-channeloptions"
                                                              class="table-channeloptions"
-                                                             value="#{checkoutController.payChannelOptionsNetBanking}"        
+                                                             value="#{checkoutController.payChannelOptionsNetBanking}"
                                                              var="payChannelOptionNetBanking"
                                                              selectionMode="single"
                                                              selection="#{checkoutController.payChannelOptionNetBanking}"
                                                              rowKey="#{payChannelOptionNetBanking.channelCode}">
-                                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPayChannelOptionNetBanking}" update="datatable-channeloptions"/>                            
+                                                    <p:ajax event="rowSelect" listener="#{checkoutController.onRowSelectPayChannelOptionNetBanking}" update="datatable-channeloptions"/>
                                                     <p:column>
-                                                        <i class="pi pi-check"></i>  
+                                                        <i class="pi pi-check"></i>
                                                     </p:column>
                                                     <p:column>
                                                         <ui:fragment rendered="${payChannelOptionNetBanking.channelCode ne 'OTHERS'}">
                                                             <p:graphicImage url="#{payChannelOptionNetBanking.iconUrl}"/>
                                                         </ui:fragment>
                                                         <ui:fragment rendered="${payChannelOptionNetBanking.channelCode eq 'OTHERS'}">
-                                                            <i class="pi pi-ellipsis-v"></i> 
-                                                        </ui:fragment> 
+                                                            <i class="pi pi-ellipsis-v"></i>
+                                                        </ui:fragment>
                                                     </p:column>
                                                     <p:column>
-                                                        <h:outputText value="#{payChannelOptionNetBanking.channelName}"/>                                
-                                                    </p:column>  
+                                                        <h:outputText value="#{payChannelOptionNetBanking.channelName}"/>
+                                                    </p:column>
                                                 </p:dataTable>
                                             </p:panel>
                                         </p:panel>
                                     </p:column>
-                                    <f:facet name="footer"> 
+                                    <f:facet name="footer">
                                         <div class="reviewAndPlaceOrderBtn">
                                             <ui:fragment rendered="#{checkoutController.isModePOD eq false}">
                                                 <p:commandButton id="reviewAndPlaceOrderBtn" actionListener="#{checkoutController.processTransaction(checkoutController.paymentMode)}" value="Review and Place Order" onclick="PF('progressPanel').show();PF('reviewAndPlaceOrderBtn').disable();" oncomplete="PF('progressPanel').close();PF('reviewAndPlaceOrderBtn').enable();" widgetVar="reviewAndPlaceOrderBtn" process="#{checkoutController.isPaymentThroughSavedCard eq true ? '@this,:form-payment-options:datatable-saved-instruments:savedCardCvv' : '@this'}" update=":form-payment-options:form-payment-options-msgs"/>
                                             </ui:fragment>
                                             <ui:fragment rendered="#{checkoutController.isModePOD eq true}">
                                                 <p:commandButton action="redirect-form.xhtml" value="Review and Place Order" onclick="PF('progressPanel').show();PF('reviewAndPlaceOrderBtn').disable();" oncomplete="PF('progressPanel').close();PF('reviewAndPlaceOrderBtn').enable();" widgetVar="reviewAndPlaceOrderBtn" update=":form-payment-options:form-payment-options-msgs"/>
-                                            </ui:fragment>                                            
+                                            </ui:fragment>
                                         </div>
-                                    </f:facet>                                           
+                                    </f:facet>
                                 </p:dataTable>
-                            </p> 
-                        </h:form>  
-                        <h:form id="paytmSidebarForm">                            
-                            <p:sidebar visible="false" widgetVar="paytmSidebar" position="right" baseZIndex="10000">   
+                            </p>
+                        </h:form>
+                        <h:form id="paytmSidebarForm">
+                            <p:sidebar visible="false" widgetVar="paytmSidebar" position="right" baseZIndex="10000">
                                 <p:panel widgetVar="progressPanelPaytmSidebarForm"
                                          visible="false"
                                          style="border:none;"
@@ -250,7 +250,7 @@
                                 <!--                                <p:message id="msg-mobile" for="paytm-mobile"/>-->
                                 <p:panel widgetVar="panelSendOtp" styleClass="p-mt-4">
                                     <div class="ui-fluid p-formgrid p-grid">
-                                        <span class="p-col">                                        
+                                        <span class="p-col">
                                             <p:outputLabel for="paytm-mobile" value="Paytm Mobile"/>
                                             <span class="ui-fluid p-formgrid p-grid p-mt-2">
                                                 <span class="p-field p-col-12">
@@ -266,7 +266,7 @@
                                                     <p:commandButton id="sendOtpBtn" value="Send OTP" actionListener="#{checkoutController.sendOTP(checkoutController.paytmMobile)}" onclick="PF('progressPanelPaytmSidebarForm').show();PF('sendOtpBtn').disable();" oncomplete="PF('progressPanelPaytmSidebarForm').close();PF('sendOtpBtn').enable();" onsuccess="if (#{checkoutController.isValidPaytmMobile}){PF('panelSendOtp').close();PF('panelEnterOtp').show();}" widgetVar="sendOtpBtn" update=":paytmSidebarForm:paytmSidebarMsgs"/>
                                                 </span>
                                             </span>
-                                        </span>                                                        
+                                        </span>
                                     </div>
                                 </p:panel>
                                 <p:panel visible="false" widgetVar="panelEnterOtp" styleClass="p-mt-4">
@@ -274,7 +274,7 @@
                                         <span class="p-col">
                                             <p:outputLabel for="enter-otp" value="Enter OTP"/>
                                             <span class="ui-fluid p-formgrid p-grid p-mt-2">
-                                                <span class="p-field p-col-12">                                                    
+                                                <span class="p-field p-col-12">
                                                     <p:inputMask class="otpInputText" id="enter-otp" value="#{checkoutController.otp}" mask="9  9  9  9  9  9" validateMask="true"/>
                                                 </span>
                                                 <span class="p-field p-col-12">
@@ -282,7 +282,7 @@
                                                 </span>
                                             </span>
                                         </span>
-                                    </div> 
+                                    </div>
                                 </p:panel>
                             </p:sidebar>
                         </h:form>
@@ -290,7 +290,7 @@
                 </div>
                 <h:outputStylesheet library="css" name="payment-gateway.css"/>
             </ui:define>
-        </ui:composition>        
+        </ui:composition>
     </h:body>
 </html>
 

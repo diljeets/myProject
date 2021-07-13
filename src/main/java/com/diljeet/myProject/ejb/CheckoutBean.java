@@ -10,6 +10,11 @@ import com.diljeet.myProject.controllers.CheckoutController;
 import com.diljeet.myProject.controllers.OrderController;
 import com.diljeet.myProject.controllers.RedirectFormController;
 import com.diljeet.myProject.utils.CardDetails;
+import com.diljeet.myProject.utils.FetchBalanceAndInstruments;
+import com.diljeet.myProject.utils.FetchBinDetails;
+import com.diljeet.myProject.utils.FetchPaymentOptions;
+import com.diljeet.myProject.utils.FetchPaymentOptionsAndNetbankingChannels;
+import com.diljeet.myProject.utils.FetchPaytmBalance;
 import com.diljeet.myProject.utils.InitiateTransaction;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
@@ -17,6 +22,9 @@ import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
 import com.diljeet.myProject.utils.RedirectForm;
 import com.diljeet.myProject.utils.SavedInstruments;
+import com.diljeet.myProject.utils.SendOtp;
+import com.diljeet.myProject.utils.UpdateTransaction;
+import com.diljeet.myProject.utils.ValidateOtp;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -113,20 +121,24 @@ public class CheckoutBean {
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
                     .post(Entity.entity(initiateTransaction, MediaType.APPLICATION_JSON), Response.class);
-
-            if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
-                checkoutController.setOrderId(createOrderId());
-                initiateTransaction(cartController.getPayableAmount(), checkoutController.getOrderId());
-            }
-            if (response.getStatus() == Response.Status.GATEWAY_TIMEOUT.getStatusCode()) {
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                if (response.hasEntity()) {
+                    String transactionToken = response.readEntity(String.class);
+                    checkoutController.setTransactionToken(transactionToken);
+                    FetchPaymentOptionsAndNetbankingChannels fetchPaymentOptionsAndNetbankingChannels
+                            = fetchPaymentOptions(checkoutController.getOrderId(), checkoutController.getTransactionToken());
+                    setPaymentOptionsAndNetbankingChannels(fetchPaymentOptionsAndNetbankingChannels);
+                } else {
+                    FetchPaymentOptionsAndNetbankingChannels fetchPaymentOptionsAndNetbankingChannels = updateTransaction(checkoutController.getOrderId(), cartController.getPayableAmount(), req.getUserPrincipal().getName(), checkoutController.getTransactionToken());
+                    setPaymentOptionsAndNetbankingChannels(fetchPaymentOptionsAndNetbankingChannels);
+                }
+            } else if (response.getStatus() == Response.Status.GATEWAY_TIMEOUT.getStatusCode()) {
                 msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info!", "Your Session has Expired. Kindly Login again.");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
-            }
-            if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
+            } else if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
                 msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "1Something went wrong. Please try again.");
                 FacesContext.getCurrentInstance().addMessage(null, msg);
             }
-
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage());
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", e.getMessage());
@@ -135,80 +147,146 @@ public class CheckoutBean {
 
     }
 
-    public List<PaymentOptions> fetchPaymentOptions() {
-        List<PaymentOptions> paymentOptions = null;
+    private void setPaymentOptionsAndNetbankingChannels(FetchPaymentOptionsAndNetbankingChannels fetchPaymentOptionsAndNetbankingChannels) {
+        if (fetchPaymentOptionsAndNetbankingChannels != null) {
+            List<PaymentOptions> paymentOptions = fetchPaymentOptionsAndNetbankingChannels.getPaymentOptions();
+            List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = fetchPaymentOptionsAndNetbankingChannels.getPayChannelOptionsNetBanking();
+            if (paymentOptions != null) {
+                checkoutController.setPaymentOptions(paymentOptions);
+            }
+            if (payChannelOptionsNetBanking != null) {
+                checkoutController.setPayChannelOptionsNetBanking(payChannelOptionsNetBanking);
+            }
+        }
+    }
+
+//    public List<PaymentOptions> fetchPaymentOptions() {
+//        List<PaymentOptions> paymentOptions = null;
+//        try {
+//            paymentOptions = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchPaymentOptions")
+//                    .request(MediaType.APPLICATION_JSON)
+//                    .header("Cookie", req.getHeader("Cookie"))
+//                    .get(new GenericType<List<PaymentOptions>>() {
+//                    });
+//        } catch (Exception e) {
+//            logger.log(Level.SEVERE, e.getMessage());
+//            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Payment Options. Please try again.");
+//            FacesContext.getCurrentInstance().addMessage(null, msg);
+//        }
+//        return paymentOptions;
+//    }
+    public FetchPaymentOptionsAndNetbankingChannels fetchPaymentOptions(String orderId, String transactionToken) {
+        FetchPaymentOptionsAndNetbankingChannels fetchPaymentOptionsAndNetbankingChannels = null;
+        FetchPaymentOptions fetchPaymentOptions = new FetchPaymentOptions(orderId, transactionToken);
         try {
-            paymentOptions = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchPaymentOptions")
+            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/paymentOptions/fetch")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .get(new GenericType<List<PaymentOptions>>() {
-                    });
+                    .post(Entity.entity(fetchPaymentOptions, MediaType.APPLICATION_JSON), Response.class);
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                if (response.hasEntity()) {
+                    fetchPaymentOptionsAndNetbankingChannels = response.readEntity(FetchPaymentOptionsAndNetbankingChannels.class);
+                }
+            } else if (response.getStatus() == Response.Status.GATEWAY_TIMEOUT.getStatusCode()) {
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info!", "Your Session has Expired. Kindly Login again.");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+            } else if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
+                msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Something went wrong. Please try again.");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+            }
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage());
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Payment Options. Please try again.");
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }
-        return paymentOptions;
+        return fetchPaymentOptionsAndNetbankingChannels;
     }
 
-    public List<PayChannelOptionsPaytmBalance> fetchPayChannelOptionsPaytmBalance() {
-        List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance = null;
+    public FetchPaymentOptionsAndNetbankingChannels updateTransaction(String orderId, String payableAmount, String username, String transactionToken) {
+        FetchPaymentOptionsAndNetbankingChannels fetchPaymentOptionsAndNetbankingChannels = null;
+        UpdateTransaction updateTransaction = new UpdateTransaction(orderId, payableAmount, username, transactionToken);
         try {
-            payChannelOptionsPaytmBalance = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchPayChannelOptionsPaytmBalance")
+            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/transaction/update")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .get(new GenericType<List<PayChannelOptionsPaytmBalance>>() {
-                    });
+                    .post(Entity.entity(updateTransaction, MediaType.APPLICATION_JSON), Response.class);
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                fetchPaymentOptionsAndNetbankingChannels = fetchPaymentOptions(orderId, transactionToken);
+            } else if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
+                checkoutController.setOrderId(createOrderId());
+                initiateTransaction(cartController.getPayableAmount(), checkoutController.getOrderId());
+            } else if (response.getStatus() == Response.Status.GATEWAY_TIMEOUT.getStatusCode()) {
+                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info!", "Your Session has Expired. Kindly Login again.");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+            } else if (response.getStatus() == Response.Status.BAD_REQUEST.getStatusCode()) {
+                msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Something went wrong. Please try again.");
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+            }
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage());
-            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Balance Options. Please try again.");
+            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Payment Options. Please try again.");
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }
-        return payChannelOptionsPaytmBalance;
+        return fetchPaymentOptionsAndNetbankingChannels;
     }
 
-    public List<SavedInstruments> fetchSavedInstruments() {
-        List<SavedInstruments> savedInstruments = null;
-        try {
-            savedInstruments = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchSavedInstruments")
-                    .request(MediaType.APPLICATION_JSON)
-                    .header("Cookie", req.getHeader("Cookie"))
-                    .get(new GenericType<List<SavedInstruments>>() {
-                    });
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Saved Cards. Please try again.");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
-        }
-        return savedInstruments;
-    }
-
-    public List<PayChannelOptionsNetBanking> fetchPayChannelOptionsNetBanking() {
-        List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = null;
-        try {
-            payChannelOptionsNetBanking = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchPayChannelOptionsNetBanking")
-                    .request(MediaType.APPLICATION_JSON)
-                    .header("Cookie", req.getHeader("Cookie"))
-                    .get(new GenericType<List<PayChannelOptionsNetBanking>>() {
-                    });
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Banking Options. Please try again.");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
-        }
-        return payChannelOptionsNetBanking;
-    }
-
+//    public List<PayChannelOptionsPaytmBalance> fetchPayChannelOptionsPaytmBalance() {
+//        List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance = null;
+//        try {
+//            payChannelOptionsPaytmBalance = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchPayChannelOptionsPaytmBalance")
+//                    .request(MediaType.APPLICATION_JSON)
+//                    .header("Cookie", req.getHeader("Cookie"))
+//                    .get(new GenericType<List<PayChannelOptionsPaytmBalance>>() {
+//                    });
+//        } catch (Exception e) {
+//            logger.log(Level.SEVERE, e.getMessage());
+//            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Balance Options. Please try again.");
+//            FacesContext.getCurrentInstance().addMessage(null, msg);
+//        }
+//        return payChannelOptionsPaytmBalance;
+//    }
+//
+//    public List<SavedInstruments> fetchSavedInstruments() {
+//        List<SavedInstruments> savedInstruments = null;
+//        try {
+//            savedInstruments = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchSavedInstruments")
+//                    .request(MediaType.APPLICATION_JSON)
+//                    .header("Cookie", req.getHeader("Cookie"))
+//                    .get(new GenericType<List<SavedInstruments>>() {
+//                    });
+//        } catch (Exception e) {
+//            logger.log(Level.SEVERE, e.getMessage());
+//            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Saved Cards. Please try again.");
+//            FacesContext.getCurrentInstance().addMessage(null, msg);
+//        }
+//        return savedInstruments;
+//    }
+//
+//    public List<PayChannelOptionsNetBanking> fetchPayChannelOptionsNetBanking() {
+//        List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = null;
+//        try {
+//            payChannelOptionsNetBanking = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchPayChannelOptionsNetBanking")
+//                    .request(MediaType.APPLICATION_JSON)
+//                    .header("Cookie", req.getHeader("Cookie"))
+//                    .get(new GenericType<List<PayChannelOptionsNetBanking>>() {
+//                    });
+//        } catch (Exception e) {
+//            logger.log(Level.SEVERE, e.getMessage());
+//            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Banking Options. Please try again.");
+//            FacesContext.getCurrentInstance().addMessage(null, msg);
+//        }
+//        return payChannelOptionsNetBanking;
+//    }
     public void sendOTP(String paytmMobile) {
         if (paytmMobile == null) {
             return;
         }
+        SendOtp sendOtp = new SendOtp(checkoutController.getOrderId(), paytmMobile, checkoutController.getTransactionToken());
         try {
-            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/sendOTP")
-                    //                    .request(MediaType.APPLICATION_JSON)
-                    .request(MediaType.TEXT_PLAIN)
+            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/otp/send")
+                    .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .post(Entity.entity(paytmMobile, MediaType.TEXT_PLAIN), Response.class);
+                    .post(Entity.entity(sendOtp, MediaType.APPLICATION_JSON), Response.class);
             String resultMsg = response.getHeaderString("resultMsg");
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", resultMsg);
@@ -221,22 +299,36 @@ public class CheckoutBean {
             msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", e.getMessage());
             FacesContext.getCurrentInstance().addMessage(null, msg);
         }
-
     }
 
-    public void validateOtpAndFetchPaytmBalance(String otp) {
+    public void validateOtp(String otp) {
+        ValidateOtp validateOtp = null;
         if (otp == null) {
             return;
         }
+        if (validateOtp == null) {
+            validateOtp = new ValidateOtp(checkoutController.getOrderId(), otp, checkoutController.getTransactionToken());
+        }
         try {
-            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/validateOTP/fetchBalance")
-                    //                    .request(MediaType.APPLICATION_JSON)
-                    .request(MediaType.TEXT_PLAIN)
+            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/otp/validate")
+                    .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .post(Entity.entity(otp, MediaType.TEXT_PLAIN), Response.class);
+                    .post(Entity.entity(validateOtp, MediaType.APPLICATION_JSON), Response.class);
             String resultMsg = response.getHeaderString("resultMsg");
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                FacesContext.getCurrentInstance().getExternalContext().redirect("http://192.168.43.80:8080/myProject/select-payment-option.xhtml");
+                FetchBalanceAndInstruments fetchBalanceAndInstruments = fetchPaytmBalance(checkoutController.getOrderId(), checkoutController.getTransactionToken());
+                if (fetchBalanceAndInstruments != null) {
+                    List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance = fetchBalanceAndInstruments.getPayChannelOptionsPaytmBalance();
+                    List<SavedInstruments> savedInstruments = fetchBalanceAndInstruments.getSavedInstruments();
+                    if (payChannelOptionsPaytmBalance != null) {
+                        checkoutController.setPayChannelOptionsPaytmBalance(payChannelOptionsPaytmBalance);
+                    }
+                    if (savedInstruments != null) {
+                        checkoutController.setSavedInstruments(savedInstruments);
+                    }
+                    FacesContext.getCurrentInstance().getExternalContext().redirect("http://192.168.43.80:8080/myProject/select-payment-option.xhtml");
+                }
+
             } else if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
                 msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
                 FacesContext.getCurrentInstance().addMessage(null, msg);
@@ -248,15 +340,50 @@ public class CheckoutBean {
 
     }
 
+    public FetchBalanceAndInstruments fetchPaytmBalance(String orderId, String transactionToken) {
+        FetchBalanceAndInstruments fetchBalanceAndInstruments = null;
+        FetchPaytmBalance fetchPaytmBalance = new FetchPaytmBalance(orderId, transactionToken);
+        try {
+            Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/paymentOptions/balance/fetch")
+                    .request(MediaType.APPLICATION_JSON)
+                    .header("Cookie", req.getHeader("Cookie"))
+                    .post(Entity.entity(fetchPaytmBalance, MediaType.APPLICATION_JSON), Response.class);
+            if (response.getStatus() == Response.Status.OK.getStatusCode()) {
+                if (response.hasEntity()) {
+                    fetchBalanceAndInstruments = response.readEntity(FetchBalanceAndInstruments.class);
+                }
+            } else if (response.getStatus() == Response.Status.NOT_ACCEPTABLE.getStatusCode()) {
+                String resultMsg = response.getHeaderString("resultMsg");
+                msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", resultMsg);
+                FacesContext.getCurrentInstance().addMessage(null, msg);
+            }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage());
+            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Payment Options. Please try again.");
+            FacesContext.getCurrentInstance().addMessage(null, msg);
+        }
+        return fetchBalanceAndInstruments;
+    }
+
     public boolean fetchBinDetails(String firstSixCardDigits) {
+        if (firstSixCardDigits == null) {
+            return false;
+        }
+        FetchBinDetails fetchBinDetails = new FetchBinDetails(checkoutController.getOrderId(), firstSixCardDigits, checkoutController.getTransactionToken());
         try {
             Response response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/card/fetchBinDetails")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .post(Entity.entity(firstSixCardDigits, MediaType.APPLICATION_JSON), Response.class);
+                    .post(Entity.entity(fetchBinDetails, MediaType.APPLICATION_JSON), Response.class);
             String resultMsg = response.getHeaderString("resultMsg");
             if (response.getStatus() == Response.Status.OK.getStatusCode()) {
-                logger.log(Level.INFO, resultMsg);
+                if (response.hasEntity()) {
+                    List<CardDetails> cardDetails = response.readEntity(new GenericType<List<CardDetails>>() {
+                    });
+                    if (cardDetails != null) {
+                        checkoutController.setCardDetails(cardDetails);
+                    }
+                }
 //                msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", resultMsg);
 //                FacesContext.getCurrentInstance().addMessage(null, msg);
             } else {
@@ -271,28 +398,36 @@ public class CheckoutBean {
         return true;
     }
 
-    public List<CardDetails> fetchCardDetails() {
-        List<CardDetails> cardDetails = null;
+//    public List<CardDetails> fetchCardDetails() {
+//        List<CardDetails> cardDetails = null;
+//        try {
+//            cardDetails = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchCardDetails")
+//                    .request(MediaType.APPLICATION_JSON)
+//                    .header("Cookie", req.getHeader("Cookie"))
+//                    .get(new GenericType<List<CardDetails>>() {
+//                    });
+//        } catch (Exception e) {
+//            logger.log(Level.SEVERE, e.getMessage());
+//            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Card Details. Please try again.");
+//            FacesContext.getCurrentInstance().addMessage(null, msg);
+//        }
+//        return cardDetails;
+//    }
+    public void fetchOtherNetBankingPaymentChannels(String orderId, String transactionToken) {
+        List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = null;
         try {
-            cardDetails = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchCardDetails")
+            payChannelOptionsNetBanking = client
+                    .target("http://192.168.43.80:8080/myProject/webapi/Checkout/netBankingPaymentChannels/other/fetch")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .get(new GenericType<List<CardDetails>>() {
+                    .header("orderId", orderId)
+                    .header("transactionToken", transactionToken)
+                    .get(new GenericType<List<PayChannelOptionsNetBanking>>() {
                     });
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, e.getMessage());
-            msg = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Could not fetch Card Details. Please try again.");
-            FacesContext.getCurrentInstance().addMessage(null, msg);
-        }
-        return cardDetails;
-    }
 
-    public void fetchOtherNetBankingPaymentChannels() {
-        try {
-            client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/fetchOtherNetBankingPaymentChannels")
-                    .request(MediaType.APPLICATION_JSON)
-                    .header("Cookie", req.getHeader("Cookie"))
-                    .get();
+            if (payChannelOptionsNetBanking != null) {
+                checkoutController.setPayChannelOptionsNetBanking(payChannelOptionsNetBanking);
+            }
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage());
         }
@@ -308,13 +443,15 @@ public class CheckoutBean {
             response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/processTransaction")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .post(Entity.entity(paymentRequestDetails, MediaType.APPLICATION_JSON), Response.class);
+                    .post(Entity.entity(paymentRequestDetails, MediaType.APPLICATION_JSON), Response.class
+                    );
             if (response.getStatus() == Response.Status.TEMPORARY_REDIRECT.getStatusCode()) {
                 //Redirect if paymode is BALANCE and Customer Transaction is unsuccessful
                 FacesContext.getCurrentInstance().getExternalContext().redirect(response.getLocation().toString());
             } else if (response.getStatus() == Response.Status.OK.getStatusCode()) {
                 if (response.hasEntity()) {
-                    JSONObject bodyObj = new JSONObject(response.readEntity(String.class));
+                    JSONObject bodyObj = new JSONObject(response.readEntity(String.class
+                    ));
                     JSONObject bankFormObj = bodyObj.getJSONObject("bankForm");
                     JSONObject redirectFormObj = bankFormObj.getJSONObject("redirectForm");
                     String actionUrl = redirectFormObj.getString("actionUrl");
@@ -385,7 +522,8 @@ public class CheckoutBean {
             response = client.target("http://192.168.43.80:8080/myProject/webapi/Checkout/transactionStatus")
                     .request(MediaType.APPLICATION_JSON)
                     .header("Cookie", req.getHeader("Cookie"))
-                    .post(Entity.entity(orderId, MediaType.APPLICATION_JSON), Response.class);
+                    .post(Entity.entity(orderId, MediaType.APPLICATION_JSON), Response.class
+                    );
         } catch (Exception e) {
             e.printStackTrace();
         }

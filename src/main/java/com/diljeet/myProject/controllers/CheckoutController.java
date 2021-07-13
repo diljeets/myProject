@@ -18,13 +18,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Iterator;
-import java.util.logging.Logger;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
@@ -33,6 +32,7 @@ import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 
@@ -50,6 +50,7 @@ public class CheckoutController implements Serializable {
 
     private CustomerOrder customerOrder;
     private String orderId;
+    private String transactionToken;
     private PaymentOptions paymentOption;
     private List<PaymentOptions> paymentOptions;
     private PayChannelOptionsPaytmBalance payChannelOptionPaytmBalance;
@@ -58,6 +59,7 @@ public class CheckoutController implements Serializable {
     private List<SavedInstruments> savedInstruments;
     private PayChannelOptionsNetBanking payChannelOptionNetBanking;
     private List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking;
+    private List<CardDetails> cardDetails;
     private PaymentRequestDetails paymentRequestDetails;
     private String paymentMode;
     private boolean isModePaytm;
@@ -125,6 +127,14 @@ public class CheckoutController implements Serializable {
         this.orderId = orderId;
     }
 
+    public String getTransactionToken() {
+        return transactionToken;
+    }
+
+    public void setTransactionToken(String transactionToken) {
+        this.transactionToken = transactionToken;
+    }
+
     public PaymentOptions getPaymentOption() {
         return paymentOption;
     }
@@ -134,7 +144,8 @@ public class CheckoutController implements Serializable {
     }
 
     public List<PaymentOptions> getPaymentOptions() {
-        return checkoutBean.fetchPaymentOptions();
+//        return checkoutBean.fetchPaymentOptions();
+        return paymentOptions;
     }
 
     public void setPaymentOptions(List<PaymentOptions> paymentOptions) {
@@ -150,7 +161,8 @@ public class CheckoutController implements Serializable {
     }
 
     public List<PayChannelOptionsPaytmBalance> getPayChannelOptionsPaytmBalance() {
-        return checkoutBean.fetchPayChannelOptionsPaytmBalance();
+//        return checkoutBean.fetchPayChannelOptionsPaytmBalance();
+        return payChannelOptionsPaytmBalance;
     }
 
     public void setPayChannelOptionsPaytmBalance(List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance) {
@@ -166,7 +178,8 @@ public class CheckoutController implements Serializable {
     }
 
     public List<SavedInstruments> getSavedInstruments() {
-        return checkoutBean.fetchSavedInstruments();
+//        return checkoutBean.fetchSavedInstruments();
+        return savedInstruments;
     }
 
     public void setSavedInstruments(List<SavedInstruments> savedInstruments) {
@@ -182,11 +195,20 @@ public class CheckoutController implements Serializable {
     }
 
     public List<PayChannelOptionsNetBanking> getPayChannelOptionsNetBanking() {
-        return checkoutBean.fetchPayChannelOptionsNetBanking();
+//        return checkoutBean.fetchPayChannelOptionsNetBanking();
+        return payChannelOptionsNetBanking;
     }
 
     public void setPayChannelOptionsNetBanking(List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking) {
         this.payChannelOptionsNetBanking = payChannelOptionsNetBanking;
+    }
+
+    public List<CardDetails> getCardDetails() {
+        return cardDetails;
+    }
+
+    public void setCardDetails(List<CardDetails> cardDetails) {
+        this.cardDetails = cardDetails;
     }
 
     public PaymentRequestDetails getPaymentRequestDetails() {
@@ -430,6 +452,11 @@ public class CheckoutController implements Serializable {
     }
 
     public void initiateTransaction(String payableAmount) {
+        setPaymentOptions(null);
+        setPayChannelOptionsPaytmBalance(null);
+        setPayChannelOptionsNetBanking(null);
+        setSavedInstruments(null);
+        setCardDetails(null);
         if (orderId == null) {
             orderId = checkoutBean.createOrderId();
         }
@@ -441,20 +468,22 @@ public class CheckoutController implements Serializable {
     }
 
     public void validateOtpAndFetchPaytmBalance(String maskedOtp) {
-        //Remove masking from maskedOtp and retrieve actual otp        
+        //Remove masking from maskedOtp and retrieve actual otp
         String[] otpArray = maskedOtp.split("  ");
         StringBuilder otpBuilder = new StringBuilder();
         for (String otpChar : otpArray) {
             otpBuilder.append(otpChar);
         }
         String otpString = otpBuilder.toString();
-        checkoutBean.validateOtpAndFetchPaytmBalance(otpString);
+        checkoutBean.validateOtp(otpString);
     }
 
     public void processTransaction(String paymentMode) {
         if (paymentMode.equals("BALANCE") || paymentMode.equals("POD")) {
             paymentRequestDetails = new PaymentRequestDetails(
-                    paymentMode
+                    orderId,
+                    paymentMode,
+                    transactionToken
             );
             try {
                 //Redirect if paymode is BALANCE/POD
@@ -465,9 +494,11 @@ public class CheckoutController implements Serializable {
         } else if (paymentMode.equals("CREDIT_CARD")) {
             if (isPaymentThroughSavedCard) {
                 paymentRequestDetails = new PaymentRequestDetails(
+                        orderId,
                         paymentMode,
                         cardId,
-                        cardCvv
+                        cardCvv,
+                        transactionToken
                 );
                 checkoutBean.processTransaction(paymentRequestDetails);
             } else {
@@ -475,20 +506,24 @@ public class CheckoutController implements Serializable {
                 String ccExpiryDate = removeMaskingFromCardExpiryDate(maskedCCExpiryDate);
                 String saveCard = saveCC ? "1" : "0";
                 paymentRequestDetails = new PaymentRequestDetails(
+                        orderId,
                         paymentMode,
                         ccNumber,
                         ccExpiryDate,
                         ccCvv,
-                        saveCard
+                        saveCard,
+                        transactionToken
                 );
                 checkoutBean.processTransaction(paymentRequestDetails);
             }
         } else if (paymentMode.equals("DEBIT_CARD")) {
             if (isPaymentThroughSavedCard) {
                 paymentRequestDetails = new PaymentRequestDetails(
+                        orderId,
                         paymentMode,
                         cardId,
-                        cardCvv
+                        cardCvv,
+                        transactionToken
                 );
                 checkoutBean.processTransaction(paymentRequestDetails);
             } else {
@@ -496,18 +531,22 @@ public class CheckoutController implements Serializable {
                 String dcExpiryDate = removeMaskingFromCardExpiryDate(maskedDCExpiryDate);
                 String saveCard = saveDC ? "1" : "0";
                 paymentRequestDetails = new PaymentRequestDetails(
+                        orderId,
                         paymentMode,
                         dcNumber,
                         dcExpiryDate,
                         dcCvv,
-                        saveCard
+                        saveCard,
+                        transactionToken
                 );
                 checkoutBean.processTransaction(paymentRequestDetails);
             }
         } else {
             paymentRequestDetails = new PaymentRequestDetails(
+                    orderId,
                     paymentMode,
-                    channelCode
+                    channelCode,
+                    transactionToken
             );
             checkoutBean.processTransaction(paymentRequestDetails);
         }
@@ -545,7 +584,7 @@ public class CheckoutController implements Serializable {
         isModePOD = false;
         String selectedChannelCode = event.getObject().getChannelCode();
         if (selectedChannelCode.equals("OTHERS")) {
-            checkoutBean.fetchOtherNetBankingPaymentChannels();
+            checkoutBean.fetchOtherNetBankingPaymentChannels(orderId, transactionToken);
         } else {
             channelCode = selectedChannelCode;
         }
@@ -584,7 +623,7 @@ public class CheckoutController implements Serializable {
         if (firstSixCardDigits.length() == 6) {
             isCardValid = checkoutBean.fetchBinDetails(firstSixCardDigits);
             if (isCardValid) {
-                List<CardDetails> cardDetails = checkoutBean.fetchCardDetails();
+//                List<CardDetails> cardDetails = checkoutBean.fetchCardDetails();
                 Iterator<CardDetails> itr = cardDetails.iterator();
                 while (itr.hasNext()) {
                     CardDetails cardDetail = itr.next();
@@ -664,7 +703,7 @@ public class CheckoutController implements Serializable {
 //        if (maskedOtp.length() < 6) {
 //            ((UIInput) comp).setValid(false);
 //            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter a valid 6-digit OTP");
-//            context.addMessage(comp.getClientId(context), message);            
+//            context.addMessage(comp.getClientId(context), message);
 //        }
 //    }
     public void validateCardNumber(FacesContext context, UIComponent comp, String cardNumber) {

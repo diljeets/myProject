@@ -7,6 +7,8 @@ package com.diljeet.myProject.ejb;
 
 import com.diljeet.myProject.entities.CustomerTransaction;
 import com.diljeet.myProject.utils.CardDetails;
+import com.diljeet.myProject.utils.FetchBalanceAndInstruments;
+import com.diljeet.myProject.utils.FetchPaymentOptionsAndNetbankingChannels;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
 import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
 import com.diljeet.myProject.utils.PaymentOptions;
@@ -49,68 +51,64 @@ public class PaymentGatewayBean {
     private static final String CURRENCY = "INR";
     private static final String TOKEN_TYPE = "TXN_TOKEN";
 
-    private String orderId;
-    private String payableAmount;
-    private String username;
-    private String channelId;
-    private String callbackUrl;
-    private String transactionToken;
+//    private String orderId;
+//    private String payableAmount;
+//    private String username;
+//    private String channelId;
+//    private String callbackUrl;
+//    private String transactionToken;
     private String iconBaseUrl;
-    private List<PaymentOptions> paymentOptions;
-    private List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance;
-    private List<SavedInstruments> savedInstruments;
-    private List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking;
-    private List<CardDetails> cardDetails;
+//    private List<PaymentOptions> paymentOptions;
+//    private List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance;
+//    private List<SavedInstruments> savedInstruments;
+//    private List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking;
+//    private List<CardDetails> cardDetails;
     private CustomerTransaction customerTransaction;
 
     public PaymentGatewayBean() {
-        paymentOptions = new ArrayList<>();
-        payChannelOptionsPaytmBalance = new ArrayList<>();
-        savedInstruments = new ArrayList<>();
-        payChannelOptionsNetBanking = new ArrayList<>();
-        cardDetails = new ArrayList<>();
+//        paymentOptions = new ArrayList<>();
+//        payChannelOptionsPaytmBalance = new ArrayList<>();
+//        savedInstruments = new ArrayList<>();
+//        payChannelOptionsNetBanking = new ArrayList<>();
+//        cardDetails = new ArrayList<>();
     }
 
-    public List<PaymentOptions> getPaymentOptions() {
-        return paymentOptions;
-    }
-
-    public void setPaymentOptions(List<PaymentOptions> paymentOptions) {
-        this.paymentOptions = paymentOptions;
-    }
-
-    public List<PayChannelOptionsPaytmBalance> getPayChannelOptionsPaytmBalance() {
-        return payChannelOptionsPaytmBalance;
-    }
-
-    public void setPayChannelOptionsPaytmBalance(List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance) {
-        this.payChannelOptionsPaytmBalance = payChannelOptionsPaytmBalance;
-    }
-
-    public List<SavedInstruments> getSavedInstruments() {
-        return savedInstruments;
-    }
-
-    public void setSavedInstruments(List<SavedInstruments> savedInstruments) {
-        this.savedInstruments = savedInstruments;
-    }
-
-    public List<PayChannelOptionsNetBanking> getPayChannelOptionsNetBanking() {
-        return payChannelOptionsNetBanking;
-    }
-
-    public void setPayChannelOptionsNetBanking(List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking) {
-        this.payChannelOptionsNetBanking = payChannelOptionsNetBanking;
-    }
-
-    public List<CardDetails> getCardDetails() {
-        return cardDetails;
-    }
-
-    public void setCardDetails(List<CardDetails> cardDetails) {
-        this.cardDetails = cardDetails;
-    }
-
+//    public List<PaymentOptions> getPaymentOptions() {
+//        return paymentOptions;
+//    }
+//
+//    public void setPaymentOptions(List<PaymentOptions> paymentOptions) {
+//        this.paymentOptions = paymentOptions;
+//    }
+//    public List<PayChannelOptionsPaytmBalance> getPayChannelOptionsPaytmBalance() {
+//        return payChannelOptionsPaytmBalance;
+//    }
+//
+//    public void setPayChannelOptionsPaytmBalance(List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance) {
+//        this.payChannelOptionsPaytmBalance = payChannelOptionsPaytmBalance;
+//    }
+//
+//    public List<SavedInstruments> getSavedInstruments() {
+//        return savedInstruments;
+//    }
+//
+//    public void setSavedInstruments(List<SavedInstruments> savedInstruments) {
+//        this.savedInstruments = savedInstruments;
+//    }
+//    public List<PayChannelOptionsNetBanking> getPayChannelOptionsNetBanking() {
+//        return payChannelOptionsNetBanking;
+//    }
+//
+//    public void setPayChannelOptionsNetBanking(List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking) {
+//        this.payChannelOptionsNetBanking = payChannelOptionsNetBanking;
+//    }
+//    public List<CardDetails> getCardDetails() {
+//        return cardDetails;
+//    }
+//
+//    public void setCardDetails(List<CardDetails> cardDetails) {
+//        this.cardDetails = cardDetails;
+//    }
     public CustomerTransaction getCustomerTransaction() {
         return customerTransaction;
     }
@@ -120,17 +118,17 @@ public class PaymentGatewayBean {
     }
 
     public Response initiateTransaction(String orderId, String payableAmount, String username, String channelId, String callbackUrl) {
-        this.orderId = orderId;
-        this.payableAmount = payableAmount;
-        this.username = username;
-        this.channelId = channelId;
-        this.callbackUrl = callbackUrl;
+//        this.orderId = orderId;
+//        this.payableAmount = payableAmount;
+//        this.username = username;
+//        this.channelId = channelId;
+//        this.callbackUrl = callbackUrl;
         logger.log(Level.SEVERE, "orderId in IT is {0}", orderId);
-        paymentOptions.clear();
-        payChannelOptionsPaytmBalance.clear();
-        savedInstruments.clear();
-        payChannelOptionsNetBanking.clear();
-        cardDetails.clear();
+//        paymentOptions.clear();
+//        payChannelOptionsPaytmBalance.clear();
+//        savedInstruments.clear();
+//        payChannelOptionsNetBanking.clear();
+//        cardDetails.clear();
         customerTransaction = null;
 
         JSONObject paytmParams = new JSONObject();
@@ -205,14 +203,21 @@ public class PaymentGatewayBean {
                 String resultCode = resultInfoObj.getString("resultCode");
                 if (resultCode.equals("0000") || resultCode.equals("0002")) {
                     //Get Transaction Token from body object and save in variable to use in subsequent API calls
-                    transactionToken = bodyObj.getString("txnToken");
+                    String transactionToken = bodyObj.getString("txnToken");
                     //if success fetch Payment Options
-                    return fetchPaymentOptions(orderId);
+//                    return fetchPaymentOptions(orderId);
+                    return Response
+                            .status(Response.Status.OK)
+                            .entity(transactionToken)
+                            .build();
                 } else if (resultCode.equals("2023")) {
                     //if there is an update to existing orderId with no transaction in process for same orderId
-                    return updateTransaction(orderId,
-                            payableAmount,
-                            username);
+//                    return updateTransaction(orderId,
+//                            payableAmount,
+//                            username);
+                    return Response
+                            .status(Response.Status.OK)
+                            .build();
                 } else if (resultCode.equals("1006")) {
                     //if Session expires
                     return Response
@@ -234,7 +239,7 @@ public class PaymentGatewayBean {
         return null;
     }
 
-    public Response updateTransaction(String orderId, String payableAmount, String username) {
+    public Response updateTransaction(String orderId, String payableAmount, String username, String transactionToken) {
         logger.log(Level.SEVERE, "orderId is {0}", orderId);
         logger.log(Level.SEVERE, "payableAmount is {0}", payableAmount);
         logger.log(Level.SEVERE, "txnToken is {0}", transactionToken);
@@ -297,7 +302,10 @@ public class PaymentGatewayBean {
                 String resultCode = resultInfoObj.getString("resultCode");
                 if (resultCode.equals("0000")) {
                     //if success fetch Payment Options
-                    return fetchPaymentOptions(orderId);
+//                    return fetchPaymentOptions(orderId);
+                    return Response
+                            .status(Response.Status.OK)
+                            .build();
                 } else if (resultCode.equals("1111")) {
                     //if there is an update to existing orderId but transaction already in process for same orderId
                     return Response
@@ -321,9 +329,11 @@ public class PaymentGatewayBean {
         return null;
     }
 
-    public Response fetchPaymentOptions(String orderId) {
+    public Response fetchPaymentOptions(String orderId, String transactionToken) {
         logger.log(Level.SEVERE, "orderId is {0}", orderId);
         logger.log(Level.SEVERE, "txnToken is {0}", transactionToken);
+        List<PaymentOptions> paymentOptions = null;
+        List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = null;
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -368,6 +378,8 @@ public class PaymentGatewayBean {
                 JSONObject resultInfoObj = bodyObj.getJSONObject("resultInfo");
                 String resultCode = resultInfoObj.getString("resultCode");
                 if (resultCode.equals("0000")) {
+                    paymentOptions = new ArrayList<>();
+                    payChannelOptionsNetBanking = new ArrayList<>();
                     JSONObject merchantPayOptionObj = bodyObj.getJSONObject("merchantPayOption");
                     JSONArray paymentModesJsonArray = merchantPayOptionObj.getJSONArray("paymentModes");
                     for (int i = 0; i < paymentModesJsonArray.length(); i++) {
@@ -432,12 +444,17 @@ public class PaymentGatewayBean {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+
+        FetchPaymentOptionsAndNetbankingChannels fetchPaymentOptionsAndNetbankingChannels
+                = new FetchPaymentOptionsAndNetbankingChannels(paymentOptions, payChannelOptionsNetBanking);
+
         return Response
                 .ok()
+                .entity(fetchPaymentOptionsAndNetbankingChannels)
                 .build();
     }
 
-    public Response sendOTP(String paytmMobile) {
+    public Response sendOTP(String orderId, String paytmMobile, String transactionToken) {
         logger.log(Level.SEVERE, "paytmMobile is {0}", paytmMobile);
         JSONObject paytmParams = new JSONObject();
 
@@ -499,7 +516,7 @@ public class PaymentGatewayBean {
                 .build();
     }
 
-    public Response validateOtpAndFetchPaytmBalance(String otp) {
+    public Response validateOtp(String orderId, String otp, String transactionToken) {
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -551,19 +568,23 @@ public class PaymentGatewayBean {
                             .header("resultMsg", resultMsg)
                             .build();
                 } else {
-                    return fetchPaytmBalance();
+//                    return fetchPaytmBalance();
+                    return Response
+                            .status(Response.Status.OK)
+                            .build();
                 }
             }
             responseReader.close();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-        return Response
-                .status(Response.Status.OK)
-                .build();
+        return null;
     }
 
-    public Response fetchPaytmBalance() {
+    public Response fetchPaytmBalance(String orderId, String transactionToken) {
+
+        List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance = null;
+        List<SavedInstruments> savedInstruments = null;
 
         JSONObject paytmParams = new JSONObject();
 
@@ -614,6 +635,8 @@ public class PaymentGatewayBean {
                             .header("resultMsg", resultMsg)
                             .build();
                 } else {
+                    payChannelOptionsPaytmBalance = new ArrayList<>();
+                    savedInstruments = new ArrayList<>();
                     JSONObject merchantPayOptionObj = bodyObj.getJSONObject("merchantPayOption");
                     //fetch balance in Paytm Wallet
                     JSONArray paymentModesJsonArray = merchantPayOptionObj.getJSONArray("paymentModes");
@@ -705,12 +728,19 @@ public class PaymentGatewayBean {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+
+        FetchBalanceAndInstruments fetchBalanceAndInstruments = new FetchBalanceAndInstruments(payChannelOptionsPaytmBalance, savedInstruments);
+
         return Response
                 .status(Response.Status.OK)
+                .entity(fetchBalanceAndInstruments)
                 .build();
     }
 
-    public Response fetchBinDetails(String firstSixCardDigits) {
+    public Response fetchBinDetails(String orderId, String firstSixCardDigits, String transactionToken) {
+
+        List<CardDetails> cardDetails = null;
+
         JSONObject paytmParams = new JSONObject();
 
         JSONObject body = new JSONObject();
@@ -760,6 +790,7 @@ public class PaymentGatewayBean {
                             .header("resultMsg", resultMsg)
                             .build();
                 } else {
+                    cardDetails = new ArrayList<>();
                     //Get attributes from binDetail Object
                     JSONObject binDetailObj = bodyObj.getJSONObject("binDetail");
                     String issuingBank = binDetailObj.getString("issuingBank");
@@ -801,12 +832,15 @@ public class PaymentGatewayBean {
         }
         return Response
                 .status(Response.Status.OK)
+                .entity(cardDetails)
                 .build();
     }
 
-    public void fetchOtherNetBankingPaymentChannels() {
+    public List<PayChannelOptionsNetBanking> fetchOtherNetBankingPaymentChannels(String orderId, String transactionToken) {
         //Clear payChannelOptionsNetBanking List
-        payChannelOptionsNetBanking.clear();
+//        payChannelOptionsNetBanking.clear();
+
+        List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = null;
 
         JSONObject paytmParams = new JSONObject();
 
@@ -852,6 +886,7 @@ public class PaymentGatewayBean {
 
                 String resultCode = resultInfoObj.getString("resultCode");
                 if (resultCode.equals("0000")) {
+                    payChannelOptionsNetBanking = new ArrayList<>();
                     JSONObject nbPayOptionObj = bodyObj.getJSONObject("nbPayOption");
                     JSONArray payChannelOptionsJsonArray = nbPayOptionObj.getJSONArray("payChannelOptions");
                     for (int i = 0; i < payChannelOptionsJsonArray.length(); i++) {
@@ -873,10 +908,13 @@ public class PaymentGatewayBean {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+        return payChannelOptionsNetBanking;
     }
 
     public Response processTransaction(PaymentRequestDetails paymentRequestDetails) {
+        String orderId = paymentRequestDetails.getOrderId();
         String paymentMode = paymentRequestDetails.getPaymentMode();
+        String transactionToken = paymentRequestDetails.getTransactionToken();
 //        logger.log(Level.SEVERE, "paymentMode in PT is {0}", paymentMode);
         JSONObject paytmParams = new JSONObject();
 

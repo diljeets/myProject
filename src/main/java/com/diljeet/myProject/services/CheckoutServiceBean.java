@@ -6,18 +6,20 @@
 package com.diljeet.myProject.services;
 
 import com.diljeet.myProject.ejb.PaymentGatewayBean;
-import java.util.logging.Logger;
 import com.diljeet.myProject.interfaces.CheckoutService;
-import com.diljeet.myProject.utils.CardDetails;
+import com.diljeet.myProject.utils.FetchBinDetails;
+import com.diljeet.myProject.utils.FetchPaymentOptions;
+import com.diljeet.myProject.utils.FetchPaytmBalance;
 import com.diljeet.myProject.utils.InitiateTransaction;
 import com.diljeet.myProject.utils.MyProjectUtils;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
-import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
-import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
-import com.diljeet.myProject.utils.SavedInstruments;
+import com.diljeet.myProject.utils.SendOtp;
+import com.diljeet.myProject.utils.UpdateTransaction;
+import com.diljeet.myProject.utils.ValidateOtp;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -70,101 +72,150 @@ public class CheckoutServiceBean implements CheckoutService {
         return response;
     }
 
+//    @Override
+//    public List<PaymentOptions> fetchPaymentOptions() {
+//        List<PaymentOptions> paymentOptions = null;
+//        try {
+//            paymentOptions = paymentGatewayBean.getPaymentOptions();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return paymentOptions;
+//    }
     @Override
-    public List<PaymentOptions> fetchPaymentOptions() {
-        List<PaymentOptions> paymentOptions = null;
+    public Response fetchPaymentOptions(FetchPaymentOptions fetchPaymentOptions) {
+        Response response = null;
+        String orderId = fetchPaymentOptions.getOrderId();
+        String transactionToken = fetchPaymentOptions.getTransactionToken();
         try {
-            paymentOptions = paymentGatewayBean.getPaymentOptions();
+            response = paymentGatewayBean.fetchPaymentOptions(orderId, transactionToken);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return paymentOptions;
+        return response;
     }
 
     @Override
-    public List<PayChannelOptionsPaytmBalance> fetchPayChannelOptionsPaytmBalance() {
-        List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance = null;
+    public Response updateTransaction(UpdateTransaction updateTransaction) {
+        Response response = null;
+        String orderId = updateTransaction.getOrderId();
+        String payableAmount = updateTransaction.getPayableAmount();
+        String username = updateTransaction.getUsername();
+        String transactionToken = updateTransaction.getTransactionToken();
         try {
-            payChannelOptionsPaytmBalance = paymentGatewayBean.getPayChannelOptionsPaytmBalance();
+            response = paymentGatewayBean.updateTransaction(orderId, payableAmount, username, transactionToken);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return payChannelOptionsPaytmBalance;
+        return response;
     }
 
+//    @Override
+//    public List<PayChannelOptionsPaytmBalance> fetchPayChannelOptionsPaytmBalance() {
+//        List<PayChannelOptionsPaytmBalance> payChannelOptionsPaytmBalance = null;
+//        try {
+//            payChannelOptionsPaytmBalance = paymentGatewayBean.getPayChannelOptionsPaytmBalance();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return payChannelOptionsPaytmBalance;
+//    }
+//
+//    @Override
+//    public List<SavedInstruments> fetchSavedInstruments() {
+//        List<SavedInstruments> savedInstruments = null;
+//        try {
+//            savedInstruments = paymentGatewayBean.getSavedInstruments();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return savedInstruments;
+//    }
+//
+//    @Override
+//    public List<PayChannelOptionsNetBanking> fetchPayChannelOptionsNetBanking() {
+//        List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = null;
+//        try {
+//            payChannelOptionsNetBanking = paymentGatewayBean.getPayChannelOptionsNetBanking();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return payChannelOptionsNetBanking;
+//    }
     @Override
-    public List<SavedInstruments> fetchSavedInstruments() {
-        List<SavedInstruments> savedInstruments = null;
+    public Response sendOTP(SendOtp sendOtp) {
+        String orderId = sendOtp.getOrderId();
+        String paytmMobile = sendOtp.getPaytmMobile();
+        String transactionToken = sendOtp.getTransactionToken();
+        Response response = null;
         try {
-            savedInstruments = paymentGatewayBean.getSavedInstruments();
+            response = paymentGatewayBean.sendOTP(orderId, paytmMobile, transactionToken);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return savedInstruments;
+        return response;
     }
 
     @Override
-    public List<PayChannelOptionsNetBanking> fetchPayChannelOptionsNetBanking() {
+    public Response validateOtp(ValidateOtp validateOtp) {
+        String orderId = validateOtp.getOrderId();
+        String otp = validateOtp.getOtp();
+        String transactionToken = validateOtp.getTransactionToken();
+        Response response = null;
+        try {
+            response = paymentGatewayBean.validateOtp(orderId, otp, transactionToken);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    @Override
+    public Response fetchPaytmBalance(FetchPaytmBalance fetchPaytmBalance) {
+        Response response = null;
+        String orderId = fetchPaytmBalance.getOrderId();
+        String transactionToken = fetchPaytmBalance.getTransactionToken();
+        try {
+            response = paymentGatewayBean.fetchPaytmBalance(orderId, transactionToken);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    @Override
+    public Response fetchBinDetails(FetchBinDetails fetchBinDetails) {
+        Response response = null;
+        String orderId = fetchBinDetails.getOrderId();
+        String firstSixCardDigits = fetchBinDetails.getFirstSixCardDigits();
+        String transactionToken = fetchBinDetails.getTransactionToken();
+        try {
+            response = paymentGatewayBean.fetchBinDetails(orderId, firstSixCardDigits, transactionToken);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+//    @Override
+//    public List<CardDetails> fetchCardDetails() {
+//        List<CardDetails> cardDetails = null;
+//        try {
+//            cardDetails = paymentGatewayBean.getCardDetails();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return cardDetails;
+//    }
+    @Override
+    public List<PayChannelOptionsNetBanking> fetchOtherNetBankingPaymentChannels(String orderId, String transactionToken) {
         List<PayChannelOptionsNetBanking> payChannelOptionsNetBanking = null;
         try {
-            payChannelOptionsNetBanking = paymentGatewayBean.getPayChannelOptionsNetBanking();
+            payChannelOptionsNetBanking = paymentGatewayBean.fetchOtherNetBankingPaymentChannels(orderId, transactionToken);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return payChannelOptionsNetBanking;
-    }
-
-    @Override
-    public Response sendOTP(String paytmMobile) {
-        Response response = null;
-        try {
-            response = paymentGatewayBean.sendOTP(paytmMobile);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
-
-    @Override
-    public Response validateOtpAndFetchPaytmBalance(String otp) {
-        Response response = null;
-        try {
-            response = paymentGatewayBean.validateOtpAndFetchPaytmBalance(otp);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
-
-    @Override
-    public Response fetchBinDetails(String firstSixCardDigits) {
-        Response response = null;
-        try {
-            response = paymentGatewayBean.fetchBinDetails(firstSixCardDigits);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
-
-    @Override
-    public List<CardDetails> fetchCardDetails() {
-        List<CardDetails> cardDetails = null;
-        try {
-            cardDetails = paymentGatewayBean.getCardDetails();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return cardDetails;
-    }
-
-    @Override
-    public void fetchOtherNetBankingPaymentChannels() {
-        try {
-            paymentGatewayBean.fetchOtherNetBankingPaymentChannels();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

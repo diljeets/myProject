@@ -5,16 +5,19 @@
  */
 package com.diljeet.myProject.interfaces;
 
-import com.diljeet.myProject.utils.CardDetails;
+import com.diljeet.myProject.utils.FetchBinDetails;
+import com.diljeet.myProject.utils.FetchPaymentOptions;
+import com.diljeet.myProject.utils.FetchPaytmBalance;
 import com.diljeet.myProject.utils.InitiateTransaction;
 import com.diljeet.myProject.utils.PayChannelOptionsNetBanking;
-import com.diljeet.myProject.utils.PayChannelOptionsPaytmBalance;
-import com.diljeet.myProject.utils.PaymentOptions;
 import com.diljeet.myProject.utils.PaymentRequestDetails;
-import com.diljeet.myProject.utils.SavedInstruments;
+import com.diljeet.myProject.utils.SendOtp;
+import com.diljeet.myProject.utils.UpdateTransaction;
+import com.diljeet.myProject.utils.ValidateOtp;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -39,51 +42,63 @@ public interface CheckoutService {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response initiateTransaction(InitiateTransaction initiateTransaction);
 
-    @GET
-    @Path("fetchPaymentOptions")
-    @Produces({MediaType.APPLICATION_JSON})
-    public List<PaymentOptions> fetchPaymentOptions();
-
-    @GET
-    @Path("fetchPayChannelOptionsPaytmBalance")
-    @Produces({MediaType.APPLICATION_JSON})
-    public List<PayChannelOptionsPaytmBalance> fetchPayChannelOptionsPaytmBalance();
-
-    @GET
-    @Path("fetchSavedInstruments")
-    @Produces({MediaType.APPLICATION_JSON})
-    public List<SavedInstruments> fetchSavedInstruments();
-
-    @GET
-    @Path("fetchPayChannelOptionsNetBanking")
-    @Produces({MediaType.APPLICATION_JSON})
-    public List<PayChannelOptionsNetBanking> fetchPayChannelOptionsNetBanking();
+//    @GET
+//    @Path("fetchPaymentOptions")
+//    @Produces({MediaType.APPLICATION_JSON})
+//    public List<PaymentOptions> fetchPaymentOptions();
+    @POST
+    @Path("paymentOptions/fetch")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response fetchPaymentOptions(FetchPaymentOptions fetchPaymentOptions);
 
     @POST
-    @Path("sendOTP")
-//    @Consumes(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.TEXT_PLAIN)
-    public Response sendOTP(String paytmMobile);
+    @Path("transaction/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateTransaction(UpdateTransaction updateTransaction);
+
+//    @GET
+//    @Path("fetchPayChannelOptionsPaytmBalance")
+//    @Produces({MediaType.APPLICATION_JSON})
+//    public List<PayChannelOptionsPaytmBalance> fetchPayChannelOptionsPaytmBalance();
+//
+//    @GET
+//    @Path("fetchSavedInstruments")
+//    @Produces({MediaType.APPLICATION_JSON})
+//    public List<SavedInstruments> fetchSavedInstruments();
+//
+//    @GET
+//    @Path("fetchPayChannelOptionsNetBanking")
+//    @Produces({MediaType.APPLICATION_JSON})
+//    public List<PayChannelOptionsNetBanking> fetchPayChannelOptionsNetBanking();
+    @POST
+    @Path("otp/send")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response sendOTP(SendOtp sendOtp);
 
     @POST
-    @Path("validateOTP/fetchBalance")
-//    @Consumes(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.TEXT_PLAIN)
-    public Response validateOtpAndFetchPaytmBalance(String otp);
+    @Path("otp/validate")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response validateOtp(ValidateOtp validateOtp);
+
+    @POST
+    @Path("paymentOptions/balance/fetch")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response fetchPaytmBalance(FetchPaytmBalance fetchPaytmBalance);
 
     @POST
     @Path("card/fetchBinDetails")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response fetchBinDetails(String firstSixCardDigits);
+    public Response fetchBinDetails(FetchBinDetails fetchBinDetails);
 
+//    @GET
+//    @Path("fetchCardDetails")
+//    @Produces({MediaType.APPLICATION_JSON})
+//    public List<CardDetails> fetchCardDetails();
     @GET
-    @Path("fetchCardDetails")
-    @Produces({MediaType.APPLICATION_JSON})
-    public List<CardDetails> fetchCardDetails();
-
-    @GET
-    @Path("fetchOtherNetBankingPaymentChannels")
-    public void fetchOtherNetBankingPaymentChannels();
+    @Path("netBankingPaymentChannels/other/fetch")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<PayChannelOptionsNetBanking> fetchOtherNetBankingPaymentChannels(@HeaderParam("orderId") String orderId,
+            @HeaderParam("transactionToken") String transactionToken);
 
     @POST
     @Path("processTransaction")
